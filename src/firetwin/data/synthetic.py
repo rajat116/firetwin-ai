@@ -90,7 +90,6 @@ def generate_synthetic_terrain(
 def generate_synthetic_fuels(
     grid_size: tuple[int, int],
     resolution_m: float,
-    fuel_continuity: float = 0.9,
     seed: int | None = None,
 ) -> FuelData:
     """Generate synthetic fuel distribution.
@@ -98,7 +97,6 @@ def generate_synthetic_fuels(
     Args:
         grid_size: (height, width) in cells
         resolution_m: Cell size in meters
-        fuel_continuity: How connected fuels are (0-1)
         seed: Random seed
 
     Returns:

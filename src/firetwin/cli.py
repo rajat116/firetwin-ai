@@ -137,6 +137,7 @@ def doctor():
 def generate_synthetic(case_id, grid_size, resolution, hours, output, seed):
     """Generate a synthetic fire case for testing and validation."""
     from pathlib import Path
+
     from firetwin.data.synthetic import generate_synthetic_fire_case
 
     console.print(f"\n[bold cyan]🔥 Generating Synthetic Fire Case: {case_id}[/bold cyan]\n")
@@ -173,9 +174,11 @@ def generate_synthetic(case_id, grid_size, resolution, hours, output, seed):
 def run_baselines(case_path, horizons, output_dir):
     """Run baseline forecast models on a fire case."""
     from pathlib import Path
+
     import numpy as np
     from rich.progress import track
-    from firetwin.models import PersistenceBaseline, RadialBaseline, EllipticalBaseline
+
+    from firetwin.models import EllipticalBaseline, PersistenceBaseline, RadialBaseline
     from firetwin.schemas import FireCase
 
     console.print("\n[bold cyan]🔥 Running Baseline Forecasts[/bold cyan]\n")
@@ -233,7 +236,9 @@ def run_baselines(case_path, horizons, output_dir):
 def evaluate(case_path, forecasts_dir, horizons):
     """Evaluate forecast accuracy against ground truth."""
     from pathlib import Path
+
     import numpy as np
+
     from firetwin.evaluation import evaluate_forecast
     from firetwin.schemas import FireCase
 
@@ -297,7 +302,7 @@ def evaluate(case_path, forecasts_dir, horizons):
 
     console.print()
     console.print(results_table)
-    console.print(f"\n[green]✓ Evaluation complete[/green]\n")
+    console.print("\n[green]✓ Evaluation complete[/green]\n")
 
 
 if __name__ == "__main__":

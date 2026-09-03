@@ -1,14 +1,14 @@
 """Core data schemas for geospatial fire modeling."""
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Annotated
 
 import numpy as np
 from pydantic import BaseModel, Field, field_validator
 
 
-class CoordinateSystem(str, Enum):
+class CoordinateSystem(StrEnum):
     """Supported coordinate reference systems."""
 
     WGS84 = "EPSG:4326"  # Lat/lon
@@ -18,7 +18,7 @@ class CoordinateSystem(str, Enum):
     ALBERS_CONUS = "ESRI:102003"  # Equal-area CONUS
 
 
-class FuelModel(str, Enum):
+class FuelModel(StrEnum):
     """Standard fuel model classifications (FBFM13/FBFM40 compatible)."""
 
     GRASS = "grass"
@@ -90,11 +90,10 @@ class TerrainData(BaseModel):
         """Ensure all grids have same shape and 2D."""
         if v.ndim != 2:
             raise ValueError(f"{info.field_name} must be 2D array")
-        if "elevation_m" in info.data:
-            if v.shape != info.data["elevation_m"].shape:
-                raise ValueError(
-                    f"{info.field_name} shape {v.shape} must match elevation shape {info.data['elevation_m'].shape}"
-                )
+        if "elevation_m" in info.data and v.shape != info.data["elevation_m"].shape:
+            raise ValueError(
+                f"{info.field_name} shape {v.shape} must match elevation shape {info.data['elevation_m'].shape}"
+            )
         return v
 
 
@@ -123,9 +122,8 @@ class FuelData(BaseModel):
         """Ensure consistent shapes."""
         if v.ndim != 2:
             raise ValueError(f"{info.field_name} must be 2D array")
-        if "fuel_model" in info.data:
-            if v.shape != info.data["fuel_model"].shape:
-                raise ValueError(f"All fuel grids must have same shape")
+        if "fuel_model" in info.data and v.shape != info.data["fuel_model"].shape:
+            raise ValueError("All fuel grids must have same shape")
         return v
 
 
@@ -169,9 +167,8 @@ class FireState(BaseModel):
             raise ValueError(f"{info.field_name} must be 2D array")
         if not np.isin(v, [0, 1]).all():
             raise ValueError(f"{info.field_name} must be binary (0 or 1)")
-        if "burned" in info.data:
-            if v.shape != info.data["burned"].shape:
-                raise ValueError("All fire state grids must have same shape")
+        if "burned" in info.data and v.shape != info.data["burned"].shape:
+            raise ValueError("All fire state grids must have same shape")
         return v
 
     @property

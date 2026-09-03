@@ -1,7 +1,6 @@
 """Tests for synthetic data generation."""
 
 import numpy as np
-import pytest
 
 from firetwin.data.synthetic import generate_synthetic_fire_case
 

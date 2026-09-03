@@ -1,6 +1,5 @@
 """Storage and serialization for fire cases using Xarray and Zarr."""
 
-import json
 from pathlib import Path
 
 import numpy as np
@@ -117,7 +116,6 @@ def xarray_to_fire_case(ds: xr.Dataset) -> FireCase:
     from firetwin.schemas import (
         BoundingBox,
         CoordinateSystem,
-        FireCaseMetadata,
         FuelData,
         TerrainData,
         WeatherData,

@@ -95,6 +95,6 @@ def test_all_baselines_comparable():
         assert len(forecasts) == len(horizons), f"{name} failed"
 
         # All forecasts should have correct shape
-        for horizon, forecast in forecasts.items():
+        for _horizon, forecast in forecasts.items():
             assert forecast.burned.shape == case.grid_shape, f"{name} shape mismatch"
             assert forecast.burned.dtype == np.int32, f"{name} dtype mismatch"
