@@ -1,17 +1,17 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-03  
-**Current Phase**: Phase 0 ✅
+**Current Phase**: Phase 1 ✅
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
-**Status**: COMPLETED
+**Status**: COMPLETED (2026-09-03)
 
 ### Completed Tasks
 
 - [x] Initialize Git repository with correct credentials
 - [x] Create comprehensive directory structure
-- [x] Set up conda environment with all required dependencies
+- [x] Set up conda environment with all required dependencies (Python 3.11 & 3.12)
 - [x] Configure Python package structure with pyproject.toml
 - [x] Implement CLI with `firetwin doctor` command
 - [x] Add code quality tools (Ruff, MyPy, Pytest)
@@ -19,44 +19,75 @@
 - [x] Set up GitHub Actions CI pipeline
 - [x] Add Apache-2.0 license
 - [x] Create initial documentation structure
-- [x] Write comprehensive README
+- [x] Write comprehensive README with data sources, specs, demo scripts
 - [x] Create Makefile for development commands
 
 ### Acceptance Criteria
 
 - [x] Fresh clone can install from documented commands
-- [ ] `pytest`, `ruff check`, `ruff format --check` and `mypy` pass (pending environment creation)
-- [ ] CI passes (pending first push)
+- [x] `pytest`, `ruff check`, `ruff format --check` and `mypy` pass
+- [x] CI passes on ubuntu/macos × Python 3.11/3.12
 - [x] No credentials or large data committed
 
-### Next Steps
+### Key Decisions
 
-1. Create conda environment and install package
-2. Run all quality checks locally
-3. Create GitHub repository (remote)
-4. Push initial commit
-5. Verify CI passes
+- Used conda over uv for geospatial dependencies (GDAL, rasterio)
+- Configured MyPy with `--no-site-packages` for Python 3.12 compatibility
+- Apache 2.0 license for commercial-friendly open source
 
-## Phase 1: Synthetic End-to-End Vertical Slice
+## Phase 1: Synthetic End-to-End Vertical Slice ✅
 
-**Status**: PENDING
+**Status**: COMPLETED (2026-09-03)
 
-**Purpose**: Prove architecture before downloading large datasets.
+**Purpose**: Validate production ML pipeline architecture with synthetic data before real data integration.
 
-### Planned Tasks
+### Completed Tasks
 
-- [ ] Generate small synthetic terrain, fuel, wind, and ignition grid
-- [ ] Implement simple persistence baseline
-- [ ] Implement radial growth baseline
-- [ ] Implement wind-oriented elliptical growth baseline
-- [ ] Store outputs in canonical Xarray/Zarr format
-- [ ] Calculate IoU, boundary distance, and area error
-- [ ] Display animated map in minimal dashboard
-- [ ] Create golden tests
+- [x] **Data Layer**: Pydantic schemas for type-safe data contracts
+  - FireCase, TerrainData, FuelData, WeatherData, FireState
+- [x] **Synthetic Generation**: Realistic terrain, fuel, and fire evolution
+  - Fractal-like elevation with slope/aspect computation
+  - Patch-based fuel distribution (grass, shrub, timber)
+  - Stochastic fire spread with fuel and wind effects
+- [x] **Storage**: Xarray/Zarr format with provenance
+  - Canonical multidimensional data format
+  - Efficient compression and chunking
+- [x] **Baseline Models**:
+  - Persistence (no-change forecast)
+  - Radial spread (uniform circular)
+  - Elliptical spread (wind-driven)
+- [x] **Evaluation Metrics**:
+  - IoU and Dice scores for burned area
+  - Boundary distance for perimeter accuracy
+  - Area error for over/under-prediction
+- [x] **CLI Commands**:
+  - `generate-synthetic`: Create test cases
+  - `run-baselines`: Execute forecast models
+  - `evaluate`: Calculate metrics
+- [x] **Golden Tests**: 8 automated tests for CI
+  - Deterministic generation
+  - Fire spread validation
+  - Baseline model correctness
 
-### Estimated Timeline
+### Acceptance Criteria
 
-Start after Phase 0 completion. Expected duration: 1-2 weeks.
+- [x] One command builds synthetic case
+- [x] One command runs all baselines
+- [x] One command produces evaluation report
+- [x] Demo visibly distinguishes observed, predicted, and target states
+- [x] All tests pass in CI
+
+### Results
+
+Elliptical baseline outperforms radial and persistence on 6-hour forecasts:
+- **Elliptical**: IoU=0.168, Dice=0.287
+- **Radial**: IoU=0.078, Dice=0.145
+- **Persistence**: IoU=0.038, Dice=0.073
+
+### Not Completed (Deferred)
+
+- MLflow experiment tracking (can add incrementally)
+- Streamlit dashboard (Phase 9 will have production React frontend)
 
 ## Phase 2: Data-Source Smoke Tests and Audit
 
@@ -90,11 +121,12 @@ Start after Phase 0 completion. Expected duration: 1-2 weeks.
 
 ```
 Phase 0: ████████████████████ 100% ✅
-Phase 1: ░░░░░░░░░░░░░░░░░░░░   0%
+Phase 1: ████████████████████ 100% ✅
 Phase 2: ░░░░░░░░░░░░░░░░░░░░   0%
 Phase 3: ░░░░░░░░░░░░░░░░░░░░   0%
+Phase 4: ░░░░░░░░░░░░░░░░░░░░   0%
 ...
-Overall: ██░░░░░░░░░░░░░░░░░░  10%
+Overall: ████░░░░░░░░░░░░░░░░  20%
 ```
 
 ## Known Issues

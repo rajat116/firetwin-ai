@@ -32,7 +32,11 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 0 - Repository and Engineering Foundation ✅
+**Current Phase**: Phase 1 - Synthetic End-to-End Vertical Slice ✅
+
+- ✅ **Phase 0**: Repository and engineering foundation
+- ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
+- 🚧 **Phase 2**: Real data source integration (FIRMS, LANDFIRE, ERA5)
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -67,6 +71,23 @@ pip install -e .
 ```bash
 firetwin doctor
 ```
+
+### Try Phase 1: Synthetic Demo
+
+Generate a synthetic fire case and run baseline forecasts:
+
+```bash
+# Generate synthetic fire evolution (50x50 grid, 12 hours)
+firetwin generate-synthetic --case-id demo_001 --grid-size 50 --hours 12 --seed 42
+
+# Run baseline forecast models
+firetwin run-baselines data/processed/demo_001.zarr --horizons "3,6,12"
+
+# Evaluate forecast accuracy
+firetwin evaluate data/processed/demo_001.zarr data/forecasts/demo_001 --horizons "3,6,12"
+```
+
+This validates the complete ML pipeline with synthetic data before real data integration.
 
 ### Configuration
 
