@@ -5,8 +5,8 @@ channels:
   - defaults
 
 dependencies:
-  # Python version
-  - python=3.11
+  # Python version (3.11 or 3.12)
+  - python>=3.11,<3.13
 
   # Core scientific computing
   - numpy>=2.0.0
