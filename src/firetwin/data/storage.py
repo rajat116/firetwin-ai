@@ -28,9 +28,7 @@ def fire_case_to_xarray(case: FireCase) -> xr.Dataset:
     times = [case.initial_state.timestamp] + [s.timestamp for s in case.target_states]
 
     # Build time-varying burned/active masks
-    burned_stack = np.stack(
-        [case.initial_state.burned] + [s.burned for s in case.target_states]
-    )
+    burned_stack = np.stack([case.initial_state.burned] + [s.burned for s in case.target_states])
     active_stack = np.stack(
         [case.initial_state.active_front] + [s.active_front for s in case.target_states]
     )

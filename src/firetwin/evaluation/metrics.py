@@ -78,9 +78,7 @@ def boundary_distance(
     }
 
 
-def area_error(
-    predicted: np.ndarray, target: np.ndarray, resolution_m: float
-) -> dict[str, float]:
+def area_error(predicted: np.ndarray, target: np.ndarray, resolution_m: float) -> dict[str, float]:
     """Calculate area-based errors.
 
     Args:

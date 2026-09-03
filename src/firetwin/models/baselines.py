@@ -13,9 +13,7 @@ class BaselineForecastModel(ABC):
     """Abstract base class for baseline forecast models."""
 
     @abstractmethod
-    def forecast(
-        self, case: FireCase, forecast_hours: list[float]
-    ) -> dict[float, FireState]:
+    def forecast(self, case: FireCase, forecast_hours: list[float]) -> dict[float, FireState]:
         """Generate forecasts at specified hours from initial state.
 
         Args:
@@ -34,9 +32,7 @@ class PersistenceBaseline(BaselineForecastModel):
     This is the simplest baseline - assumes no change.
     """
 
-    def forecast(
-        self, case: FireCase, forecast_hours: list[float]
-    ) -> dict[float, FireState]:
+    def forecast(self, case: FireCase, forecast_hours: list[float]) -> dict[float, FireState]:
         """Generate persistence forecasts."""
         forecasts = {}
 
@@ -68,9 +64,7 @@ class RadialBaseline(BaselineForecastModel):
         """Initialize radial baseline."""
         self.spread_rate_m_h = spread_rate_m_h
 
-    def forecast(
-        self, case: FireCase, forecast_hours: list[float]
-    ) -> dict[float, FireState]:
+    def forecast(self, case: FireCase, forecast_hours: list[float]) -> dict[float, FireState]:
         """Generate radial spread forecasts."""
         forecasts = {}
         resolution_m = case.resolution_m
@@ -135,9 +129,7 @@ class EllipticalBaseline(BaselineForecastModel):
         self.wind_factor = wind_factor
         self.lateral_factor = lateral_factor
 
-    def forecast(
-        self, case: FireCase, forecast_hours: list[float]
-    ) -> dict[float, FireState]:
+    def forecast(self, case: FireCase, forecast_hours: list[float]) -> dict[float, FireState]:
         """Generate elliptical spread forecasts."""
         forecasts = {}
         resolution_m = case.resolution_m
@@ -151,9 +143,7 @@ class EllipticalBaseline(BaselineForecastModel):
 
         for hours in forecast_hours:
             # Calculate spread distances
-            head_fire_rate = (
-                self.base_spread_rate_m_h * self.wind_factor * wind_multiplier
-            )
+            head_fire_rate = self.base_spread_rate_m_h * self.wind_factor * wind_multiplier
             flank_fire_rate = self.base_spread_rate_m_h * self.lateral_factor
             back_fire_rate = self.base_spread_rate_m_h * 0.3  # Very slow backing
 
@@ -172,9 +162,7 @@ class EllipticalBaseline(BaselineForecastModel):
 
             # Create kernel grid
             max_radius = max(a, b, c)
-            y_grid, x_grid = np.ogrid[
-                -max_radius : max_radius + 1, -max_radius : max_radius + 1
-            ]
+            y_grid, x_grid = np.ogrid[-max_radius : max_radius + 1, -max_radius : max_radius + 1]
 
             # Rotate grid to align with wind
             # Wind direction is "from" direction, fire spreads "to" opposite

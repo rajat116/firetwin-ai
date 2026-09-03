@@ -132,7 +132,9 @@ def doctor():
 @click.option("--grid-size", default=100, help="Grid dimension (creates NxN grid)")
 @click.option("--resolution", default=30.0, help="Grid resolution in meters")
 @click.option("--hours", default=24, help="Hours of fire evolution to generate")
-@click.option("--output", type=click.Path(), help="Output path (defaults to data/processed/CASE_ID.zarr)")
+@click.option(
+    "--output", type=click.Path(), help="Output path (defaults to data/processed/CASE_ID.zarr)"
+)
 @click.option("--seed", type=int, help="Random seed for reproducibility")
 def generate_synthetic(case_id, grid_size, resolution, hours, output, seed):
     """Generate a synthetic fire case for testing and validation."""
@@ -164,12 +166,16 @@ def generate_synthetic(case_id, grid_size, resolution, hours, output, seed):
 
     # Summary
     console.print(f"\n[green]✓ Generated {len(case.target_states)} time steps[/green]")
-    console.print(f"[green]  Grid: {grid_size}x{grid_size} @ {resolution}m = {(grid_size * resolution / 1000):.1f}km²[/green]\n")
+    console.print(
+        f"[green]  Grid: {grid_size}x{grid_size} @ {resolution}m = {(grid_size * resolution / 1000):.1f}km²[/green]\n"
+    )
 
 
 @main.command()
 @click.argument("case_path", type=click.Path(exists=True))
-@click.option("--horizons", default="3,6,12,24", help="Forecast horizons in hours (comma-separated)")
+@click.option(
+    "--horizons", default="3,6,12,24", help="Forecast horizons in hours (comma-separated)"
+)
 @click.option("--output-dir", type=click.Path(), help="Output directory for forecasts")
 def run_baselines(case_path, horizons, output_dir):
     """Run baseline forecast models on a fire case."""
@@ -209,7 +215,9 @@ def run_baselines(case_path, horizons, output_dir):
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Run forecasts
-    for model_name, model in track(models.items(), description="[green]Running models...", total=len(models)):
+    for model_name, model in track(
+        models.items(), description="[green]Running models...", total=len(models)
+    ):
         forecasts = model.forecast(case, forecast_hours)
 
         # Save forecasts
@@ -224,7 +232,9 @@ def run_baselines(case_path, horizons, output_dir):
                 active_front=forecast_state.active_front,
             )
 
-        console.print(f"  [green]✓[/green] {model_name}: {len(forecasts)} forecasts → {model_dir.name}/")
+        console.print(
+            f"  [green]✓[/green] {model_name}: {len(forecasts)} forecasts → {model_dir.name}/"
+        )
 
     console.print(f"\n[green]✓ All baselines complete[/green] → {output_dir}\n")
 
@@ -232,7 +242,9 @@ def run_baselines(case_path, horizons, output_dir):
 @main.command()
 @click.argument("case_path", type=click.Path(exists=True))
 @click.argument("forecasts_dir", type=click.Path(exists=True))
-@click.option("--horizons", default="3,6,12,24", help="Forecast horizons to evaluate (comma-separated)")
+@click.option(
+    "--horizons", default="3,6,12,24", help="Forecast horizons to evaluate (comma-separated)"
+)
 def evaluate(case_path, forecasts_dir, horizons):
     """Evaluate forecast accuracy against ground truth."""
     from pathlib import Path

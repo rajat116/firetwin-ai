@@ -18,9 +18,7 @@ class FireCaseMetadata(BaseModel):
     creation_timestamp: datetime = Field(
         default_factory=datetime.utcnow, description="When this case was created"
     )
-    source: str = Field(
-        default="unknown", description="Data source (synthetic, FIRMS, etc.)"
-    )
+    source: str = Field(default="unknown", description="Data source (synthetic, FIRMS, etc.)")
     tags: list[str] = Field(default_factory=list, description="Searchable tags")
 
 

@@ -67,12 +67,8 @@ class BoundingBox(BaseModel):
 class TerrainData(BaseModel):
     """Digital elevation model and derived terrain attributes."""
 
-    elevation_m: Annotated[
-        np.ndarray, Field(..., description="Elevation in meters (H x W)")
-    ]
-    slope_degrees: Annotated[
-        np.ndarray, Field(..., description="Slope angle in degrees (H x W)")
-    ]
+    elevation_m: Annotated[np.ndarray, Field(..., description="Elevation in meters (H x W)")]
+    slope_degrees: Annotated[np.ndarray, Field(..., description="Slope angle in degrees (H x W)")]
     aspect_degrees: Annotated[
         np.ndarray, Field(..., description="Aspect in degrees from north (H x W)")
     ]
@@ -100,12 +96,8 @@ class TerrainData(BaseModel):
 class FuelData(BaseModel):
     """Fuel model and moisture content."""
 
-    fuel_model: Annotated[
-        np.ndarray, Field(..., description="Fuel type classification (H x W)")
-    ]
-    fuel_load_kg_m2: Annotated[
-        np.ndarray, Field(..., description="Fuel load in kg/m² (H x W)")
-    ]
+    fuel_model: Annotated[np.ndarray, Field(..., description="Fuel type classification (H x W)")]
+    fuel_load_kg_m2: Annotated[np.ndarray, Field(..., description="Fuel load in kg/m² (H x W)")]
     fuel_moisture_percent: Annotated[
         np.ndarray, Field(..., description="Fuel moisture content percentage (H x W)")
     ]
@@ -144,9 +136,7 @@ class WeatherData(BaseModel):
 class FireState(BaseModel):
     """Fire perimeter and active burning state at a specific time."""
 
-    burned: Annotated[
-        np.ndarray, Field(..., description="Binary burned/not-burned mask (H x W)")
-    ]
+    burned: Annotated[np.ndarray, Field(..., description="Binary burned/not-burned mask (H x W)")]
     active_front: Annotated[
         np.ndarray, Field(..., description="Binary active burning front (H x W)")
     ]
