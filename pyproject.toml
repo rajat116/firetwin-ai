@@ -83,6 +83,10 @@ warn_no_return = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
+module = "numpy"
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
 module = [
     "rasterio.*",
     "geopandas.*",

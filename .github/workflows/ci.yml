@@ -45,7 +45,7 @@ jobs:
       - name: Run mypy
         shell: bash -l {0}
         run: |
-          mypy src --ignore-missing-imports
+          mypy src --ignore-missing-imports --no-site-packages
 
       - name: Run pytest
         shell: bash -l {0}

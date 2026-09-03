@@ -113,6 +113,58 @@ Use **Apache License 2.0**.
 
 ---
 
+## Decision 4: MyPy Configuration - Skip Site Packages
+
+**Date**: 2026-09-03  
+**Phase**: 0 - Repository Setup
+
+### Context
+
+MyPy type checking fails on Python 3.12 with the following error:
+```
+/usr/share/miniconda/envs/firetwin/lib/python3.12/site-packages/numpy/__init__.pyi:737: error: Type statement is only supported in Python 3.12 and greater  [syntax]
+```
+
+This occurs because:
+- NumPy 2.5.2 type stubs use Python 3.12+ `type` statement syntax
+- MyPy 2.3.1 (latest available) has incomplete support for this new syntax
+- The parsing error happens before mypy configuration can skip the module
+
+### Decision
+
+Use `--no-site-packages` flag in all mypy invocations to skip type checking of installed packages.
+
+### Rationale
+
+1. **Still checks our code**: Our source code is fully type-checked
+2. **Avoids third-party stub issues**: Skips all site-packages, avoiding compatibility problems
+3. **CI compatibility**: Works across Python 3.11 and 3.12
+4. **Temporary workaround**: Can be removed when mypy/numpy compatibility improves
+5. **Precedent**: Common practice for projects with complex dependencies
+
+### Alternatives Considered
+
+**Downgrade NumPy**:
+- Lose latest features, bug fixes, and Python 3.12 optimizations
+- Not future-proof
+
+**Skip MyPy on Python 3.12**:
+- Would miss type errors in our code
+- Defeats purpose of type checking
+
+**Disable MyPy entirely**:
+- Lose valuable type safety
+- Against best practices
+
+### Consequences
+
+- We don't get type checking against third-party API signatures
+- Our own code still gets full type checking
+- Must rely on runtime checks and tests for third-party API usage
+- Can re-enable site-packages checking when tooling matures
+
+---
+
 ## Future Decisions
 
 Document all future material decisions here, including:
