@@ -174,10 +174,11 @@ def xarray_to_fire_case(ds: xr.Dataset) -> FireCase:
 
     # Convert numpy datetime64 to Python datetime
     import pandas as pd
+    from typing import cast
 
     def to_datetime(np_datetime: np.datetime64) -> datetime:
         """Convert numpy datetime64 to Python datetime."""
-        return pd.Timestamp(np_datetime).to_pydatetime()
+        return cast(datetime, pd.Timestamp(np_datetime).to_pydatetime())
 
     initial_state = FireState(
         burned=burned_stack[0].astype(np.int32),

@@ -41,7 +41,7 @@ class BoundingBox(BaseModel):
 
     @field_validator("max_x")
     @classmethod
-    def validate_x_bounds(cls, v: float, info) -> float:  # type: ignore[no-untyped-def]
+    def validate_x_bounds(cls, v: float, info) -> float:
         """Ensure max_x > min_x."""
         if "min_x" in info.data and v <= info.data["min_x"]:
             raise ValueError("max_x must be greater than min_x")
@@ -49,7 +49,7 @@ class BoundingBox(BaseModel):
 
     @field_validator("max_y")
     @classmethod
-    def validate_y_bounds(cls, v: float, info) -> float:  # type: ignore[no-untyped-def]
+    def validate_y_bounds(cls, v: float, info) -> float:
         """Ensure max_y > min_y."""
         if "min_y" in info.data and v <= info.data["min_y"]:
             raise ValueError("max_y must be greater than min_y")
@@ -75,14 +75,14 @@ class TerrainData(BaseModel):
     resolution_m: Annotated[float, Field(..., gt=0, description="Grid resolution in meters")]
     bbox: BoundingBox
 
-    class Config:  # type: ignore[override]
+    class Config:
         """Pydantic config for numpy arrays."""
 
         arbitrary_types_allowed = True
 
     @field_validator("elevation_m", "slope_degrees", "aspect_degrees")
     @classmethod
-    def validate_grid_shape(cls, v: np.ndarray, info) -> np.ndarray:  # type: ignore[no-untyped-def]
+    def validate_grid_shape(cls, v: np.ndarray, info) -> np.ndarray:
         """Ensure all grids have same shape and 2D."""
         if v.ndim != 2:
             raise ValueError(f"{info.field_name} must be 2D array")
@@ -103,14 +103,14 @@ class FuelData(BaseModel):
     ]
     resolution_m: Annotated[float, Field(..., gt=0)]
 
-    class Config:  # type: ignore[override]
+    class Config:
         """Pydantic config for numpy arrays."""
 
         arbitrary_types_allowed = True
 
     @field_validator("fuel_model", "fuel_load_kg_m2", "fuel_moisture_percent")
     @classmethod
-    def validate_grid_shape(cls, v: np.ndarray, info) -> np.ndarray:  # type: ignore[no-untyped-def]
+    def validate_grid_shape(cls, v: np.ndarray, info) -> np.ndarray:
         """Ensure consistent shapes."""
         if v.ndim != 2:
             raise ValueError(f"{info.field_name} must be 2D array")
@@ -144,14 +144,14 @@ class FireState(BaseModel):
     resolution_m: Annotated[float, Field(..., gt=0)]
     bbox: BoundingBox
 
-    class Config:  # type: ignore[override]
+    class Config:
         """Pydantic config for numpy arrays."""
 
         arbitrary_types_allowed = True
 
     @field_validator("burned", "active_front")
     @classmethod
-    def validate_binary_mask(cls, v: np.ndarray, info) -> np.ndarray:  # type: ignore[no-untyped-def]
+    def validate_binary_mask(cls, v: np.ndarray, info) -> np.ndarray:
         """Ensure masks are 2D binary arrays."""
         if v.ndim != 2:
             raise ValueError(f"{info.field_name} must be 2D array")

@@ -34,7 +34,7 @@ class FireCase(BaseModel):
         default_factory=list, description="Ground truth states at future times"
     )
 
-    class Config:  # type: ignore[override]
+    class Config:
         """Pydantic config."""
 
         arbitrary_types_allowed = True
@@ -42,7 +42,8 @@ class FireCase(BaseModel):
     @property
     def grid_shape(self) -> tuple[int, int]:
         """Get (height, width) of the modeling grid."""
-        return self.terrain.elevation_m.shape
+        shape = self.terrain.elevation_m.shape
+        return (int(shape[0]), int(shape[1]))
 
     @property
     def resolution_m(self) -> float:
