@@ -173,8 +173,9 @@ def xarray_to_fire_case(ds: xr.Dataset) -> FireCase:
     active_stack = ds["active_front"].values
 
     # Convert numpy datetime64 to Python datetime
-    import pandas as pd
     from typing import cast
+
+    import pandas as pd
 
     def to_datetime(np_datetime: np.datetime64) -> datetime:
         """Convert numpy datetime64 to Python datetime."""
