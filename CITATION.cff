@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use FireTwin in your research, please cite it as below."
+type: software
+title: "FireTwin: A Research-Grade Wildfire Digital Twin"
+abstract: "FireTwin is a research-grade wildfire digital twin that combines satellite observations, weather, terrain, and vegetation with physics-guided machine learning to produce probabilistic fire-spread forecasts and evaluate simulated containment strategies."
+authors:
+  - family-names: "Gupta"
+    given-names: "Rajat"
+    email: "rajatgupta116@gmail.com"
+    orcid: "https://orcid.org/0000-0000-0000-0000"  # Update with real ORCID if available
+repository-code: "https://github.com/rajat116/firetwin-ai"
+url: "https://github.com/rajat116/firetwin-ai"
+license: Apache-2.0
+keywords:
+  - wildfire
+  - digital-twin
+  - machine-learning
+  - geospatial
+  - forecasting
+  - physics-guided-ml
+  - uncertainty-quantification
+  - data-assimilation
+version: 0.1.0
+date-released: 2026-09-03

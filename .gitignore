@@ -1,0 +1,107 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# Conda
+.conda/
+*.conda
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*~
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Ruff
+.ruff_cache/
+
+# Environment variables
+.env
+.env.local
+
+# Data directories (never commit large data)
+data/raw/*
+data/interim/*
+data/processed/*
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+!data/manifests/
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# DVC
+.dvc/cache/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Secrets and credentials
+*.p12
+*.pem
+*.key
+credentials.json
+secrets.yaml
+
+# Large geospatial files
+*.root
+*.h5
+*.hdf5
+*.zarr
+*.nc
+*.tif
+*.tiff
+*.geotiff
+*.shp
+*.shx
+*.dbf
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+logs/
