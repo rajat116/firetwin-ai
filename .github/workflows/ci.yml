@@ -27,7 +27,6 @@ jobs:
           environment-file: environment.yml
           activate-environment: firetwin
           use-mamba: true
-          cache-environment: true
 
       - name: Install package in development mode
         shell: bash -l {0}
