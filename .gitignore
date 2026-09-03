@@ -105,3 +105,4 @@ secrets.yaml
 *.bak
 *.log
 logs/
+data/forecasts/**
