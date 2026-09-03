@@ -1,6 +1,5 @@
 """Command-line interface for FireTwin."""
 
-
 import click
 from rich.console import Console
 from rich.panel import Panel
