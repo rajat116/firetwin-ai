@@ -32,11 +32,12 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 1 - Synthetic End-to-End Vertical Slice ✅
+**Current Phase**: Phase 2 Complete - Real Data Infrastructure ✅
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
-- 🚧 **Phase 2**: Real data source integration (FIRMS, LANDFIRE, ERA5)
+- ✅ **Phase 2**: Real data source integration (all 6 clients + validation + inventory)
+- 🚧 **Phase 3**: Historical case builder (next)
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -72,7 +73,9 @@ pip install -e .
 firetwin doctor
 ```
 
-### Try Phase 1: Synthetic Demo
+### Try the Demo
+
+**Phase 1: Synthetic Fire Evolution**
 
 Generate a synthetic fire case and run baseline forecasts:
 
@@ -87,7 +90,24 @@ firetwin run-baselines data/processed/demo_001.zarr --horizons "3,6,12"
 firetwin evaluate data/processed/demo_001.zarr data/forecasts/demo_001 --horizons "3,6,12"
 ```
 
-This validates the complete ML pipeline with synthetic data before real data integration.
+**Phase 2: Real Data Access**
+
+All 6 data source clients are implemented and tested:
+
+```python
+from firetwin.data.clients import FIRMSClient, NIFCClient, MTBSClient
+from firetwin.data.clients import ERA5LandClient, LANDFIREClient, USGS3DEPClient
+
+# Example: Query FIRMS active fire detections
+firms = FIRMSClient(map_key="YOUR_KEY")
+detections = firms.get_area_detections(
+    bbox=(-121, 38, -120, 39),
+    start_date="2024-08-01",
+    days=7
+)
+```
+
+See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
 ### Configuration
 
@@ -177,8 +197,8 @@ FireTwin is designed to answer measurable questions:
 ## Roadmap
 
 - [x] **Phase 0**: Repository and engineering foundation
-- [ ] **Phase 1**: Synthetic end-to-end vertical slice
-- [ ] **Phase 2**: Data-source smoke tests and audit
+- [x] **Phase 1**: Synthetic end-to-end vertical slice
+- [x] **Phase 2**: Data-source clients, validation, inventory, and audit
 - [ ] **Phase 3**: Historical case builder
 - [ ] **Phase 4**: Real-data baselines
 - [ ] **Phase 5**: Simulation corpus and surrogate
@@ -193,6 +213,8 @@ FireTwin is designed to answer measurable questions:
 - [Project Status](docs/PROJECT_STATUS.md)
 - [Technical Decisions](docs/DECISIONS.md)
 - [Data Sources](docs/DATA_SOURCES.md)
+- [Data Validation](docs/DATA_VALIDATION.md)
+- [Data Availability Audit](reports/data_availability_audit.md)
 - [Product Specification](docs/PRODUCT_SPEC.md)
 - [UI/UX Specification](docs/UI_UX_SPEC.md)
 - [Demo Script](docs/DEMO_SCRIPT.md)
