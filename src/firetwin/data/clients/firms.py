@@ -13,7 +13,7 @@ Requires a free MAP_KEY from: https://firms.modaps.eosdis.nasa.gov/api/
 """
 
 from datetime import date, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 import geopandas as gpd
@@ -25,7 +25,7 @@ from shapely.geometry import Point
 from firetwin.settings import settings
 
 
-class FIRMSSatellite(str, Enum):
+class FIRMSSatellite(StrEnum):
     """Available FIRMS satellite instruments."""
 
     MODIS_C6_1 = "MODIS_NRT"  # MODIS Collection 6.1 NRT
