@@ -218,7 +218,9 @@ def test_get_country_detections_invalid_code(firms_client: FIRMSClient) -> None:
     """Test country detection with invalid country code raises error."""
     with pytest.raises(ValueError, match="country_code must be 2-letter"):
         firms_client.get_country_detections(
-            satellite=FIRMSSatellite.VIIRS_SNPP, country_code="USA", day_range=1  # Invalid (3 letters)
+            satellite=FIRMSSatellite.VIIRS_SNPP,
+            country_code="USA",
+            day_range=1,  # Invalid (3 letters)
         )
 
 

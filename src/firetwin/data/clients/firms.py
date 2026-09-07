@@ -45,7 +45,9 @@ class FIRMSDetection(BaseModel):
     acq_time: str = Field(..., description="Acquisition time (HHMM UTC)")
     satellite: str = Field(..., description="Satellite identifier")
     instrument: str = Field(..., description="Instrument name")
-    confidence: int | str = Field(..., description="Detection confidence (0-100 or low/nominal/high)")
+    confidence: int | str = Field(
+        ..., description="Detection confidence (0-100 or low/nominal/high)"
+    )
     version: str = Field(..., description="Collection version")
     bright_t31: float | None = Field(None, description="Brightness temperature I-4 channel (K)")
     frp: float = Field(..., description="Fire Radiative Power (MW)")
