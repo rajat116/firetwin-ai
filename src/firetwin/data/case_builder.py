@@ -18,6 +18,7 @@ from firetwin.data.clients import (
     NIFCClient,
     USGS3DEPClient,
 )
+from firetwin.data.clients.firms import FIRMSSatellite
 from firetwin.schemas.fire_case import FireCase
 
 
@@ -48,14 +49,14 @@ class CaseBuilderConfig:
 
 class FireCaseBuilder:
     """Build complete FireCase objects from real-world data sources.
-    
+
     This class orchestrates data acquisition from multiple sources,
     spatial/temporal alignment, and conversion to canonical format.
     """
 
     def __init__(self, config: CaseBuilderConfig) -> None:
         """Initialize fire case builder.
-        
+
         Args:
             config: Case builder configuration
         """
@@ -77,15 +78,13 @@ class FireCaseBuilder:
         self.era5_client = None
         if config.fetch_era5:
             if config.cds_api_url and config.cds_api_key:
-                self.era5_client = ERA5LandClient(
-                    url=config.cds_api_url, key=config.cds_api_key
-                )
+                self.era5_client = ERA5LandClient(url=config.cds_api_url, key=config.cds_api_key)
             else:
                 # Try using ~/.cdsapirc
-                try:
+                from contextlib import suppress
+
+                with suppress(Exception):
                     self.era5_client = ERA5LandClient()
-                except Exception:
-                    pass  # Skip if credentials not available
 
         self.landfire_client = None
         if config.fetch_landfire:
@@ -100,7 +99,7 @@ class FireCaseBuilder:
 
     def fetch_all_data(self) -> dict[str, Any]:
         """Fetch all available data for this fire case.
-        
+
         Returns:
             Dictionary with data from each source
         """
@@ -114,9 +113,14 @@ class FireCaseBuilder:
                 # FIRMS uses day_range parameter
                 days = (self.config.end_date - self.config.start_date).days + 1
 
+                # FIRMS get_area_detections signature: satellite, min_lon, min_lat, max_lon, max_lat
                 detections = self.firms_client.get_area_detections(
-                    bbox=(minx, miny, maxx, maxy),
-                    start_date=self.config.start_date.isoformat(),
+                    satellite=FIRMSSatellite.MODIS_C6_1,
+                    min_lon=minx,
+                    min_lat=miny,
+                    max_lon=maxx,
+                    max_lat=maxy,
+                    date=self.config.start_date,
                     day_range=min(days, 10),  # FIRMS limits to 10 days
                 )
 
@@ -130,9 +134,7 @@ class FireCaseBuilder:
         if self.nifc_client:
             print("  - Fetching NIFC perimeters...")
             try:
-                perimeters = self.nifc_client.get_fire_by_name(
-                    fire_name=self.config.fire_name
-                )
+                perimeters = self.nifc_client.get_fire_by_name(fire_name=self.config.fire_name)
                 self.raw_data["nifc"] = perimeters
                 print(f"    Found {len(perimeters)} perimeters")
             except Exception as e:
@@ -143,9 +145,7 @@ class FireCaseBuilder:
         if self.mtbs_client:
             print("  - Fetching MTBS perimeter...")
             try:
-                fires = self.mtbs_client.get_fire_by_name(
-                    fire_name=self.config.fire_name
-                )
+                fires = self.mtbs_client.get_fire_by_name(fire_name=self.config.fire_name)
                 self.raw_data["mtbs"] = fires
                 print(f"    Found {len(fires)} MTBS records")
             except Exception as e:
@@ -201,7 +201,7 @@ class FireCaseBuilder:
 
     def get_data_summary(self) -> dict[str, Any]:
         """Get summary of fetched data.
-        
+
         Returns:
             Dictionary with data availability and counts
         """
@@ -213,50 +213,54 @@ class FireCaseBuilder:
             "data_sources": {},
         }
 
+        data_sources: dict[str, Any] = {}
+
         if "firms" in self.raw_data:
-            summary["data_sources"]["FIRMS"] = {
+            data_sources["FIRMS"] = {
                 "available": len(self.raw_data["firms"]) > 0,
                 "count": len(self.raw_data["firms"]),
             }
 
         if "nifc" in self.raw_data:
-            summary["data_sources"]["NIFC"] = {
+            data_sources["NIFC"] = {
                 "available": len(self.raw_data["nifc"]) > 0,
                 "count": len(self.raw_data["nifc"]),
             }
 
         if "mtbs" in self.raw_data:
-            summary["data_sources"]["MTBS"] = {
+            data_sources["MTBS"] = {
                 "available": len(self.raw_data["mtbs"]) > 0,
                 "count": len(self.raw_data["mtbs"]),
             }
 
         if "era5" in self.raw_data:
-            summary["data_sources"]["ERA5"] = {
+            data_sources["ERA5"] = {
                 "available": self.raw_data["era5"] is not None,
                 "path": self.raw_data["era5"],
             }
 
         if "3dep" in self.raw_data:
-            summary["data_sources"]["3DEP"] = {
+            data_sources["3DEP"] = {
                 "available": len(self.raw_data["3dep"]) > 0,
                 "count": len(self.raw_data["3dep"]),
             }
 
         if "landfire" in self.raw_data:
-            summary["data_sources"]["LANDFIRE"] = {
+            data_sources["LANDFIRE"] = {
                 "available": self.raw_data["landfire"] is not None,
                 "note": "Manual download required",
             }
+
+        summary["data_sources"] = data_sources
 
         return summary
 
     def build_case(self) -> FireCase | None:
         """Build complete FireCase from fetched data.
-        
+
         Returns:
             FireCase object or None if insufficient data
-        
+
         Note:
             This is a placeholder. Full implementation requires:
             - Spatial alignment and regridding
