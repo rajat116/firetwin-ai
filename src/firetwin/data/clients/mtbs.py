@@ -29,13 +29,12 @@ class MTBSFire(BaseModel):
 
     fire_id: str = Field(..., description="Unique MTBS fire identifier")
     fire_name: str = Field(..., description="Fire name")
-    fire_year: int = Field(..., description="Fire year")
-    start_date: datetime | None = Field(None, description="Fire start date")
-    end_date: datetime | None = Field(None, description="Fire end date")
+    fire_year: int = Field(..., description="Fire year (extracted from fire_id)")
+    ignition_date: datetime | None = Field(
+        None, description="Ignition date (from ig_date timestamp)"
+    )
     acres: float = Field(..., description="Fire size in acres")
-    state: str = Field(..., description="State code")
-    agency: str | None = Field(None, description="Managing agency")
-    fire_type: str | None = Field(None, description="Fire type (Wildfire, Prescribed)")
+    fire_type: str | None = Field(None, description="Fire type (Wildfire, Prescribed, Unknown)")
     geometry_wkt: str = Field(..., description="Polygon geometry as WKT")
 
     class Config:
@@ -77,7 +76,6 @@ class MTBSClient:
         self,
         year: int,
         min_acres: float | None = None,
-        state: str | None = None,
         bbox: tuple[float, float, float, float] | None = None,
         max_records: int = 2000,
     ) -> list[MTBSFire]:
@@ -86,7 +84,6 @@ class MTBSClient:
         Args:
             year: Fire year (1984-present)
             min_acres: Minimum fire size in acres
-            state: State code filter (e.g., 'CA', 'OR')
             bbox: Bounding box as (min_lon, min_lat, max_lon, max_lat) in WGS84
             max_records: Maximum number of records to return (max 2000)
 
@@ -95,27 +92,35 @@ class MTBSClient:
 
         Raises:
             ValueError: If max_records > 2000 or year < 1984
+
+        Note:
+            MTBS API does not have a Fire_Year field. This method fetches all fires
+            within the bbox/criteria and filters by year in Python after parsing.
         """
         if max_records > 2000:
             raise ValueError("max_records cannot exceed 2000 (ESRI API limit)")
         if year < 1984:
             raise ValueError("MTBS data starts from 1984")
 
+        if not bbox:
+            raise ValueError(
+                "bbox is required for year queries - MTBS API does not support "
+                "temporal filtering, so spatial bounds are needed to limit results"
+            )
+
         # Build where clause
-        where_conditions = [f"FIRE_YEAR={year}"]
+        # Note: MTBS API does not support ig_date range queries (returns 400 error)
+        # Year filtering is done in Python after fetch using fire_id date extraction
+        where_conditions = ["1=1"]  # Get all records within bbox
         if min_acres:
-            where_conditions.append(f"ACRES>={min_acres}")
-        if state:
-            where_conditions.append(f"STATE='{state.upper()}'")
+            where_conditions.append(f"acres>={min_acres}")
 
         where_clause = " AND ".join(where_conditions)
 
-        # Build query parameters
+        # Build query parameters (use lowercase field names)
         params = {
             "where": where_clause,
-            "outFields": (
-                "FIRE_ID,FIRE_NAME,FIRE_YEAR,START_DATE,END_DATE,ACRES,STATE,AGENCY,FIRE_TYPE"
-            ),
+            "outFields": "fire_id,fire_name,acres,ig_date,fire_type",
             "f": "geojson",
             "outSR": "4326",  # WGS84
             "returnGeometry": "true",
@@ -141,30 +146,31 @@ class MTBSClient:
 
         # Parse GeoJSON response
         geojson_data = response.json()
+        all_fires = self._parse_geojson_response(geojson_data)
 
-        return self._parse_geojson_response(geojson_data)
+        # Filter by year in Python (year extracted from fire_id during parsing)
+        return [f for f in all_fires if f.fire_year == year]
 
     def get_fire_by_name(self, fire_name: str, year: int | None = None) -> list[MTBSFire]:
         """Get MTBS fires by name (partial match supported).
 
         Args:
             fire_name: Fire name (partial match)
-            year: Optional year filter
+            year: Optional year filter (applied in Python after fetch)
 
         Returns:
             List of MTBSFire objects matching the fire name
-        """
-        where_parts = [f"FIRE_NAME LIKE '%{fire_name}%'"]
-        if year:
-            where_parts.append(f"FIRE_YEAR={year}")
 
-        where_clause = " AND ".join(where_parts)
+        Note:
+            Case-insensitive search using UPPER() function.
+        """
+        # Use UPPER for case-insensitive matching
+        search_name = fire_name.upper().replace("'", "''")  # SQL escape
+        where_clause = f"UPPER(fire_name) LIKE '%{search_name}%'"
 
         params = {
             "where": where_clause,
-            "outFields": (
-                "FIRE_ID,FIRE_NAME,FIRE_YEAR,START_DATE,END_DATE,ACRES,STATE,AGENCY,FIRE_TYPE"
-            ),
+            "outFields": "fire_id,fire_name,acres,ig_date,fire_type",
             "f": "geojson",
             "outSR": "4326",
             "returnGeometry": "true",
@@ -181,7 +187,13 @@ class MTBSClient:
         response.raise_for_status()
 
         geojson_data = response.json()
-        return self._parse_geojson_response(geojson_data)
+        fires = self._parse_geojson_response(geojson_data)
+
+        # Filter by year if specified
+        if year:
+            fires = [f for f in fires if f.fire_year == year]
+
+        return fires
 
     def _parse_geojson_response(self, geojson_data: dict) -> list[MTBSFire]:
         """Parse GeoJSON response into MTBSFire objects.
@@ -191,6 +203,10 @@ class MTBSClient:
 
         Returns:
             List of MTBSFire objects
+
+        Note:
+            Extracts year from fire_id (format: STATE+COORDS+YYYYMMDD).
+            Example: "CA3630511215520200904" -> year=2020
         """
         fires: list[MTBSFire] = []
 
@@ -198,7 +214,8 @@ class MTBSClient:
             return fires
 
         for feature in geojson_data["features"]:
-            properties = feature.get("properties", {})
+            # ESRI REST API can return properties under either 'properties' or 'attributes'
+            properties = feature.get("properties", {}) or feature.get("attributes", {})
             geometry = feature.get("geometry")
 
             if not geometry:
@@ -207,25 +224,39 @@ class MTBSClient:
             # Convert GeoJSON geometry to WKT
             geom_shapely = shape(geometry)
 
-            # Parse dates (Unix timestamps in milliseconds)
-            start_date = None
-            if properties.get("START_DATE"):
-                start_date = datetime.fromtimestamp(properties["START_DATE"] / 1000)
+            # Get fire_id and extract year from it
+            fire_id = properties.get("fire_id", "")
 
-            end_date = None
-            if properties.get("END_DATE"):
-                end_date = datetime.fromtimestamp(properties["END_DATE"] / 1000)
+            # Extract year from fire_id (last 8 digits are YYYYMMDD)
+            # Example: "CA3630511215520200904" -> "20200904" -> year=2020
+            try:
+                if len(fire_id) >= 8:
+                    date_str = fire_id[-8:]  # YYYYMMDD
+                    fire_year = int(date_str[:4])
+                else:
+                    fire_year = 0
+            except (ValueError, IndexError):
+                fire_year = 0
+
+            # Parse ignition date from ig_date (Unix timestamp in milliseconds)
+            ignition_date = None
+            ig_date_ms = properties.get("ig_date")
+            if ig_date_ms:
+                try:
+                    ignition_date = datetime.fromtimestamp(ig_date_ms / 1000)
+                    # If year extraction failed, try to get it from ignition date
+                    if fire_year == 0:
+                        fire_year = ignition_date.year
+                except (ValueError, OSError):
+                    pass
 
             fire = MTBSFire(
-                fire_id=properties.get("FIRE_ID", ""),
-                fire_name=properties.get("FIRE_NAME", "Unknown"),
-                fire_year=int(properties.get("FIRE_YEAR", 0)),
-                start_date=start_date,
-                end_date=end_date,
-                acres=float(properties.get("ACRES", 0.0)),
-                state=properties.get("STATE", ""),
-                agency=properties.get("AGENCY"),
-                fire_type=properties.get("FIRE_TYPE"),
+                fire_id=fire_id,
+                fire_name=properties.get("fire_name", "Unknown"),
+                fire_year=fire_year,
+                ignition_date=ignition_date,
+                acres=float(properties.get("acres", 0.0)),
+                fire_type=properties.get("fire_type", "Unknown"),
                 geometry_wkt=geom_shapely.wkt,
             )
             fires.append(fire)
@@ -247,11 +278,8 @@ class MTBSClient:
                     "fire_id",
                     "fire_name",
                     "fire_year",
-                    "start_date",
-                    "end_date",
+                    "ignition_date",
                     "acres",
-                    "state",
-                    "agency",
                     "fire_type",
                     "geometry",
                 ],
@@ -262,11 +290,8 @@ class MTBSClient:
             "fire_id": [f.fire_id for f in fires],
             "fire_name": [f.fire_name for f in fires],
             "fire_year": [f.fire_year for f in fires],
-            "start_date": [f.start_date for f in fires],
-            "end_date": [f.end_date for f in fires],
+            "ignition_date": [f.ignition_date for f in fires],
             "acres": [f.acres for f in fires],
-            "state": [f.state for f in fires],
-            "agency": [f.agency for f in fires],
             "fire_type": [f.fire_type for f in fires],
             "geometry": [f.to_shapely_polygon() for f in fires],
         }
