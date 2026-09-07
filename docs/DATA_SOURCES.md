@@ -9,7 +9,7 @@ This document maintains a verified registry of all data sources used in FireTwin
 | Data Source | Client Status | Tests | Coverage | Access Method |
 |------------|--------------|-------|----------|---------------|
 | NASA FIRMS | ✅ Implemented | 17 tests passing | 92% | REST API with MAP_KEY |
-| NIFC/WFIGS | 🚧 Pending | - | - | ArcGIS REST / GeoJSON |
+| NIFC/WFIGS | ✅ Implemented | 13 tests passing | 96% | ArcGIS REST / GeoJSON |
 | MTBS | 🚧 Pending | - | - | FTP/HTTPS download |
 | ERA5-Land | 🚧 Pending | - | - | `cdsapi` Python package |
 | LANDFIRE | 🚧 Pending | - | - | AOI download / REST |
