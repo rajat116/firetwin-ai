@@ -5,6 +5,7 @@ from firetwin.data.clients.firms import FIRMSClient
 from firetwin.data.clients.landfire import LANDFIREClient
 from firetwin.data.clients.mtbs import MTBSClient
 from firetwin.data.clients.nifc import NIFCClient
+from firetwin.data.clients.nifc_historical import NIFCHistoricalClient
 from firetwin.data.clients.usgs import USGS3DEPClient
 
 __all__ = [
@@ -13,5 +14,6 @@ __all__ = [
     "LANDFIREClient",
     "MTBSClient",
     "NIFCClient",
+    "NIFCHistoricalClient",
     "USGS3DEPClient",
 ]
