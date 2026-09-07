@@ -8,6 +8,16 @@ import pytest
 
 from firetwin.data.clients.firms import FIRMSClient, FIRMSDetection, FIRMSSatellite
 
+
+def _has_pyarrow() -> bool:
+    """Check if pyarrow is available."""
+    try:
+        import pyarrow  # noqa: F401
+
+        return True
+    except ImportError:
+        return False
+
 # Sample FIRMS CSV response (VIIRS format)
 SAMPLE_CSV_RESPONSE = """latitude,longitude,brightness,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_t31,frp,daynight
 38.5,-120.3,330.2,0.4,0.4,2024-08-15,1830,N,VIIRS,95,2.0NRT,290.5,25.3,D
@@ -285,6 +295,10 @@ def test_detections_to_geodataframe_empty(firms_client: FIRMSClient) -> None:
     assert "geometry" in gdf.columns
 
 
+@pytest.mark.skipif(
+    not _has_pyarrow(),
+    reason="pyarrow not installed",
+)
 def test_save_detections_parquet(firms_client: FIRMSClient, tmp_path) -> None:
     """Test saving detections to Parquet format."""
     detections = [
