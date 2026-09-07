@@ -87,6 +87,42 @@
 
 ## Recommended Initial Selection
 
+### **FINAL SELECTION: 2014 Historical Fires** ✅
+
+After discovering NIFC Historical archive (2000-2021+) and validating MTBS coverage for 2014, we selected 2014 fires for better data completeness:
+
+1. **Carlton Complex (2014)** - Washington State
+   - **Size**: 251,965 acres (largest in WA state history at the time)
+   - **Region**: Pacific Northwest
+   - **Dates**: July 2014
+   - **Data**: NIFC Historical ✅, MTBS ✅, FIRMS ✅
+   - **Why**: Massive complex, multiple merged fires, excellent progression data
+
+2. **King Fire (2014)** - California
+   - **Size**: 97,685 acres
+   - **Region**: Central California (Sierra Nevada)
+   - **Dates**: September 2014
+   - **Data**: NIFC Historical ✅, MTBS ✅, FIRMS ✅
+   - **Why**: Well-documented Sierra Nevada fire, diverse terrain
+
+3. **Big Cougar (2014)** - Northern Rockies (OR/ID)
+   - **Size**: 65,305 acres
+   - **Region**: Oregon/Idaho border
+   - **Dates**: August 2014
+   - **Data**: NIFC Historical ✅, MTBS ✅, FIRMS ✅
+   - **Why**: Geographic diversity, different ecosystem
+
+**Benefits of 2014 Selection:**
+- Fully validated MTBS data (2-3 year lag means 2014 is complete)
+- NIFC Historical perimeters with progression data
+- FIRMS daily detections available
+- ERA5-Land weather reanalysis complete
+- Geographic diversity: WA, CA, OR/ID
+- Scale diversity: 65k - 252k acres
+
+### Original Candidates (2018-2024)
+*Kept for reference if needed for recent fire analysis*
+
 ### Option A: Diverse Scale
 1. **Large**: Creek Fire (2020) - 379k acres, Sierra Nevada
 2. **Medium**: McKinney Fire (2022) - 60k acres, Northern CA

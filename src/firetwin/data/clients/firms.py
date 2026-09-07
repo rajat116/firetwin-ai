@@ -87,9 +87,9 @@ class FIRMSClient:
         """Initialize FIRMS client.
 
         Args:
-            map_key: FIRMS MAP_KEY. If None, reads from settings.FIRMS_MAP_KEY
+            map_key: FIRMS MAP_KEY. If None, reads from settings.firms_map_key
         """
-        self.map_key = map_key or settings.FIRMS_MAP_KEY
+        self.map_key = map_key or settings.firms_map_key
         if not self.map_key:
             raise ValueError(
                 "FIRMS MAP_KEY is required. Set FIRMS_MAP_KEY environment variable "

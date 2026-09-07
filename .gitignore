@@ -106,3 +106,4 @@ secrets.yaml
 *.log
 logs/
 data/forecasts/**
+data/fire_cases/
