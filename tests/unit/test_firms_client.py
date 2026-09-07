@@ -18,6 +18,7 @@ def _has_pyarrow() -> bool:
     except ImportError:
         return False
 
+
 # Sample FIRMS CSV response (VIIRS format)
 SAMPLE_CSV_RESPONSE = """latitude,longitude,brightness,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_t31,frp,daynight
 38.5,-120.3,330.2,0.4,0.4,2024-08-15,1830,N,VIIRS,95,2.0NRT,290.5,25.3,D
