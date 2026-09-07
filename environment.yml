@@ -20,6 +20,7 @@ dependencies:
   - pyproj>=3.6.0
   - fiona>=1.9.0
   - gdal>=3.8.0
+  - pyarrow>=14.0.0
   
   # Multidimensional arrays
   - xarray>=2024.1.0
