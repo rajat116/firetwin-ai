@@ -188,7 +188,7 @@ class NIFCClient:
         Returns:
             List of NIFCPerimeter objects
         """
-        perimeters = []
+        perimeters: list[NIFCPerimeter] = []
 
         if "features" not in geojson_data:
             return perimeters
