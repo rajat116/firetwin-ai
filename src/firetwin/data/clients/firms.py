@@ -12,10 +12,9 @@ FIRMS provides active fire/thermal anomaly detections from:
 Requires a free MAP_KEY from: https://firms.modaps.eosdis.nasa.gov/api/
 """
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any
 
 import geopandas as gpd
 import pandas as pd
