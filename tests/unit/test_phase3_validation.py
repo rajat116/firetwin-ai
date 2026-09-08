@@ -1,9 +1,10 @@
 """Tests for Phase 3 fire-case validation."""
 
+import importlib.util
 from datetime import datetime
+from pathlib import Path
 
 import numpy as np
-from scripts.validate_fire_cases import validate_fire_case
 
 from firetwin.schemas import (
     BoundingBox,
@@ -15,6 +16,14 @@ from firetwin.schemas import (
     TerrainData,
     WeatherData,
 )
+
+VALIDATOR_PATH = Path(__file__).resolve().parents[2] / "scripts" / "validate_fire_cases.py"
+VALIDATOR_SPEC = importlib.util.spec_from_file_location("validate_fire_cases", VALIDATOR_PATH)
+assert VALIDATOR_SPEC is not None
+assert VALIDATOR_SPEC.loader is not None
+validator_module = importlib.util.module_from_spec(VALIDATOR_SPEC)
+VALIDATOR_SPEC.loader.exec_module(validator_module)
+validate_fire_case = validator_module.validate_fire_case
 
 
 def test_validate_fire_case_computes_known_final_extent_area(tmp_path):
