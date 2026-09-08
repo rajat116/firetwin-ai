@@ -41,7 +41,7 @@ def test_firms_client_init_with_key() -> None:
 def test_firms_client_init_without_key_raises() -> None:
     """Test FIRMSClient initialization without key raises error."""
     with patch("firetwin.data.clients.firms.settings") as mock_settings:
-        mock_settings.FIRMS_MAP_KEY = ""
+        mock_settings.firms_map_key = ""
         with pytest.raises(ValueError, match="FIRMS MAP_KEY is required"):
             FIRMSClient()
 
