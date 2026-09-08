@@ -32,13 +32,17 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 3 Complete - Historical Fire Case Builder ✅
+**Current Phase**: Phase 3 Complete - Historical Final-Extent Case Builder ✅
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
 - ✅ **Phase 2**: Real data source integration (all 6 clients + validation + inventory)
-- ✅ **Phase 3**: Historical case builder (3 pilot fires with validated accuracy)
-- 🚧 **Phase 4**: Real-data baselines (next)
+- ✅ **Phase 3**: Historical final-extent case builder (3 pilot fires with validated area/CRS metadata)
+- 🚧 **Phase 4**: Real covariate enrichment and real-data baselines (next)
+
+Phase 3 cases contain real NIFC/MTBS-derived final perimeter masks, but terrain, fuel, weather,
+and initial fire state fields are still placeholders. They are not valid 3/6/12/24-hour
+fire-progression labels yet.
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -105,22 +109,26 @@ perimeters = nifc.get_fire_by_name("King", year=2014)
 gdf = nifc.perimeters_to_geodataframe(perimeters)
 ```
 
-**Phase 3: Real Fire Cases** ✨ NEW
+**Phase 3: Historical Final-Extent Fire Cases** ✨ NEW
 
-Build complete FireCase objects from real wildfire data:
+Build canonical FireCase objects from real historical perimeter data:
 
 ```bash
 # Build all 3 pilot fires (Carlton Complex, King Fire, Big Cougar)
-python scripts/build_all_pilot_fires.py
+python3 scripts/build_all_pilot_fires.py
 
 # Validate the generated fire cases
-python scripts/validate_fire_cases.py
+python3 scripts/validate_fire_cases.py
 ```
 
-Generated fire cases available in `data/fire_cases/`:
+Generated local fire cases are written to ignored data storage under `data/fire_cases/`:
 - Carlton Complex 2014 (WA): 275k acres, validated accuracy
 - King Fire 2014 (CA): 98k acres, validated accuracy
 - Big Cougar 2014 (OR/ID): 65k acres, validated accuracy
+
+These artifacts are explicitly marked with `target_type=final_burned_extent` and
+`covariate_status=placeholder` so downstream evaluation cannot accidentally treat final extent as
+short-horizon progression.
 
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
@@ -228,7 +236,9 @@ FireTwin is designed to answer measurable questions:
 - [Project Status](docs/PROJECT_STATUS.md)
 - [Technical Decisions](docs/DECISIONS.md)
 - [Data Sources](docs/DATA_SOURCES.md)
+- [Machine-Readable Data Source Registry](configs/data_sources.yaml)
 - [Data Validation](docs/DATA_VALIDATION.md)
+- [Evaluation Protocol](docs/EVALUATION_PROTOCOL.md)
 - [Data Availability Audit](reports/data_availability_audit.md)
 - [Product Specification](docs/PRODUCT_SPEC.md)
 - [UI/UX Specification](docs/UI_UX_SPEC.md)

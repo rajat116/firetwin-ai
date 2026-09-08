@@ -1,0 +1,192 @@
+metadata:
+  registry_version: 1
+  last_updated: "2026-09-08"
+  scope: "Western United States wildfire research prototype"
+  warning: "Research prototype. Not for operational wildfire response, evacuation planning or safety-critical decision-making."
+
+sources:
+  firms:
+    provider: "NASA Fire Information for Resource Management System"
+    products:
+      - "MODIS active fire / thermal anomaly"
+      - "VIIRS active fire / thermal anomaly"
+    variables:
+      - "latitude"
+      - "longitude"
+      - "acquisition_date"
+      - "acquisition_time"
+      - "satellite"
+      - "confidence"
+      - "brightness_temperature"
+      - "fire_radiative_power"
+      - "day_night"
+    spatial_resolution: "MODIS nominal 1 km; VIIRS nominal 375 m"
+    temporal_resolution: "Near-real-time satellite overpass detections"
+    access_method: "REST API with FIRMS_MAP_KEY"
+    official_urls:
+      api: "https://firms.modaps.eosdis.nasa.gov/api/"
+      active_fire: "https://firms.modaps.eosdis.nasa.gov/active_fire/"
+      web_services: "https://firms.modaps.eosdis.nasa.gov/web-services/"
+      terms: "https://earthdata.nasa.gov/earth-observation-data/data-use-policy"
+    access_date: "2026-09-08"
+    version: "FIRMS API 4.1.9 observed on 2026-09-08"
+    checksum: null
+    known_limitations:
+      - "Detection points/pixels are not exact fire perimeters."
+      - "Cloud, smoke, orbit timing, and sensor resolution create missing or uncertain observations."
+      - "Non-detection is not evidence of no fire."
+
+  nifc_current:
+    provider: "National Interagency Fire Center / WFIGS"
+    products:
+      - "Current interagency fire perimeters"
+    variables:
+      - "incident_identifier"
+      - "fire_name"
+      - "perimeter_geometry"
+      - "gis_acres"
+      - "perimeter_datetime"
+      - "modified_datetime"
+    spatial_resolution: "Varies by mapping method"
+    temporal_resolution: "Variable by incident; current active-fire feed"
+    access_method: "ArcGIS REST / GeoJSON"
+    official_urls:
+      portal: "https://data-nifc.opendata.arcgis.com/"
+      wfigs: "https://data-nifc.opendata.arcgis.com/pages/wfigs-page"
+      current_perimeters: "https://data-nifc.opendata.arcgis.com/datasets/nifc::wfigs-current-interagency-fire-perimeters/"
+    access_date: "2026-09-08"
+    version: "Current WFIGS service"
+    checksum: null
+    known_limitations:
+      - "Current service is for active/recent incidents and is not a complete historical archive."
+      - "Perimeter timestamps and modified timestamps must not be assumed to be exact fire-arrival times."
+
+  nifc_historical:
+    provider: "National Interagency Fire Center"
+    products:
+      - "Historic wildland fire perimeter datasets"
+    variables:
+      - "incident_identifier"
+      - "fire_name"
+      - "perimeter_geometry"
+      - "gis_acres"
+      - "perimeter_datetime"
+      - "modified_datetime"
+    spatial_resolution: "Varies by mapping method"
+    temporal_resolution: "Dataset-dependent; may contain one final perimeter or multiple snapshots"
+    access_method: "ArcGIS REST / GeoJSON"
+    official_urls:
+      historical_catalogue: "https://data-nifc.opendata.arcgis.com/search?tags=Category,historic_wildlandfire_opendata"
+    access_date: "2026-09-08"
+    version: "Historic wildlandfire opendata catalogue"
+    checksum: null
+    known_limitations:
+      - "Historical coverage and progression availability vary by incident."
+      - "Multiple records require source timestamp interpretation before use as progression labels."
+
+  mtbs:
+    provider: "Monitoring Trends in Burn Severity"
+    products:
+      - "Final burned-area boundary"
+      - "Burn severity"
+    variables:
+      - "fire_id"
+      - "fire_name"
+      - "ignition_date"
+      - "fire_type"
+      - "acres"
+      - "geometry"
+      - "burn_severity"
+    spatial_resolution: "30 m burn severity products; perimeter geometry varies"
+    temporal_resolution: "Historical annual products"
+    access_method: "Burn Severity Site / direct download"
+    official_urls:
+      homepage: "https://www.mtbs.gov/"
+      direct_download: "https://www.mtbs.gov/direct-download"
+      burn_severity: "https://burnseverity.cr.usgs.gov/direct-download"
+    access_date: "2026-09-08"
+    version: "Direct Download consolidated with Burn Severity Site as observed on 2026-09-08"
+    checksum: null
+    known_limitations:
+      - "Final burned extent is not an hourly progression label."
+      - "Recent fires can lag annual processing and availability."
+
+  era5_land:
+    provider: "Copernicus Climate Data Store / ECMWF"
+    products:
+      - "ERA5-Land hourly data from 1950 to present"
+    variables:
+      - "10m_u_component_of_wind"
+      - "10m_v_component_of_wind"
+      - "2m_temperature"
+      - "2m_dewpoint_temperature"
+      - "total_precipitation"
+      - "surface_pressure"
+      - "soil_moisture_layers"
+      - "surface_solar_radiation"
+    spatial_resolution: "0.1 degree x 0.1 degree; native resolution about 9 km"
+    temporal_resolution: "Hourly"
+    access_method: "Climate Data Store API"
+    official_urls:
+      dataset: "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-land"
+      portal: "https://cds.climate.copernicus.eu/"
+      doi: "https://doi.org/10.24381/cds.e2161bac"
+    access_date: "2026-09-08"
+    version: "Dataset update date 2026-09-08 observed on CDS page"
+    checksum: null
+    known_limitations:
+      - "Coarse reanalysis data; resampling to the fire grid does not create fine-scale weather truth."
+      - "Requires CDS account and accepted terms."
+
+  landfire:
+    provider: "LANDFIRE"
+    products:
+      - "Fire Behavior Fuel Model"
+      - "Existing Vegetation Type"
+      - "Existing Vegetation Cover"
+      - "Existing Vegetation Height"
+      - "Canopy fuel layers"
+      - "Disturbance layers"
+    variables:
+      - "fuel_model"
+      - "vegetation_type"
+      - "vegetation_cover"
+      - "vegetation_height"
+      - "canopy_cover"
+      - "canopy_height"
+      - "canopy_base_height"
+      - "canopy_bulk_density"
+    spatial_resolution: "30 m delivered products"
+    temporal_resolution: "Periodic base maps and updates by region/product"
+    access_method: "Map Viewer AOI download, full extent downloads, LF Product Service, image/WCS/WMS services"
+    official_urls:
+      data: "https://www.landfire.gov/data"
+      product_service: "https://lfps.usgs.gov"
+      fuel_vegetation_type: "https://www.landfire.gov/fuel/fvt"
+    access_date: "2026-09-08"
+    version: "Record exact LANDFIRE product/version per downloaded case"
+    checksum: null
+    known_limitations:
+      - "Product version/year may not represent vegetation and fuels on the fire date."
+      - "Delivered 30 m pixels should be interpreted at appropriate landscape scales."
+
+  usgs_3dep:
+    provider: "U.S. Geological Survey 3D Elevation Program"
+    products:
+      - "Digital elevation model"
+    variables:
+      - "elevation"
+      - "slope"
+      - "aspect"
+    spatial_resolution: "Resolution varies by product and area; choose resolution consistent with model grid"
+    temporal_resolution: "Static terrain product with acquisition/update metadata"
+    access_method: "The National Map / 3DEP services"
+    official_urls:
+      homepage: "https://www.usgs.gov/3d-elevation-program"
+      data_download: "https://www.usgs.gov/the-national-map-data-delivery/gis-data-download"
+    access_date: "2026-09-08"
+    version: "Record source product and acquisition metadata per case"
+    checksum: null
+    known_limitations:
+      - "High-resolution elevation should be downselected to match label/input resolution and compute budget."
+      - "Terrain source date may differ from fire date."

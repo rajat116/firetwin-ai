@@ -165,6 +165,75 @@ Use `--no-site-packages` flag in all mypy invocations to skip type checking of i
 
 ---
 
+## Decision 5: Phase 3 Real Cases Are Final-Extent Artifacts
+
+**Date**: 2026-09-08  
+**Phase**: 3 - Historical Fire Case Builder
+
+### Context
+
+The first real pilot fire cases successfully rasterize NIFC/MTBS-derived perimeters, but the
+canonical cases still use placeholder terrain, fuels, weather, and initial-state fields. The master
+project brief explicitly says not to treat final perimeters as time-resolved progression labels.
+
+### Decision
+
+Mark Phase 3 pilot cases as `target_type=final_burned_extent` and
+`covariate_status=placeholder` in FireCase metadata and Zarr attributes. Keep hourly real-data
+forecast evaluation out of scope until time-stamped observations and real covariates are added.
+
+### Rationale
+
+This preserves the value of the Phase 3 artifacts while preventing leakage or inflated claims. The
+cases are valid for final-extent validation and pipeline testing, but not yet for 3/6/12/24-hour
+forecast benchmarking.
+
+### Alternatives Considered
+
+**Treat generated masks as forecast targets**:
+- Rejected because final extent would leak future information into short-horizon evaluation.
+
+**Delay all real-case artifacts until every covariate is integrated**:
+- Rejected because the perimeter-to-grid pipeline is independently valuable and now carries clear
+  limitations.
+
+### Consequences
+
+- Baseline/model code must inspect target metadata before reporting horizon-specific real-data
+  metrics.
+- Phase 4 should enrich or reconstruct time-stamped states before claiming real-data forecasting
+  performance.
+
+---
+
+## Decision 6: Machine-Readable Data Source Registry
+
+**Date**: 2026-09-08  
+**Phase**: 3 - Data Foundation Cleanup
+
+### Context
+
+The master project brief requires a machine-readable registry at `configs/data_sources.yaml` in
+addition to human documentation in `docs/DATA_SOURCES.md`.
+
+### Decision
+
+Add `configs/data_sources.yaml` with provider, products, variables, resolution, access method,
+official URLs, access date, version notes, checksums where available, and known limitations for
+the current FireTwin data sources.
+
+### Rationale
+
+The YAML registry gives later builders a structured source of truth for provenance, audits and
+dataset manifests.
+
+### Consequences
+
+- Future downloads should update source versions/checksums at case-build time.
+- Docs and config must be kept in sync when source behavior changes.
+
+---
+
 ## Future Decisions
 
 Document all future material decisions here, including:

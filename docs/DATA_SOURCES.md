@@ -2,7 +2,9 @@
 
 This document maintains a verified registry of all data sources used in FireTwin.
 
-**Last Updated**: 2026-09-07
+**Last Updated**: 2026-09-08
+
+Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources.yaml)
 
 ## Implementation Status
 

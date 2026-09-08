@@ -1,7 +1,10 @@
 # Phase 3 Status - Historical Fire Case Builder
 
 **Last Updated**: 2026-09-08
-**Status**: COMPLETE ✅ - All 3 pilot fires validated and working!
+**Status**: COMPLETE ✅ - Final-extent pilot cases built and validated with explicit limitations
+
+**Scientific Scope**: These cases are valid final-burned-extent artifacts. They are not yet
+time-resolved fire-progression labels and are not forecast-ready real-data samples.
 
 ## Completed ✅
 
@@ -10,8 +13,10 @@
    - ✅ **Bbox filtering** to prevent multiple fires with similar names
    - ✅ **Smart buffer calculation** (10% of fire size, max 5km)
    - ✅ Spatial alignment and CRS reprojection
+   - ✅ Target CRS preserved in FireCase bbox metadata
    - ✅ Fire perimeter rasterization
    - ✅ FireCase construction with canonical schemas
+   - ✅ Final-extent and placeholder-covariate limitations stored in metadata
    - ✅ Zarr format export with compression
 
 ### 2. All 3 Pilot Fires Generated & Validated
@@ -28,6 +33,8 @@
    - ✅ **King fire bbox filtering**: Was returning 7 fires across the US, now filters to California fire only
    - ✅ **Smart buffer calculation**: Changed from "10% of max dimension" to "10% of fire dimension, max 5km"
    - ✅ **Big Cougar bbox corrected**: Updated bbox to match actual fire location
+   - ✅ **Big Cougar CRS metadata**: FireCase bbox now records EPSG:32611 when requested instead of hard-coded EPSG:32610
+   - ✅ **Validation script storage layout**: Validator now reads the actual `burned(time, y, x)` Zarr layout
    - ✅ **Grid efficiency**: All fires now have reasonable grid sizes (~30% burned vs 0.01%)
 
 ## Critical Findings 🔍
@@ -70,6 +77,7 @@
    - Fire progression data not yet implemented
    - Only final perimeter captured (no time-resolved evolution)
    - Temporal alignment deferred to future phase
+   - Final extent must not be used as hourly forecast labels
 
 3. **Data Source Coverage**
    - NIFC Historical: ✅ Working for 2014 fires
@@ -120,4 +128,13 @@ RealFireCaseConverter
 - Each with real fire perimeter rasterized to 100m grid
 - Geographic diversity: Washington, California, Oregon/Idaho
 - Scale diversity: 65k - 252k acres
-- Ready for Phase 4 baseline model evaluation
+- Ready for final-extent validation; not yet ready for hourly real-data forecast evaluation
+
+## Phase 3 Exit Gate
+
+Completed before Phase 4:
+
+- ✅ Regenerated the three local pilot Zarr artifacts after the metadata/CRS fixes.
+- ✅ Ran `scripts/validate_fire_cases.py` successfully with the project Python environment.
+- ✅ Ran unit tests, lint/format checks, and type checks.
+- ✅ Documented that Phase 4 baseline code must respect `target_type=final_burned_extent`.

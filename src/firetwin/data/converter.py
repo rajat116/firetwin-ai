@@ -22,6 +22,13 @@ from firetwin.data.clients import (
 from firetwin.schemas.core import FireState, FuelData, TerrainData, WeatherData
 from firetwin.schemas.fire_case import FireCase, FireCaseMetadata
 
+PLACEHOLDER_COVARIATE_LIMITATIONS = [
+    "Terrain is placeholder flat elevation, not USGS 3DEP.",
+    "Fuel grids are placeholder uniform FBFM 10, not LANDFIRE.",
+    "Weather is a placeholder scalar condition, not ERA5-Land.",
+    "Target state is final burned extent, not time-resolved fire progression.",
+]
+
 
 class RealFireCaseConverter:
     """Convert real wildfire data to canonical FireCase format.
@@ -277,15 +284,24 @@ class RealFireCaseConverter:
         metadata = FireCaseMetadata(
             case_id=case_id,
             name=f"{self.fire_name} ({self.fire_year})",
-            description=f"Real fire case from {self.fire_name} fire in {self.fire_year}",
+            description=(
+                f"Real final-extent fire case from {self.fire_name} fire in {self.fire_year}. "
+                "Perimeter is real; terrain, fuels, and weather are placeholders."
+            ),
             is_synthetic=False,
             creation_timestamp=datetime.utcnow(),
             source="NIFC/MTBS",
             tags=[
                 "real_data",
+                "final_extent_only",
+                "placeholder_covariates",
                 f"year_{self.fire_year}",
                 self.fire_name.lower().replace(" ", "_"),
             ],
+            target_type="final_burned_extent",
+            data_quality="phase3_final_extent_only",
+            covariate_status="placeholder",
+            limitations=PLACEHOLDER_COVARIATE_LIMITATIONS,
         )
 
         # Create BoundingBox from aligned grid bounds
@@ -297,7 +313,7 @@ class RealFireCaseConverter:
             max_x=maxx,
             min_y=miny,
             max_y=maxy,
-            crs=CoordinateSystem.UTM_10N,  # Assuming Western US for now
+            crs=CoordinateSystem(self.target_crs),
         )
 
         # 2. Create TerrainData (placeholder with flat terrain for now)

@@ -165,6 +165,10 @@ Elliptical baseline outperforms radial and persistence on 6-hour forecasts:
 
 **Purpose**: Build complete FireCase objects from real historical wildfire data.
 
+**Scientific Scope**: Phase 3 produces validated **final-burned-extent** artifacts. These are
+not yet time-resolved forecast samples and must not be reported as 3/6/12/24-hour progression
+labels.
+
 ### Completed Tasks
 
 **RealFireCaseConverter Implementation**:
@@ -183,7 +187,8 @@ Elliptical baseline outperforms radial and persistence on 6-hour forecasts:
 **Scripts and Testing**:
 - [x] Individual fire test script (`test_converter_carlton.py`)
 - [x] Batch build script (`build_all_pilot_fires.py`)
-- [x] All code passes linting and formatting
+- [x] Validation script checks actual Zarr layout, final burned area, CRS, and limitation metadata
+- [x] Regression tests cover final-extent metadata and CRS preservation
 
 ### Acceptance Criteria
 
@@ -193,6 +198,9 @@ Elliptical baseline outperforms radial and persistence on 6-hour forecasts:
 - [x] Build complete FireCase objects
 - [x] Save to Zarr format
 - [x] Generate 3 diverse pilot fires
+- [x] Machine-readable data-source registry exists (`configs/data_sources.yaml`)
+- [x] Evaluation protocol exists (`docs/EVALUATION_PROTOCOL.md`)
+- [x] Final-extent limitation is stored in case metadata
 
 ### Key Results
 
@@ -204,8 +212,10 @@ Elliptical baseline outperforms radial and persistence on 6-hour forecasts:
 
 **Known Limitations**:
 - Terrain, fuels, weather using placeholder data (real integration in Phase 4)
-- Static perimeters only (no time-resolved progression yet)
+- Final/static extent only (no validated time-resolved progression labels yet)
 - Limited to fires with NIFC Historical coverage
+- Artifacts generated before the metadata/schema cleanup must be regenerated before the stricter
+  validator will pass
 
 ### Documentation
 
@@ -238,11 +248,15 @@ Overall: ████████░░░░░░░░░░░░  40%
 
 ## Known Issues
 
-None at this time.
+- Phase 3 pilot cases are final-burned-extent artifacts with placeholder terrain, fuel and weather.
+- Real-data baseline evaluation must not treat these final masks as hourly progression labels.
+- `python` on the local machine resolves to Python 2.7 outside conda; use `conda activate firetwin`
+  or `python3` for scripts.
 
 ## Blockers
 
-None at this time.
+None for completing the Phase 0-3 cleanup. Phase 4 enrichment/evaluation requires external data
+access/credentials for full real terrain, fuel, weather and FIRMS covariates.
 
 ## Notes
 

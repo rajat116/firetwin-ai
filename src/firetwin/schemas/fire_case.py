@@ -20,6 +20,15 @@ class FireCaseMetadata(BaseModel):
     )
     source: str = Field(default="unknown", description="Data source (synthetic, FIRMS, etc.)")
     tags: list[str] = Field(default_factory=list, description="Searchable tags")
+    target_type: str = Field(default="unknown", description="Scientific target represented")
+    data_quality: str = Field(default="unknown", description="Summary data-quality tier/status")
+    covariate_status: str = Field(
+        default="unknown",
+        description="Whether terrain/fuel/weather covariates are real or placeholders",
+    )
+    limitations: list[str] = Field(
+        default_factory=list, description="Known limitations that affect scientific use"
+    )
 
 
 class FireCase(BaseModel):

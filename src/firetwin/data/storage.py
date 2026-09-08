@@ -62,6 +62,10 @@ def fire_case_to_xarray(case: FireCase) -> xr.Dataset:
             "creation_timestamp": case.metadata.creation_timestamp.isoformat(),
             "source": case.metadata.source,
             "tags": ",".join(case.metadata.tags),
+            "target_type": case.metadata.target_type,
+            "data_quality": case.metadata.data_quality,
+            "covariate_status": case.metadata.covariate_status,
+            "limitations": "|".join(case.metadata.limitations),
             # Grid info
             "resolution_m": case.resolution_m,
             "bbox_min_x": case.terrain.bbox.min_x,
@@ -128,6 +132,12 @@ def xarray_to_fire_case(ds: xr.Dataset) -> FireCase:
         creation_timestamp=datetime.fromisoformat(ds.attrs["creation_timestamp"]),
         source=ds.attrs["source"],
         tags=ds.attrs.get("tags", "").split(",") if ds.attrs.get("tags") else [],
+        target_type=ds.attrs.get("target_type", "unknown"),
+        data_quality=ds.attrs.get("data_quality", "unknown"),
+        covariate_status=ds.attrs.get("covariate_status", "unknown"),
+        limitations=ds.attrs.get("limitations", "").split("|")
+        if ds.attrs.get("limitations")
+        else [],
     )
 
     # Extract bbox
