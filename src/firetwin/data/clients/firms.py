@@ -95,10 +95,6 @@ class FIRMSClient:
         self.map_key = map_key or settings.firms_map_key
         if not self.map_key:
             raise ValueError(
-                "FIRMS MAP_KEY is required. Provide via map_key parameter or FIRMS_MAP_KEY environment variable"
-            )
-        if not self.map_key:
-            raise ValueError(
                 "FIRMS MAP_KEY is required. Set FIRMS_MAP_KEY environment variable "
                 "or pass map_key parameter. Get a key from: "
                 "https://firms.modaps.eosdis.nasa.gov/api/"

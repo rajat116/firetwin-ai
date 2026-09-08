@@ -38,12 +38,13 @@ def test_firms_client_init_with_key() -> None:
     assert client.map_key == "my_test_key"
 
 
-def test_firms_client_init_without_key_raises() -> None:
+def test_firms_client_init_without_key_raises(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test FIRMSClient initialization without key raises error."""
-    with patch("firetwin.data.clients.firms.settings") as mock_settings:
-        mock_settings.firms_map_key = ""
-        with pytest.raises(ValueError, match="FIRMS MAP_KEY is required"):
-            FIRMSClient()
+    monkeypatch.setattr("firetwin.data.clients.firms.settings.firms_map_key", None)
+    with pytest.raises(ValueError, match="FIRMS MAP_KEY is required"):
+        FIRMSClient()
+    with pytest.raises(ValueError, match="FIRMS MAP_KEY is required"):
+        FIRMSClient(map_key="")
 
 
 def test_firms_detection_model() -> None:
