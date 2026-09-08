@@ -96,17 +96,31 @@ firetwin evaluate data/processed/demo_001.zarr data/forecasts/demo_001 --horizon
 All 6 data source clients are implemented and tested:
 
 ```python
-from firetwin.data.clients import FIRMSClient, NIFCClient, MTBSClient
+from firetwin.data.clients import FIRMSClient, NIFCHistoricalClient, MTBSClient
 from firetwin.data.clients import ERA5LandClient, LANDFIREClient, USGS3DEPClient
 
-# Example: Query FIRMS active fire detections
-firms = FIRMSClient(map_key="YOUR_KEY")
-detections = firms.get_area_detections(
-    bbox=(-121, 38, -120, 39),
-    start_date="2024-08-01",
-    days=7
-)
+# Example: Query NIFC Historical fire perimeters
+nifc = NIFCHistoricalClient()
+perimeters = nifc.get_fire_by_name("King", year=2014)
+gdf = nifc.perimeters_to_geodataframe(perimeters)
 ```
+
+**Phase 3: Real Fire Cases** ✨ NEW
+
+Build complete FireCase objects from real wildfire data:
+
+```bash
+# Build all 3 pilot fires (Carlton Complex, King Fire, Big Cougar)
+python scripts/build_all_pilot_fires.py
+
+# Validate the generated fire cases
+python scripts/validate_fire_cases.py
+```
+
+Generated fire cases available in `data/fire_cases/`:
+- Carlton Complex 2014 (WA): 275k acres, validated accuracy
+- King Fire 2014 (CA): 98k acres, validated accuracy
+- Big Cougar 2014 (OR/ID): 65k acres, validated accuracy
 
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
@@ -200,7 +214,7 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 0**: Repository and engineering foundation
 - [x] **Phase 1**: Synthetic end-to-end vertical slice
 - [x] **Phase 2**: Data-source clients, validation, inventory, and audit
-- [x] **Phase 3**: Historical case builder (3 pilot fires)
+- [x] **Phase 3**: Historical case builder (3 validated pilot fires with real perimeters)
 - [ ] **Phase 4**: Real-data baselines
 - [ ] **Phase 5**: Simulation corpus and surrogate
 - [ ] **Phase 6**: Hybrid model
