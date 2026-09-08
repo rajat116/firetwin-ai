@@ -103,7 +103,9 @@ class RealFireCaseConverter:
                 if len(gdf_filtered) > 0:
                     self.raw_data["nifc_perimeters"] = gdf_filtered
                     if len(gdf_filtered) < len(gdf):
-                        print(f"   ✅ Found {len(gdf_filtered)} perimeter(s) in bbox (filtered from {len(gdf)})")
+                        print(
+                            f"   ✅ Found {len(gdf_filtered)} perimeter(s) in bbox (filtered from {len(gdf)})"
+                        )
                     else:
                         print(f"   ✅ Found {len(gdf_filtered)} perimeter(s)")
                 else:
@@ -127,7 +129,9 @@ class RealFireCaseConverter:
                 if len(gdf_filtered) > 0:
                     self.raw_data["mtbs_fires"] = gdf_filtered
                     if len(gdf_filtered) < len(gdf):
-                        print(f"   ✅ Found {len(gdf_filtered)} MTBS fire(s) in bbox (filtered from {len(gdf)})")
+                        print(
+                            f"   ✅ Found {len(gdf_filtered)} MTBS fire(s) in bbox (filtered from {len(gdf)})"
+                        )
                     else:
                         print(f"   ✅ Found {len(gdf_filtered)} MTBS fire(s)")
                 else:
@@ -202,8 +206,8 @@ class RealFireCaseConverter:
             fire_dimension = np.sqrt(fire_area_m2)  # Approximate side length
             buffer_m = min(fire_dimension * 0.1, 5000)  # Max 5km buffer
 
-            print(f"   📏 Fire area: {fire_area_m2/1e6:.1f} km²")
-            print(f"   📏 Buffer: {buffer_m:,.0f}m ({buffer_m/1000:.1f}km)")
+            print(f"   📏 Fire area: {fire_area_m2 / 1e6:.1f} km²")
+            print(f"   📏 Buffer: {buffer_m:,.0f}m ({buffer_m / 1000:.1f}km)")
 
             minx = bounds[0] - buffer_m
             miny = bounds[1] - buffer_m
