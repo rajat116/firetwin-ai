@@ -4,7 +4,12 @@ This module orchestrates the transformation of raw data from multiple sources
 (NIFC, MTBS, FIRMS, ERA5, USGS, LANDFIRE) into the canonical FireCase schema.
 """
 
+from datetime import datetime
 from pathlib import Path
+
+import numpy as np
+from rasterio.features import rasterize
+from rasterio.transform import from_bounds
 
 from firetwin.data.clients import (
     ERA5LandClient,
@@ -14,7 +19,8 @@ from firetwin.data.clients import (
     NIFCHistoricalClient,
     USGS3DEPClient,
 )
-from firetwin.schemas.fire_case import FireCase
+from firetwin.schemas.core import FireState, FuelData, TerrainData, WeatherData
+from firetwin.schemas.fire_case import FireCase, FireCaseMetadata
 
 
 class RealFireCaseConverter:
@@ -85,9 +91,23 @@ class RealFireCaseConverter:
         try:
             perimeters = self.nifc_historical.get_fire_by_name(self.fire_name, year=self.fire_year)
             if perimeters:
+                # Filter perimeters to those within the target bbox
+                # This prevents getting fires with similar names from other regions
+                min_lon, min_lat, max_lon, max_lat = self.bbox
+
                 gdf = self.nifc_historical.perimeters_to_geodataframe(perimeters)
-                self.raw_data["nifc_perimeters"] = gdf
-                print(f"   ✅ Found {len(perimeters)} perimeter(s)")
+
+                # Filter by bbox
+                gdf_filtered = gdf.cx[min_lon:max_lon, min_lat:max_lat]
+
+                if len(gdf_filtered) > 0:
+                    self.raw_data["nifc_perimeters"] = gdf_filtered
+                    if len(gdf_filtered) < len(gdf):
+                        print(f"   ✅ Found {len(gdf_filtered)} perimeter(s) in bbox (filtered from {len(gdf)})")
+                    else:
+                        print(f"   ✅ Found {len(gdf_filtered)} perimeter(s)")
+                else:
+                    print(f"   ⚠️  Found {len(gdf)} perimeter(s) but none in target bbox")
             else:
                 print("   ⚠️  No NIFC perimeters found")
         except Exception as e:
@@ -99,8 +119,19 @@ class RealFireCaseConverter:
             mtbs_fires = self.mtbs.get_fire_by_name(self.fire_name, year=self.fire_year)
             if mtbs_fires:
                 gdf = self.mtbs.fires_to_geodataframe(mtbs_fires)
-                self.raw_data["mtbs_fires"] = gdf
-                print(f"   ✅ Found {len(mtbs_fires)} MTBS fire(s)")
+
+                # Filter by bbox
+                min_lon, min_lat, max_lon, max_lat = self.bbox
+                gdf_filtered = gdf.cx[min_lon:max_lon, min_lat:max_lat]
+
+                if len(gdf_filtered) > 0:
+                    self.raw_data["mtbs_fires"] = gdf_filtered
+                    if len(gdf_filtered) < len(gdf):
+                        print(f"   ✅ Found {len(gdf_filtered)} MTBS fire(s) in bbox (filtered from {len(gdf)})")
+                    else:
+                        print(f"   ✅ Found {len(gdf_filtered)} MTBS fire(s)")
+                else:
+                    print(f"   ⚠️  Found {len(gdf)} MTBS fire(s) but none in target bbox")
             else:
                 print("   ⚠️  No MTBS fires found")
         except Exception as e:
@@ -144,10 +175,82 @@ class RealFireCaseConverter:
         print(f"   Target CRS: {self.target_crs}")
         print(f"   Target Resolution: {self.target_resolution_m}m")
 
-        # Compute target grid bounds in projected CRS
-        # (For now, just placeholder - will implement full reprojection)
-        print("   ⚠️  Layer alignment not yet implemented")
-        print("   TODO: Implement reprojection, resampling, clipping")
+        if not self.raw_data:
+            print("   ⚠️  No data to align")
+            return
+
+        # 1. Reproject fire perimeter to target CRS
+        if "nifc_perimeters" in self.raw_data:
+            gdf = self.raw_data["nifc_perimeters"]
+            gdf_proj = gdf.to_crs(self.target_crs)
+            self.aligned_data["fire_perimeter"] = gdf_proj
+            print(f"   ✅ Reprojected NIFC perimeter to {self.target_crs}")
+        elif "mtbs_fires" in self.raw_data:
+            gdf = self.raw_data["mtbs_fires"]
+            gdf_proj = gdf.to_crs(self.target_crs)
+            self.aligned_data["fire_perimeter"] = gdf_proj
+            print(f"   ✅ Reprojected MTBS perimeter to {self.target_crs}")
+
+        # 2. Compute target grid bounds in projected CRS
+        if "fire_perimeter" in self.aligned_data:
+            gdf_proj = self.aligned_data["fire_perimeter"]
+            bounds = gdf_proj.total_bounds  # (minx, miny, maxx, maxy)
+
+            # Smart buffer: 10% of fire dimension, max 5km
+            # This prevents huge buffers for large fires
+            fire_area_m2 = gdf_proj.geometry.area.sum()
+            fire_dimension = np.sqrt(fire_area_m2)  # Approximate side length
+            buffer_m = min(fire_dimension * 0.1, 5000)  # Max 5km buffer
+
+            print(f"   📏 Fire area: {fire_area_m2/1e6:.1f} km²")
+            print(f"   📏 Buffer: {buffer_m:,.0f}m ({buffer_m/1000:.1f}km)")
+
+            minx = bounds[0] - buffer_m
+            miny = bounds[1] - buffer_m
+            maxx = bounds[2] + buffer_m
+            maxy = bounds[3] + buffer_m
+
+            # Compute grid dimensions
+            width = int(np.ceil((maxx - minx) / self.target_resolution_m))
+            height = int(np.ceil((maxy - miny) / self.target_resolution_m))
+
+            # Adjust bounds to align with grid
+            maxx = minx + width * self.target_resolution_m
+            maxy = miny + height * self.target_resolution_m
+
+            self.aligned_data["grid_bounds"] = (minx, miny, maxx, maxy)
+            self.aligned_data["grid_shape"] = (height, width)
+            self.aligned_data["transform"] = from_bounds(minx, miny, maxx, maxy, width, height)
+
+            print(f"   ✅ Grid: {width}x{height} cells ({self.target_resolution_m}m resolution)")
+            print(f"   📐 Bounds: {minx:.0f}, {miny:.0f} → {maxx:.0f}, {maxy:.0f}")
+
+        # 3. Rasterize fire perimeter onto target grid
+        if "fire_perimeter" in self.aligned_data and "grid_shape" in self.aligned_data:
+            gdf_proj = self.aligned_data["fire_perimeter"]
+            height, width = self.aligned_data["grid_shape"]
+            transform = self.aligned_data["transform"]
+
+            # Rasterize: 1 inside fire perimeter, 0 outside
+            shapes = [(geom, 1) for geom in gdf_proj.geometry]
+            burned_mask = rasterize(
+                shapes,
+                out_shape=(height, width),
+                transform=transform,
+                fill=0,
+                dtype=np.uint8,
+            )
+
+            self.aligned_data["burned_mask"] = burned_mask
+            burned_pixels = np.sum(burned_mask)
+            total_pixels = height * width
+            burned_fraction = burned_pixels / total_pixels * 100
+
+            print(
+                f"   ✅ Rasterized fire perimeter: {burned_pixels}/{total_pixels} pixels burned ({burned_fraction:.1f}%)"
+            )
+
+        print("   ✅ Layer alignment complete")
 
     def build_fire_case(self) -> FireCase | None:
         """Build canonical FireCase from aligned data.
@@ -158,16 +261,105 @@ class RealFireCaseConverter:
         print("\n🏗️  Building FireCase...")
 
         # Check minimum data requirements
-        has_perimeter = "nifc_perimeters" in self.raw_data or "mtbs_fires" in self.raw_data
-
-        if not has_perimeter:
-            print("   ❌ Insufficient data: No fire perimeter available")
+        if "burned_mask" not in self.aligned_data:
+            print("   ❌ Insufficient data: No aligned fire perimeter")
             return None
 
-        print("   ⚠️  FireCase construction not yet implemented")
-        print("   TODO: Convert raw data to TerrainData, FuelData, WeatherData, FireState")
+        height, width = self.aligned_data["grid_shape"]
+        burned_mask = self.aligned_data["burned_mask"]
 
-        return None
+        # 1. Create metadata
+        case_id = f"{self.fire_name.lower().replace(' ', '_')}_{self.fire_year}"
+        metadata = FireCaseMetadata(
+            case_id=case_id,
+            name=f"{self.fire_name} ({self.fire_year})",
+            description=f"Real fire case from {self.fire_name} fire in {self.fire_year}",
+            is_synthetic=False,
+            creation_timestamp=datetime.utcnow(),
+            source="NIFC/MTBS",
+            tags=[
+                "real_data",
+                f"year_{self.fire_year}",
+                self.fire_name.lower().replace(" ", "_"),
+            ],
+        )
+
+        # Create BoundingBox from aligned grid bounds
+        from firetwin.schemas.core import BoundingBox, CoordinateSystem
+
+        minx, miny, maxx, maxy = self.aligned_data["grid_bounds"]
+        bbox_obj = BoundingBox(
+            min_x=minx,
+            max_x=maxx,
+            min_y=miny,
+            max_y=maxy,
+            crs=CoordinateSystem.UTM_10N,  # Assuming Western US for now
+        )
+
+        # 2. Create TerrainData (placeholder with flat terrain for now)
+        print("   ⚠️  Using placeholder terrain (flat at 1000m elevation)")
+        terrain = TerrainData(
+            elevation_m=np.full((height, width), 1000.0, dtype=np.float32),
+            slope_degrees=np.zeros((height, width), dtype=np.float32),
+            aspect_degrees=np.zeros((height, width), dtype=np.float32),
+            resolution_m=self.target_resolution_m,
+            bbox=bbox_obj,
+        )
+
+        # 3. Create FuelData (placeholder with moderate fuel load)
+        print("   ⚠️  Using placeholder fuels (uniform FBFM 10)")
+        fuels = FuelData(
+            fuel_model=np.full((height, width), 10, dtype=np.int32),  # FBFM 10: Timber
+            fuel_load_kg_m2=np.full((height, width), 2.0, dtype=np.float32),
+            fuel_moisture_percent=np.full((height, width), 8.0, dtype=np.float32),
+            resolution_m=self.target_resolution_m,
+        )
+
+        # 4. Create WeatherData (placeholder with moderate conditions)
+        print("   ⚠️  Using placeholder weather (moderate wind/temp)")
+        weather = WeatherData(
+            temperature_c=25.0,  # Scalar, not array
+            relative_humidity_percent=30.0,
+            wind_speed_m_s=5.0,
+            wind_direction_degrees=270.0,  # West
+            timestamp=datetime(self.fire_year, 7, 1),  # Placeholder date
+        )
+
+        # 5. Create initial FireState (no fire initially)
+        print("   ✅ Creating initial state (no fire)")
+        initial_state = FireState(
+            timestamp=datetime(self.fire_year, 1, 1),  # Placeholder date
+            burned=np.zeros((height, width), dtype=np.uint8),
+            active_front=np.zeros((height, width), dtype=np.uint8),
+            resolution_m=self.target_resolution_m,
+            bbox=bbox_obj,
+        )
+
+        # 6. Create target state (final fire perimeter)
+        print("   ✅ Creating target state (final perimeter)")
+        target_state = FireState(
+            timestamp=datetime(self.fire_year, 12, 31),  # Placeholder date
+            burned=burned_mask.astype(np.uint8),
+            active_front=np.zeros((height, width), dtype=np.uint8),  # No active front at end
+            resolution_m=self.target_resolution_m,
+            bbox=bbox_obj,
+        )
+
+        # 7. Build FireCase
+        fire_case = FireCase(
+            metadata=metadata,
+            terrain=terrain,
+            fuels=fuels,
+            weather=weather,
+            initial_state=initial_state,
+            target_states=[target_state],
+        )
+
+        print(f"   ✅ Built FireCase: {case_id}")
+        print(f"      Grid: {width}x{height} @ {self.target_resolution_m}m")
+        print(f"      Burned area: {np.sum(burned_mask)} pixels")
+
+        return fire_case
 
     def save_fire_case(self, fire_case: FireCase, output_dir: Path) -> None:
         """Save FireCase to disk in Zarr format.

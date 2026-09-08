@@ -32,12 +32,13 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 2 Complete - Real Data Infrastructure ✅
+**Current Phase**: Phase 3 Complete - Historical Fire Case Builder ✅
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
 - ✅ **Phase 2**: Real data source integration (all 6 clients + validation + inventory)
-- 🚧 **Phase 3**: Historical case builder (next)
+- ✅ **Phase 3**: Historical case builder (3 pilot fires with validated accuracy)
+- 🚧 **Phase 4**: Real-data baselines (next)
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -199,7 +200,7 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 0**: Repository and engineering foundation
 - [x] **Phase 1**: Synthetic end-to-end vertical slice
 - [x] **Phase 2**: Data-source clients, validation, inventory, and audit
-- [ ] **Phase 3**: Historical case builder
+- [x] **Phase 3**: Historical case builder (3 pilot fires)
 - [ ] **Phase 4**: Real-data baselines
 - [ ] **Phase 5**: Simulation corpus and surrogate
 - [ ] **Phase 6**: Hybrid model

@@ -46,22 +46,18 @@ def test_carlton_complex_converter():
     # Test layer alignment (placeholder for now)
     converter.align_layers()
 
-    # Test FireCase building (placeholder for now)
+    # Test FireCase building
     fire_case = converter.build_fire_case()
 
-    # Validation
-    has_core_data = (
-        "nifc_historical" in summary.get("data_sources", {})
-        or "mtbs" in summary.get("data_sources", {})
-    )
-
-    if has_core_data:
-        print("\n✅ SUCCESS: Core fire perimeter data available!")
-        print("   Converter infrastructure working correctly")
+    # Save FireCase if successful
+    if fire_case:
+        output_dir = Path("data/fire_cases")
+        converter.save_fire_case(fire_case, output_dir)
+        print("\n✅ SUCCESS: FireCase built and saved!")
+        print("   Converter working end-to-end")
         return True
     else:
-        print("\n⚠️  WARNING: No core perimeter data available")
-        print("   Cannot build complete FireCase without perimeter data")
+        print("\n⚠️  WARNING: Failed to build FireCase")
         return False
 
 

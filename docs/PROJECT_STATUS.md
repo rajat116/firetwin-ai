@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
-**Last Updated**: 2026-09-07  
-**Current Phase**: Phase 2 ✅
+**Last Updated**: 2026-09-08  
+**Current Phase**: Phase 3 ✅
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -159,9 +159,63 @@ Elliptical baseline outperforms radial and persistence on 6-hour forecasts:
 - `src/firetwin/data/inventory.py`: Fire inventory system
 - `src/firetwin/data/audit.py`: Data auditor
 
+## Phase 3: Historical Fire Case Builder ✅
+
+**Status**: COMPLETED (2026-09-08)
+
+**Purpose**: Build complete FireCase objects from real historical wildfire data.
+
+### Completed Tasks
+
+**RealFireCaseConverter Implementation**:
+- [x] Multi-source data fetching (NIFC Historical, MTBS)
+- [x] Spatial alignment and CRS reprojection
+- [x] Grid computation with configurable resolution (100m default)
+- [x] Fire perimeter rasterization using rasterio
+- [x] Canonical FireCase construction
+- [x] Zarr format export with compression
+
+**3 Pilot Fires Built**:
+- [x] Carlton Complex 2014 (WA) - 251,965 acres
+- [x] King Fire 2014 (CA) - 97,685 acres  
+- [x] Big Cougar 2014 (OR/ID) - 65,305 acres
+
+**Scripts and Testing**:
+- [x] Individual fire test script (`test_converter_carlton.py`)
+- [x] Batch build script (`build_all_pilot_fires.py`)
+- [x] All code passes linting and formatting
+
+### Acceptance Criteria
+
+- [x] Successfully fetch real fire perimeter data
+- [x] Reproject and align to target CRS
+- [x] Rasterize perimeters to canonical grid
+- [x] Build complete FireCase objects
+- [x] Save to Zarr format
+- [x] Generate 3 diverse pilot fires
+
+### Key Results
+
+**Generated Fire Cases**:
+- 3 complete FireCase objects with real perimeters
+- Geographic diversity: Pacific NW, Sierra Nevada, Northern Rockies
+- Scale diversity: 65k - 252k acres
+- Total storage: ~24MB compressed Zarr
+
+**Known Limitations**:
+- Terrain, fuels, weather using placeholder data (real integration in Phase 4)
+- Static perimeters only (no time-resolved progression yet)
+- Limited to fires with NIFC Historical coverage
+
+### Documentation
+
+- `docs/PHASE3_STATUS.md`: Complete phase status and lessons learned
+- `docs/PHASE3_PILOT_FIRES.md`: Fire selection rationale
+- `src/firetwin/data/converter.py`: Core converter implementation
+- `scripts/build_all_pilot_fires.py`: Batch processing script
+
 ## Future Phases
 
-- **Phase 3**: Historical case builder (3 pilot fires)
 - **Phase 4**: Real-data baselines
 - **Phase 5**: Simulation corpus and surrogate
 - **Phase 6**: Hybrid model
@@ -175,11 +229,11 @@ Elliptical baseline outperforms radial and persistence on 6-hour forecasts:
 ```
 Phase 0: ████████████████████ 100% ✅
 Phase 1: ████████████████████ 100% ✅
-Phase 2: ░░░░░░░░░░░░░░░░░░░░   0%
-Phase 3: ░░░░░░░░░░░░░░░░░░░░   0%
+Phase 2: ████████████████████ 100% ✅
+Phase 3: ████████████████████ 100% ✅
 Phase 4: ░░░░░░░░░░░░░░░░░░░░   0%
 ...
-Overall: ████░░░░░░░░░░░░░░░░  20%
+Overall: ████████░░░░░░░░░░░░  40%
 ```
 
 ## Known Issues

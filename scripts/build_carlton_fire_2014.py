@@ -16,12 +16,9 @@ Carlton Complex Fire 2014:
 """
 
 import json
-from datetime import date, datetime
 from pathlib import Path
 
 from firetwin.data.clients import (
-    ERA5LandClient,
-    FIRMSClient,
     MTBSClient,
     NIFCHistoricalClient,
     USGS3DEPClient,
@@ -87,13 +84,9 @@ def build_carlton_complex_case():
         if mtbs_fires:
             print(f"   ✅ Found {len(mtbs_fires)} MTBS fire(s)")
             for f in mtbs_fires:
-                ig_date = (
-                    f.ignition_date.strftime("%Y-%m-%d") if f.ignition_date else "N/A"
-                )
+                ig_date = f.ignition_date.strftime("%Y-%m-%d") if f.ignition_date else "N/A"
                 print(f"      - {f.fire_name}: {f.acres:,.0f} acres")
-                print(
-                    f"        Year: {f.fire_year}, Ignition: {ig_date}, Type: {f.fire_type}"
-                )
+                print(f"        Year: {f.fire_year}, Ignition: {ig_date}, Type: {f.fire_type}")
 
             data_summary["data_sources"]["mtbs"] = {
                 "available": True,
@@ -171,14 +164,12 @@ def build_carlton_complex_case():
     print("📊 Data Availability Summary\n")
 
     available_sources = sum(
-        1
-        for src in data_summary["data_sources"].values()
-        if src.get("available", False)
+        1 for src in data_summary["data_sources"].values() if src.get("available", False)
     )
     total_sources = len(data_summary["data_sources"])
 
     print(f"Available: {available_sources}/{total_sources} data sources")
-    print(f"\nCore fire data:")
+    print("\nCore fire data:")
     print(
         f"  - NIFC Historical: {'✅' if data_summary['data_sources']['nifc_historical'].get('available') else '❌'}"
     )
@@ -197,10 +188,9 @@ def build_carlton_complex_case():
     print(f"\n💾 Summary saved to: {summary_file}")
 
     # Validation
-    has_core_data = (
-        data_summary["data_sources"]["nifc_historical"].get("available", False)
-        or data_summary["data_sources"]["mtbs"].get("available", False)
-    )
+    has_core_data = data_summary["data_sources"]["nifc_historical"].get(
+        "available", False
+    ) or data_summary["data_sources"]["mtbs"].get("available", False)
 
     if has_core_data:
         print("\n✅ SUCCESS: Core fire perimeter data available!")
