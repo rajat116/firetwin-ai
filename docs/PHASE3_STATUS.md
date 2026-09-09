@@ -1,7 +1,11 @@
 # Phase 3 Status - Historical Fire Case Builder
 
-**Last Updated**: 2026-09-08
+**Last Updated**: 2026-09-09
 **Status**: COMPLETE ✅ - Final-extent pilot cases built and validated with explicit limitations
+
+> Update: Phase 4A has now replaced the flat terrain placeholder in generated pilot cases with
+> real USGS 3DEP elevation, slope and aspect. Fuel, weather and time-resolved progression remain
+> pending.
 
 **Scientific Scope**: These cases are valid final-burned-extent artifacts. They are not yet
 time-resolved fire-progression labels and are not forecast-ready real-data samples.
@@ -16,7 +20,8 @@ time-resolved fire-progression labels and are not forecast-ready real-data sampl
    - ✅ Target CRS preserved in FireCase bbox metadata
    - ✅ Fire perimeter rasterization
    - ✅ FireCase construction with canonical schemas
-   - ✅ Final-extent and placeholder-covariate limitations stored in metadata
+   - ✅ Final-extent and covariate limitations stored in metadata
+   - ✅ Real USGS 3DEP terrain alignment added in Phase 4A
    - ✅ Zarr format export with compression
 
 ### 2. All 3 Pilot Fires Generated & Validated
@@ -68,8 +73,8 @@ time-resolved fire-progression labels and are not forecast-ready real-data sampl
 
 ## Known Limitations
 
-1. **Placeholder Data**
-   - ⚠️ Terrain: Using flat 1000m elevation (real USGS 3DEP integration pending)
+1. **Remaining Placeholder Data**
+   - ✅ Terrain: Real USGS 3DEP elevation, slope and aspect integrated in Phase 4A
    - ⚠️ Fuels: Using uniform FBFM 10 (real LANDFIRE integration pending)
    - ⚠️ Weather: Using moderate conditions (real ERA5 integration pending)
 
@@ -84,12 +89,13 @@ time-resolved fire-progression labels and are not forecast-ready real-data sampl
    - MTBS: ⚠️ Limited data for Carlton Complex
    - FIRMS: ❌ Requires API key
    - ERA5: ❌ Requires CDS credentials
-   - USGS/LANDFIRE: ❌ Not yet integrated
+   - USGS 3DEP: ✅ Integrated for terrain in Phase 4A
+   - LANDFIRE: ❌ Not yet integrated
 
 ## Next Steps (Phase 4+)
 
 1. **Phase 4: Real Data Enrichment**
-   - Integrate USGS 3DEP for real terrain
+   - ✅ Integrate USGS 3DEP for real terrain
    - Integrate LANDFIRE for real fuels
    - Integrate ERA5-Land for real weather
    - Add FIRMS active fire detections
@@ -125,10 +131,11 @@ RealFireCaseConverter
 
 **Output**:
 - 3 canonical FireCase objects in `data/fire_cases/`
-- Each with real fire perimeter rasterized to 100m grid
+- Each with real fire perimeter and real USGS terrain rasterized/resampled to 100m grid
 - Geographic diversity: Washington, California, Oregon/Idaho
 - Scale diversity: 65k - 252k acres
-- Ready for final-extent validation; not yet ready for hourly real-data forecast evaluation
+- Ready for final-extent validation with terrain covariates; not yet ready for hourly real-data
+  forecast evaluation
 
 ## Phase 3 Exit Gate
 

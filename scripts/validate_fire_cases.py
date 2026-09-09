@@ -1,9 +1,9 @@
-"""Validate generated fire cases for Phase 3 completion.
+"""Validate generated pilot fire cases.
 
 This script validates that the generated fire cases:
 1. Have correct metadata
 2. Match expected fire sizes (within reasonable tolerance)
-3. Have valid spatial properties
+3. Have valid spatial properties and real terrain covariates
 4. Are properly formatted
 """
 
@@ -13,12 +13,19 @@ import numpy as np
 import xarray as xr
 
 
-def validate_fire_case(zarr_path: Path, expected_acres: float, expected_crs: str) -> dict:
+def validate_fire_case(
+    zarr_path: Path,
+    expected_acres: float,
+    expected_crs: str,
+    require_real_terrain: bool = False,
+) -> dict:
     """Validate a single fire case.
 
     Args:
         zarr_path: Path to the zarr file
         expected_acres: Expected fire size in acres
+        expected_crs: Expected target CRS
+        require_real_terrain: If True, fail flat placeholder terrain
 
     Returns:
         Dictionary with validation results
@@ -40,6 +47,7 @@ def validate_fire_case(zarr_path: Path, expected_acres: float, expected_crs: str
             "target_type",
             "covariate_status",
             "limitations",
+            "covariate_sources",
         ]
         for attr in required_attrs:
             if attr in ds.attrs:
@@ -54,8 +62,21 @@ def validate_fire_case(zarr_path: Path, expected_acres: float, expected_crs: str
 
         if ds.attrs.get("covariate_status") == "placeholder":
             results["passed"].append("✅ Placeholder covariates explicitly marked")
+        elif ds.attrs.get("covariate_status") == "partial_real_terrain":
+            results["passed"].append("✅ Partial real covariates explicitly marked")
         else:
-            results["failed"].append("❌ Placeholder covariate status is not explicit")
+            results["failed"].append("❌ Covariate status is not explicit")
+
+        if require_real_terrain and ds.attrs.get("covariate_status") != "partial_real_terrain":
+            results["failed"].append(
+                "❌ Real terrain is required but covariate status is not partial_real_terrain"
+            )
+
+        covariate_sources = ds.attrs.get("covariate_sources", "")
+        if require_real_terrain and "USGS 3DEP" in covariate_sources:
+            results["passed"].append("✅ Terrain source provenance records USGS 3DEP")
+        elif require_real_terrain:
+            results["failed"].append("❌ Terrain source provenance does not record USGS 3DEP")
 
         if ds.attrs.get("bbox_crs") == expected_crs:
             results["passed"].append(f"✅ CRS matches expected {expected_crs}")
@@ -147,9 +168,40 @@ def validate_fire_case(zarr_path: Path, expected_acres: float, expected_crs: str
         if "elevation_m" in ds:
             elev = ds["elevation_m"].values
             if np.all(elev == 1000.0):
-                results["warnings"].append("⚠️  Terrain is placeholder (flat at 1000m)")
+                message = "Terrain is placeholder (flat at 1000m)"
+                if require_real_terrain:
+                    results["failed"].append(f"❌ {message}")
+                else:
+                    results["warnings"].append(f"⚠️  {message}")
             else:
-                results["passed"].append("✅ Terrain has variation")
+                elev_range = float(np.nanmax(elev) - np.nanmin(elev))
+                if np.isfinite(elev).all() and elev_range > 1.0:
+                    results["passed"].append(
+                        f"✅ Terrain has real elevation variation ({elev_range:.0f}m range)"
+                    )
+                else:
+                    results["failed"].append("❌ Terrain elevation is missing or nearly flat")
+
+            if require_real_terrain:
+                if "slope_degrees" in ds:
+                    slope = ds["slope_degrees"].values
+                    if np.isfinite(slope).all() and float(np.nanmax(slope)) > 0.1:
+                        results["passed"].append(
+                            f"✅ Slope is derived and non-flat (max {float(np.nanmax(slope)):.1f}°)"
+                        )
+                    else:
+                        results["failed"].append("❌ Slope is missing, invalid, or flat")
+                else:
+                    results["failed"].append("❌ Missing slope data")
+
+                if "aspect_degrees" in ds:
+                    aspect = ds["aspect_degrees"].values
+                    if np.isfinite(aspect).all() and np.all((aspect >= 0.0) & (aspect < 360.0)):
+                        results["passed"].append("✅ Aspect is finite and within [0, 360)")
+                    else:
+                        results["failed"].append("❌ Aspect contains invalid values")
+                else:
+                    results["failed"].append("❌ Missing aspect data")
         else:
             results["failed"].append("❌ Missing elevation data")
 
@@ -171,7 +223,7 @@ def validate_fire_case(zarr_path: Path, expected_acres: float, expected_crs: str
 
 def main():
     """Validate all fire cases."""
-    print("🔥 Phase 3 Fire Case Validation")
+    print("🔥 Pilot Fire Case Validation (Phase 4A terrain gate)")
     print("=" * 80)
 
     # Expected sizes (from PHASE3_PILOT_FIRES.md)
@@ -196,7 +248,12 @@ def main():
         print(f"🔥 {case_id.replace('_', ' ').title()}")
         print(f"{'=' * 80}")
 
-        results = validate_fire_case(zarr_path, expected_acres, expected_crs)
+        results = validate_fire_case(
+            zarr_path,
+            expected_acres,
+            expected_crs,
+            require_real_terrain=True,
+        )
 
         # Print passed checks
         for msg in results["passed"]:
@@ -224,11 +281,11 @@ def main():
 
     if all_passed:
         print("✅ ALL VALIDATIONS PASSED")
-        print("   Phase 3 fire cases are ready")
+        print("   Phase 4A fire cases have real terrain and are ready")
         return True
     else:
         print("❌ SOME VALIDATIONS FAILED")
-        print("   Review issues above before completing Phase 3")
+        print("   Review issues above before completing the current phase")
         return False
 
 

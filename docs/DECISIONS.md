@@ -167,7 +167,7 @@ Use `--no-site-packages` flag in all mypy invocations to skip type checking of i
 
 ## Decision 5: Phase 3 Real Cases Are Final-Extent Artifacts
 
-**Date**: 2026-09-08  
+**Date**: 2026-09-09
 **Phase**: 3 - Historical Fire Case Builder
 
 ### Context
@@ -208,7 +208,7 @@ forecast benchmarking.
 
 ## Decision 6: Machine-Readable Data Source Registry
 
-**Date**: 2026-09-08  
+**Date**: 2026-09-09
 **Phase**: 3 - Data Foundation Cleanup
 
 ### Context
@@ -231,6 +231,41 @@ dataset manifests.
 
 - Future downloads should update source versions/checksums at case-build time.
 - Docs and config must be kept in sync when source behavior changes.
+
+---
+
+## Decision 7: Use USGS 3DEP 1 Arc-Second DEM for Phase 4A Terrain
+
+**Date**: 2026-09-09
+**Phase**: 4A - Real Terrain Enrichment
+
+### Context
+
+The pilot fire cases use a 100m model grid. USGS 3DEP 1/3 arc-second tiles are available but are
+hundreds of megabytes per 1-degree tile, while 1 arc-second GeoTIFF tiles are still real 3DEP DEM
+data and finer than the current model grid.
+
+### Decision
+
+Use `National Elevation Dataset (NED) 1 arc-second` as the default USGS 3DEP product for Phase 4A.
+Select the latest GeoTIFF product per 1-degree tile, cache the source DEMs under ignored
+`data/raw/3dep/`, resample them onto the FireTwin grid, and derive slope/aspect from the aligned
+elevation.
+
+Generated cases are marked as `target_type=final_burned_extent` and
+`covariate_status=partial_real_terrain`.
+
+### Rationale
+
+This replaces dummy terrain with physically meaningful covariates while keeping download size and
+local processing practical. It also keeps the metadata honest: terrain is real, while fuel, weather
+and time-resolved progression remain unfinished.
+
+### Consequences
+
+- Pilot Zarrs should now fail validation if terrain is flat or missing.
+- Future LANDFIRE and weather work can build on an already-aligned terrain grid.
+- 1/3 arc-second DEM can be enabled later for cases where storage and compute budgets justify it.
 
 ---
 

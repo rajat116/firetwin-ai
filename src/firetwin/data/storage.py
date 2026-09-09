@@ -1,5 +1,6 @@
 """Storage and serialization for fire cases using Xarray and Zarr."""
 
+import json
 from pathlib import Path
 
 import numpy as np
@@ -66,6 +67,7 @@ def fire_case_to_xarray(case: FireCase) -> xr.Dataset:
             "data_quality": case.metadata.data_quality,
             "covariate_status": case.metadata.covariate_status,
             "limitations": "|".join(case.metadata.limitations),
+            "covariate_sources": json.dumps(case.metadata.covariate_sources, sort_keys=True),
             # Grid info
             "resolution_m": case.resolution_m,
             "bbox_min_x": case.terrain.bbox.min_x,
@@ -138,6 +140,7 @@ def xarray_to_fire_case(ds: xr.Dataset) -> FireCase:
         limitations=ds.attrs.get("limitations", "").split("|")
         if ds.attrs.get("limitations")
         else [],
+        covariate_sources=json.loads(ds.attrs.get("covariate_sources", "{}")),
     )
 
     # Extract bbox

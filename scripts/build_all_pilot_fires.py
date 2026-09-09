@@ -1,15 +1,16 @@
-"""Build all 3 pilot fire cases for Phase 3.
+"""Build all 3 pilot fire cases with real USGS terrain.
 
 This script builds complete FireCase objects for:
 1. Carlton Complex 2014 (WA, 252k acres) - Pacific NW
 2. King Fire 2014 (CA, 98k acres) - Sierra Nevada
 3. Big Cougar 2014 (OR/ID, 65k acres) - Northern Rockies
 
-Each fire demonstrates the end-to-end pipeline:
+Each fire demonstrates the end-to-end Phase 4A pipeline:
 - Multi-source data fetching (NIFC, MTBS, FIRMS, ERA5, USGS, LANDFIRE)
 - Spatial alignment and reprojection
+- USGS 3DEP DEM resampling to the FireTwin grid
 - Rasterization to canonical grid
-- FireCase construction with real perimeters
+- FireCase construction with real perimeters and real terrain
 """
 
 from pathlib import Path
@@ -67,7 +68,7 @@ def build_pilot_fire(
 
 def main():
     """Build all 3 pilot fire cases."""
-    print("🚀 Building All Pilot Fire Cases (Phase 3)")
+    print("🚀 Building All Pilot Fire Cases (Phase 4A: Real Terrain)")
     print("=" * 70)
 
     # Define pilot fires (from PHASE3_PILOT_FIRES.md)
@@ -118,7 +119,7 @@ def main():
 
     if successful == total:
         print("\n✅ ALL PILOT FIRES COMPLETE!")
-        print("   Phase 3 pilot case building successful")
+        print("   Phase 4A pilot case building successful")
         print("   FireCases saved to: data/fire_cases/")
         return True
     else:

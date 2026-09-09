@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
-**Last Updated**: 2026-09-08  
-**Current Phase**: Phase 3 ✅
+**Last Updated**: 2026-09-09
+**Current Phase**: Phase 4A ✅
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -224,9 +224,42 @@ labels.
 - `src/firetwin/data/converter.py`: Core converter implementation
 - `scripts/build_all_pilot_fires.py`: Batch processing script
 
+## Phase 4A: Real Terrain Enrichment ✅
+
+**Status**: COMPLETED (2026-09-08)
+
+**Purpose**: Replace flat placeholder terrain in the pilot fire cases with real USGS 3DEP DEM
+covariates aligned to the canonical FireTwin grid.
+
+### Completed Tasks
+
+- [x] Updated USGS 3DEP client to use current TNM dataset names.
+- [x] Select latest GeoTIFF product per 1-degree DEM tile instead of historical duplicates.
+- [x] Download and cache DEM tiles under ignored `data/raw/3dep/`.
+- [x] Reproject/resample DEM tiles onto each target FireTwin grid.
+- [x] Derive slope and aspect from aligned elevation arrays.
+- [x] Store real terrain arrays in generated Zarr fire cases.
+- [x] Mark generated cases with `covariate_status=partial_real_terrain`.
+- [x] Store covariate-source provenance in case metadata and Zarr attributes.
+- [x] Tighten validation so pilot cases fail if terrain remains flat/placeholder.
+- [x] Add unit tests for DEM selection, alignment, derivative computation and converter metadata.
+
+### Result-Wise Validation
+
+- Carlton Complex: elevation 218-2255m, mean slope 13.5°, final burned area 9.3% from reference.
+- King: elevation 388-2371m, mean slope 14.5°, final burned area 0.2% from reference.
+- Big Cougar: elevation 240-1671m, mean slope 19.9°, final burned area ~0.0% from reference.
+
+### Remaining Phase 4 Work
+
+- [ ] Phase 4B: Replace uniform FBFM 10 with real LANDFIRE fuel layers.
+- [ ] Phase 4C: Replace scalar placeholder weather with real ERA5-Land/weather covariates.
+- [ ] Phase 4D: Add real-data baselines that respect `target_type=final_burned_extent`.
+
 ## Future Phases
 
-- **Phase 4**: Real-data baselines
+- **Phase 4B**: Real LANDFIRE fuel enrichment
+- **Phase 4C**: Real weather covariates and real-data baselines
 - **Phase 5**: Simulation corpus and surrogate
 - **Phase 6**: Hybrid model
 - **Phase 7**: Assimilation and calibrated uncertainty
@@ -241,22 +274,22 @@ Phase 0: ████████████████████ 100% ✅
 Phase 1: ████████████████████ 100% ✅
 Phase 2: ████████████████████ 100% ✅
 Phase 3: ████████████████████ 100% ✅
-Phase 4: ░░░░░░░░░░░░░░░░░░░░   0%
+Phase 4A: ████████████████████ 100% ✅
+Phase 4B: ░░░░░░░░░░░░░░░░░░░░   0%
 ...
-Overall: ████████░░░░░░░░░░░░  40%
+Overall: █████████░░░░░░░░░░░  45%
 ```
 
 ## Known Issues
 
-- Phase 3 pilot cases are final-burned-extent artifacts with placeholder terrain, fuel and weather.
+- Pilot cases are final-burned-extent artifacts with real terrain but placeholder fuel and weather.
 - Real-data baseline evaluation must not treat these final masks as hourly progression labels.
 - `python` on the local machine resolves to Python 2.7 outside conda; use `conda activate firetwin`
   or `python3` for scripts.
 
 ## Blockers
 
-None for completing the Phase 0-3 cleanup. Phase 4 enrichment/evaluation requires external data
-access/credentials for full real terrain, fuel, weather and FIRMS covariates.
+None for Phase 4A. Phase 4B/4C require LANDFIRE and weather data integration decisions.
 
 ## Notes
 

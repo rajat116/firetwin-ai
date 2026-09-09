@@ -1,6 +1,6 @@
 metadata:
   registry_version: 1
-  last_updated: "2026-09-08"
+  last_updated: "2026-09-09"
   scope: "Western United States wildfire research prototype"
   warning: "Research prototype. Not for operational wildfire response, evacuation planning or safety-critical decision-making."
 
@@ -173,20 +173,23 @@ sources:
   usgs_3dep:
     provider: "U.S. Geological Survey 3D Elevation Program"
     products:
-      - "Digital elevation model"
+      - "National Elevation Dataset (NED) 1 arc-second GeoTIFF"
+      - "National Elevation Dataset (NED) 1/3 arc-second GeoTIFF"
     variables:
       - "elevation"
       - "slope"
       - "aspect"
-    spatial_resolution: "Resolution varies by product and area; choose resolution consistent with model grid"
+    spatial_resolution: "FireTwin defaults to 1 arc-second (~30 m) source DEM resampled to the 100 m model grid; 1/3 arc-second (~10 m) is optional"
     temporal_resolution: "Static terrain product with acquisition/update metadata"
-    access_method: "The National Map / 3DEP services"
+    access_method: "The National Map products API; latest GeoTIFF selected per 1-degree tile"
     official_urls:
       homepage: "https://www.usgs.gov/3d-elevation-program"
       data_download: "https://www.usgs.gov/the-national-map-data-delivery/gis-data-download"
+      tnm_api: "https://tnmaccess.nationalmap.gov/api/v1/products"
     access_date: "2026-09-08"
-    version: "Record source product and acquisition metadata per case"
+    version: "Phase 4A uses latest available TNM 1 arc-second GeoTIFF per tile at build time"
     checksum: null
     known_limitations:
       - "High-resolution elevation should be downselected to match label/input resolution and compute budget."
       - "Terrain source date may differ from fire date."
+      - "DEM tiles are static terrain covariates and do not provide fire progression labels."

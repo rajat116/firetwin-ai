@@ -29,6 +29,10 @@ class FireCaseMetadata(BaseModel):
     limitations: list[str] = Field(
         default_factory=list, description="Known limitations that affect scientific use"
     )
+    covariate_sources: dict[str, str] = Field(
+        default_factory=dict,
+        description="Source provenance for terrain, fuel, weather and other covariates",
+    )
 
 
 class FireCase(BaseModel):

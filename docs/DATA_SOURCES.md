@@ -2,7 +2,7 @@
 
 This document maintains a verified registry of all data sources used in FireTwin.
 
-**Last Updated**: 2026-09-08
+**Last Updated**: 2026-09-09
 
 Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources.yaml)
 
@@ -182,7 +182,13 @@ Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources
 - Data Download: https://www.usgs.gov/the-national-map-data-delivery/gis-data-download
 
 **Access Method**: The National Map download / API  
-**Spatial Resolution**: 10m, 30m (resolution varies by area)  
+**Default Product in FireTwin**: `National Elevation Dataset (NED) 1 arc-second` GeoTIFF,
+latest product per 1-degree tile
+
+**Optional Higher-Resolution Product**: `National Elevation Dataset (NED) 1/3 arc-second` GeoTIFF
+
+**Spatial Resolution**: 30m default source product resampled to the 100m FireTwin modeling grid;
+10m source tiles are available when justified by compute/storage budget
 **License/Terms**: Public domain (U.S. government work)
 
 **Derived Variables**:
@@ -193,6 +199,9 @@ Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources
 **Known Limitations**:
 - Select resolution consistent with model grid and computational budget
 - Very high resolution (1m) may not be justified given coarser weather/fuel inputs
+- 1/3 arc-second tiles are much larger than 1 arc-second tiles; FireTwin defaults to 1 arc-second
+  because it is still finer than the current 100m grid
+- Terrain source date may differ from the fire date
 
 **Citation**: USGS. (2026). USGS 3D Elevation Program. Retrieved from https://www.usgs.gov/3d-elevation-program
 

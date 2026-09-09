@@ -52,6 +52,11 @@ def test_validate_fire_case_computes_known_final_extent_area(tmp_path):
             data_quality="test",
             covariate_status="placeholder",
             limitations=["Target state is final burned extent, not progression."],
+            covariate_sources={
+                "terrain": "placeholder_flat_1000m",
+                "fuels": "placeholder_uniform_fbfm_10",
+                "weather": "placeholder_scalar_moderate_conditions",
+            },
         ),
         terrain=TerrainData(
             elevation_m=np.full((3, 3), 1000.0, dtype=np.float32),
@@ -92,9 +97,11 @@ def test_validate_fire_case_computes_known_final_extent_area(tmp_path):
     )
     zarr_path = tmp_path / "known_area.zarr"
     fire_case.save_to_zarr(zarr_path)
+    loaded = FireCase.load_from_zarr(zarr_path)
 
     results = validate_fire_case(zarr_path, expected_acres, "EPSG:32610")
 
+    assert loaded.metadata.covariate_sources["terrain"] == "placeholder_flat_1000m"
     assert not results["failed"]
     assert results["burned_pixels"] == 2
     assert results["burned_area_acres"] == expected_acres

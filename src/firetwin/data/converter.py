@@ -29,6 +29,13 @@ PLACEHOLDER_COVARIATE_LIMITATIONS = [
     "Target state is final burned extent, not time-resolved fire progression.",
 ]
 
+REAL_TERRAIN_LIMITATIONS = [
+    "Terrain is real USGS 3DEP elevation resampled to the FireTwin grid.",
+    "Fuel grids are placeholder uniform FBFM 10, not LANDFIRE.",
+    "Weather is a placeholder scalar condition, not ERA5-Land.",
+    "Target state is final burned extent, not time-resolved fire progression.",
+]
+
 
 class RealFireCaseConverter:
     """Convert real wildfire data to canonical FireCase format.
@@ -164,7 +171,7 @@ class RealFireCaseConverter:
 
         # 5. USGS 3DEP elevation
         print("\n5️⃣  Checking USGS 3DEP elevation...")
-        print("   ℹ️  USGS elevation (to be implemented)")
+        print("   ℹ️  USGS DEM tiles are downloaded, cached, and aligned after grid creation")
 
         # 6. LANDFIRE fuels
         print("\n6️⃣  Checking LANDFIRE fuels...")
@@ -261,6 +268,32 @@ class RealFireCaseConverter:
                 f"   ✅ Rasterized fire perimeter: {burned_pixels}/{total_pixels} pixels burned ({burned_fraction:.1f}%)"
             )
 
+        # 4. Align real USGS terrain to the target grid. This happens after
+        # grid creation because DEMs must be resampled onto the exact model grid.
+        if "grid_shape" in self.aligned_data and "grid_bounds" in self.aligned_data:
+            print("\n🏔️  Aligning USGS 3DEP terrain...")
+            case_id = f"{self.fire_name.lower().replace(' ', '_')}_{self.fire_year}"
+            output_dir = Path("data/raw/3dep") / case_id
+            try:
+                terrain = self.usgs.build_terrain_data(
+                    bbox=self.bbox,
+                    grid_bounds=self.aligned_data["grid_bounds"],
+                    grid_shape=self.aligned_data["grid_shape"],
+                    target_crs=self.target_crs,
+                    resolution_m=self.target_resolution_m,
+                    output_dir=output_dir,
+                )
+                self.aligned_data["terrain"] = terrain
+                elev = terrain.elevation_m
+                slope = terrain.slope_degrees
+                print(
+                    "   ✅ Real terrain aligned: "
+                    f"elevation {float(np.nanmin(elev)):.0f}-{float(np.nanmax(elev)):.0f}m, "
+                    f"slope mean {float(np.nanmean(slope)):.1f}°"
+                )
+            except Exception as e:
+                print(f"   ⚠️  USGS terrain unavailable; falling back to placeholder terrain: {e}")
+
         print("   ✅ Layer alignment complete")
 
     def build_fire_case(self) -> FireCase | None:
@@ -281,27 +314,51 @@ class RealFireCaseConverter:
 
         # 1. Create metadata
         case_id = f"{self.fire_name.lower().replace(' ', '_')}_{self.fire_year}"
+        has_real_terrain = "terrain" in self.aligned_data
+        if has_real_terrain:
+            description = (
+                f"Real final-extent fire case from {self.fire_name} fire in {self.fire_year}. "
+                "Perimeter is real; terrain is USGS 3DEP; fuels and weather are placeholders."
+            )
+            data_quality = "phase4a_real_terrain_final_extent"
+        else:
+            description = (
+                f"Real final-extent fire case from {self.fire_name} fire in {self.fire_year}. "
+                "Perimeter is real; terrain, fuels, and weather are placeholders."
+            )
+            data_quality = "phase3_final_extent_only"
+
         metadata = FireCaseMetadata(
             case_id=case_id,
             name=f"{self.fire_name} ({self.fire_year})",
-            description=(
-                f"Real final-extent fire case from {self.fire_name} fire in {self.fire_year}. "
-                "Perimeter is real; terrain, fuels, and weather are placeholders."
-            ),
+            description=description,
             is_synthetic=False,
             creation_timestamp=datetime.utcnow(),
-            source="NIFC/MTBS",
+            source="NIFC/MTBS/USGS 3DEP" if has_real_terrain else "NIFC/MTBS",
             tags=[
                 "real_data",
                 "final_extent_only",
-                "placeholder_covariates",
+                "real_terrain" if has_real_terrain else "placeholder_covariates",
+                "placeholder_fuels",
+                "placeholder_weather",
                 f"year_{self.fire_year}",
                 self.fire_name.lower().replace(" ", "_"),
             ],
             target_type="final_burned_extent",
-            data_quality="phase3_final_extent_only",
-            covariate_status="placeholder",
-            limitations=PLACEHOLDER_COVARIATE_LIMITATIONS,
+            data_quality=data_quality,
+            covariate_status="partial_real_terrain" if has_real_terrain else "placeholder",
+            limitations=REAL_TERRAIN_LIMITATIONS
+            if has_real_terrain
+            else PLACEHOLDER_COVARIATE_LIMITATIONS,
+            covariate_sources={
+                "terrain": (
+                    "USGS 3DEP National Elevation Dataset (NED) 1 arc-second GeoTIFF via TNM"
+                    if has_real_terrain
+                    else "placeholder_flat_1000m"
+                ),
+                "fuels": "placeholder_uniform_fbfm_10",
+                "weather": "placeholder_scalar_moderate_conditions",
+            },
         )
 
         # Create BoundingBox from aligned grid bounds
@@ -316,15 +373,19 @@ class RealFireCaseConverter:
             crs=CoordinateSystem(self.target_crs),
         )
 
-        # 2. Create TerrainData (placeholder with flat terrain for now)
-        print("   ⚠️  Using placeholder terrain (flat at 1000m elevation)")
-        terrain = TerrainData(
-            elevation_m=np.full((height, width), 1000.0, dtype=np.float32),
-            slope_degrees=np.zeros((height, width), dtype=np.float32),
-            aspect_degrees=np.zeros((height, width), dtype=np.float32),
-            resolution_m=self.target_resolution_m,
-            bbox=bbox_obj,
-        )
+        # 2. Create TerrainData
+        if has_real_terrain:
+            print("   ✅ Using real USGS 3DEP terrain")
+            terrain = self.aligned_data["terrain"]
+        else:
+            print("   ⚠️  Using placeholder terrain (flat at 1000m elevation)")
+            terrain = TerrainData(
+                elevation_m=np.full((height, width), 1000.0, dtype=np.float32),
+                slope_degrees=np.zeros((height, width), dtype=np.float32),
+                aspect_degrees=np.zeros((height, width), dtype=np.float32),
+                resolution_m=self.target_resolution_m,
+                bbox=bbox_obj,
+            )
 
         # 3. Create FuelData (placeholder with moderate fuel load)
         print("   ⚠️  Using placeholder fuels (uniform FBFM 10)")

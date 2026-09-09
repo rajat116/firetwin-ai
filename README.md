@@ -32,17 +32,18 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 3 Complete - Historical Final-Extent Case Builder ✅
+**Current Phase**: Phase 4A Complete - Real Terrain Enrichment ✅
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
 - ✅ **Phase 2**: Real data source integration (all 6 clients + validation + inventory)
 - ✅ **Phase 3**: Historical final-extent case builder (3 pilot fires with validated area/CRS metadata)
-- 🚧 **Phase 4**: Real covariate enrichment and real-data baselines (next)
+- ✅ **Phase 4A**: Real USGS 3DEP terrain enrichment with derived slope/aspect
+- 🚧 **Phase 4B**: Real LANDFIRE fuels enrichment (next)
 
-Phase 3 cases contain real NIFC/MTBS-derived final perimeter masks, but terrain, fuel, weather,
-and initial fire state fields are still placeholders. They are not valid 3/6/12/24-hour
-fire-progression labels yet.
+Current pilot cases contain real NIFC/MTBS-derived final perimeter masks and real USGS 3DEP
+terrain-derived elevation, slope and aspect. Fuel, weather and initial fire state fields are still
+placeholders. The cases are not valid 3/6/12/24-hour fire-progression labels yet.
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -109,9 +110,9 @@ perimeters = nifc.get_fire_by_name("King", year=2014)
 gdf = nifc.perimeters_to_geodataframe(perimeters)
 ```
 
-**Phase 3: Historical Final-Extent Fire Cases** ✨ NEW
+**Phase 4A: Historical Final-Extent Fire Cases With Real Terrain** ✨ NEW
 
-Build canonical FireCase objects from real historical perimeter data:
+Build canonical FireCase objects from real historical perimeter data plus USGS 3DEP terrain:
 
 ```bash
 # Build all 3 pilot fires (Carlton Complex, King Fire, Big Cougar)
@@ -127,8 +128,8 @@ Generated local fire cases are written to ignored data storage under `data/fire_
 - Big Cougar 2014 (OR/ID): 65k acres, validated accuracy
 
 These artifacts are explicitly marked with `target_type=final_burned_extent` and
-`covariate_status=placeholder` so downstream evaluation cannot accidentally treat final extent as
-short-horizon progression.
+`covariate_status=partial_real_terrain` so downstream evaluation can use terrain covariates while
+still refusing to treat final extent as short-horizon progression.
 
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
@@ -223,7 +224,9 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 1**: Synthetic end-to-end vertical slice
 - [x] **Phase 2**: Data-source clients, validation, inventory, and audit
 - [x] **Phase 3**: Historical case builder (3 validated pilot fires with real perimeters)
-- [ ] **Phase 4**: Real-data baselines
+- [x] **Phase 4A**: Real USGS 3DEP terrain covariates
+- [ ] **Phase 4B**: Real LANDFIRE fuel covariates
+- [ ] **Phase 4C**: Real weather and real-data baselines
 - [ ] **Phase 5**: Simulation corpus and surrogate
 - [ ] **Phase 6**: Hybrid model
 - [ ] **Phase 7**: Assimilation and calibrated uncertainty
