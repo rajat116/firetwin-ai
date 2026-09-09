@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-09
-**Current Phase**: Phase 4A ✅
+**Current Phase**: Phase 4B ✅
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -252,13 +252,45 @@ covariates aligned to the canonical FireTwin grid.
 
 ### Remaining Phase 4 Work
 
-- [ ] Phase 4B: Replace uniform FBFM 10 with real LANDFIRE fuel layers.
 - [ ] Phase 4C: Replace scalar placeholder weather with real ERA5-Land/weather covariates.
 - [ ] Phase 4D: Add real-data baselines that respect `target_type=final_burned_extent`.
 
+## Phase 4B: Real LANDFIRE Fuel Enrichment ✅
+
+**Status**: COMPLETED (2026-09-09)
+
+**Purpose**: Replace uniform placeholder FBFM 10 fuel grids in the pilot fire cases with real
+LANDFIRE LF2022 FBFM40 categorical fuel-model rasters aligned to the canonical FireTwin grid.
+
+### Completed Tasks
+
+- [x] Added LANDFIRE LF2022 FBFM40 ImageServer export support.
+- [x] Export and cache grid-aligned GeoTIFF rasters under ignored `data/raw/landfire/`.
+- [x] Use nearest-neighbor resampling for categorical fuel-model classes.
+- [x] Preserve burnable FBFM40 class codes and convert LANDFIRE non-burnable codes to `0`.
+- [x] Derive deterministic fuel-load and fuel-moisture proxy grids from FBFM40 class groups.
+- [x] Store real fuel arrays in generated Zarr fire cases.
+- [x] Mark generated cases with `covariate_status=partial_real_terrain_fuels`.
+- [x] Store LANDFIRE fuel-model provenance in case metadata and Zarr attributes.
+- [x] Tighten validation so pilot cases fail if fuels remain uniform FBFM 10.
+- [x] Add unit tests for LANDFIRE export parameters, raster normalization, proxy derivation and
+  converter metadata.
+
+### Result-Wise Validation
+
+- Carlton Complex: 21 fuel classes, 88.5% burnable cells, final burned area 9.3% from reference.
+- King: 26 fuel classes, 95.7% burnable cells, final burned area 0.2% from reference.
+- Big Cougar: 21 fuel classes, 95.2% burnable cells, final burned area ~0.0% from reference.
+
+### Remaining Phase 4 Work
+
+- [ ] Phase 4C: Replace scalar placeholder weather with real ERA5-Land/weather covariates.
+- [ ] Phase 4D: Add real-data baselines that respect `target_type=final_burned_extent`.
+- [ ] Replace fuel-load and fuel-moisture proxies with source-derived/live fuel attributes when
+  that data source is selected.
+
 ## Future Phases
 
-- **Phase 4B**: Real LANDFIRE fuel enrichment
 - **Phase 4C**: Real weather covariates and real-data baselines
 - **Phase 5**: Simulation corpus and surrogate
 - **Phase 6**: Hybrid model
@@ -275,21 +307,25 @@ Phase 1: ████████████████████ 100% ✅
 Phase 2: ████████████████████ 100% ✅
 Phase 3: ████████████████████ 100% ✅
 Phase 4A: ████████████████████ 100% ✅
-Phase 4B: ░░░░░░░░░░░░░░░░░░░░   0%
+Phase 4B: ████████████████████ 100% ✅
+Phase 4C: ░░░░░░░░░░░░░░░░░░░░   0%
 ...
-Overall: █████████░░░░░░░░░░░  45%
+Overall: ██████████░░░░░░░░░░  50%
 ```
 
 ## Known Issues
 
-- Pilot cases are final-burned-extent artifacts with real terrain but placeholder fuel and weather.
+- Pilot cases are final-burned-extent artifacts with real terrain and real fuel-model classes, but
+  placeholder weather and placeholder empty initial fire states.
+- Fuel load and fuel moisture are class-based static proxies, not observed live/dead fuel moisture.
 - Real-data baseline evaluation must not treat these final masks as hourly progression labels.
 - `python` on the local machine resolves to Python 2.7 outside conda; use `conda activate firetwin`
   or `python3` for scripts.
 
 ## Blockers
 
-None for Phase 4A. Phase 4B/4C require LANDFIRE and weather data integration decisions.
+None for Phase 4B. Phase 4C requires an ERA5-Land/weather extraction and temporal-alignment
+decision.
 
 ## Notes
 

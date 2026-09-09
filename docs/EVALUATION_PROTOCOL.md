@@ -1,7 +1,7 @@
 # FireTwin Evaluation Protocol
 
 **Last Updated**: 2026-09-09
-**Status**: Phase 0-4A baseline protocol before real fuel/weather model work
+**Status**: Phase 0-4B baseline protocol before real weather/progression model work
 
 > Research prototype. Not for operational wildfire response, evacuation planning or safety-critical decision-making.
 
@@ -17,10 +17,11 @@ The current pilot fire cases are **final-burned-extent cases**:
 - King 2014
 - Big Cougar 2014
 
-They currently contain real NIFC/MTBS-derived final perimeter masks and real USGS 3DEP
-terrain-derived elevation, slope and aspect. Fuel, weather and initial-state fields remain
-placeholders. They must not be used as 3-, 6-, 12- or 24-hour fire-progression labels until
-time-stamped observations are reconstructed and validated.
+They currently contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
+terrain-derived elevation/slope/aspect, and real LANDFIRE LF2022 FBFM40 fuel-model classes.
+Fuel load/moisture are class-based proxies; weather and initial-state fields remain placeholders.
+They must not be used as 3-, 6-, 12- or 24-hour fire-progression labels until time-stamped
+observations are reconstructed and validated.
 
 ## Target Types
 
@@ -88,13 +89,15 @@ The current validation gate checks that each local pilot Zarr case:
 - Uses the expected projected CRS.
 - Contains initial and target fire-state arrays on the stored time axis.
 - Produces a final burned area within tolerance of the documented fire size.
-- Explicitly marks `covariate_status=partial_real_terrain`.
-- Records covariate-source provenance, including USGS 3DEP terrain.
+- Explicitly marks `covariate_status=partial_real_terrain_fuels`.
+- Records covariate-source provenance, including USGS 3DEP terrain and LANDFIRE FBFM40 fuels.
 - Contains finite, non-flat USGS 3DEP elevation and derived slope/aspect.
-- Still warns that fuel and weather covariates are placeholders.
+- Contains non-uniform LANDFIRE FBFM40 fuel-model classes.
+- Still warns that weather and initial fire state are placeholders, and that fuel load/moisture are
+  class-based proxies.
 
-Passing this gate means the cases are valid **final-extent artifacts with terrain covariates**, not
-forecast-ready real-data progression samples.
+Passing this gate means the cases are valid **final-extent artifacts with terrain and fuel-model
+covariates**, not forecast-ready real-data progression samples.
 
 ## Phase 4B Entry Criteria
 
@@ -104,7 +107,7 @@ Do not start real-data model evaluation until:
 - All Phase 0-3 unit tests pass.
 - `scripts/validate_fire_cases.py` passes against regenerated pilot fire artifacts.
 - The generated artifacts carry `target_type=final_burned_extent` and
-  `covariate_status=partial_real_terrain`.
+  `covariate_status=partial_real_terrain_fuels`.
 - Any baseline evaluation script refuses to treat final extent as hourly progression.
 - Fuel and weather enrichment status is explicit in metadata and validation output.
 

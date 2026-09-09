@@ -3,9 +3,9 @@
 **Last Updated**: 2026-09-09
 **Status**: COMPLETE ✅ - Final-extent pilot cases built and validated with explicit limitations
 
-> Update: Phase 4A has now replaced the flat terrain placeholder in generated pilot cases with
-> real USGS 3DEP elevation, slope and aspect. Fuel, weather and time-resolved progression remain
-> pending.
+> Update: Phase 4B has now replaced flat terrain and uniform fuel placeholders in generated pilot
+> cases with real USGS 3DEP elevation/slope/aspect and LANDFIRE LF2022 FBFM40 fuel-model classes.
+> Weather, ignition timing and time-resolved progression remain pending.
 
 **Scientific Scope**: These cases are valid final-burned-extent artifacts. They are not yet
 time-resolved fire-progression labels and are not forecast-ready real-data samples.
@@ -22,6 +22,7 @@ time-resolved fire-progression labels and are not forecast-ready real-data sampl
    - ✅ FireCase construction with canonical schemas
    - ✅ Final-extent and covariate limitations stored in metadata
    - ✅ Real USGS 3DEP terrain alignment added in Phase 4A
+   - ✅ Real LANDFIRE LF2022 FBFM40 fuel-model alignment added in Phase 4B
    - ✅ Zarr format export with compression
 
 ### 2. All 3 Pilot Fires Generated & Validated
@@ -75,7 +76,8 @@ time-resolved fire-progression labels and are not forecast-ready real-data sampl
 
 1. **Remaining Placeholder Data**
    - ✅ Terrain: Real USGS 3DEP elevation, slope and aspect integrated in Phase 4A
-   - ⚠️ Fuels: Using uniform FBFM 10 (real LANDFIRE integration pending)
+   - ✅ Fuel model: Real LANDFIRE LF2022 FBFM40 classes integrated in Phase 4B
+   - ⚠️ Fuel load/moisture: Static class-based proxies
    - ⚠️ Weather: Using moderate conditions (real ERA5 integration pending)
 
 2. **Static Perimeters Only**
@@ -90,13 +92,13 @@ time-resolved fire-progression labels and are not forecast-ready real-data sampl
    - FIRMS: ❌ Requires API key
    - ERA5: ❌ Requires CDS credentials
    - USGS 3DEP: ✅ Integrated for terrain in Phase 4A
-   - LANDFIRE: ❌ Not yet integrated
+   - LANDFIRE: ✅ Integrated for FBFM40 fuel model in Phase 4B
 
 ## Next Steps (Phase 4+)
 
 1. **Phase 4: Real Data Enrichment**
    - ✅ Integrate USGS 3DEP for real terrain
-   - Integrate LANDFIRE for real fuels
+   - ✅ Integrate LANDFIRE for real fuel models
    - Integrate ERA5-Land for real weather
    - Add FIRMS active fire detections
 

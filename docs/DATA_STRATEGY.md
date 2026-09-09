@@ -125,7 +125,7 @@ def build_historical_fire_case(fire_name: str, year: int, bbox: tuple):
     elevation = usgs_client.download_bbox(bbox)
     
     # 6. Get fuels from LANDFIRE
-    fuels = landfire_client.get_product("FBFM40", bbox)
+    fuels = landfire_client.build_fuel_data(grid_bounds, grid_shape, target_crs, resolution_m, output_dir)
     
     return FireCase(
         perimeter=mtbs_fire,
@@ -172,7 +172,7 @@ def build_recent_fire_case(fire_name: str, bbox: tuple):
 | NIFC Historical incomplete | Varies | Use MTBS as fallback |
 | MTBS burn severity delay | Recent fires | Accept or use proxy |
 | FIRMS requires API key | All | User must provide key |
-| LANDFIRE manual download | All | Document instructions |
+| LANDFIRE canopy/vegetation products not integrated | All | FBFM40 fuel model is automated; add other products when needed |
 
 ## Production Deployment Considerations
 
@@ -237,7 +237,7 @@ The FireTwin project now has:
 - ✅ Multiple data sources for validation/cross-referencing
 - ✅ Strategies for recent vs. historical fires
 - ✅ Fallback mechanisms for data gaps
-- ✅ Validated clients for all 7 data sources
+- ✅ Validated clients for all 6 core data sources
 
-**Status**: Phase 3 historical case building is complete; Phase 4A real terrain enrichment is
-complete; LANDFIRE fuels and weather enrichment remain next.
+**Status**: Phase 3 historical case building is complete; Phase 4A real terrain enrichment and
+Phase 4B LANDFIRE FBFM40 fuel-model enrichment are complete. Weather enrichment remains next.

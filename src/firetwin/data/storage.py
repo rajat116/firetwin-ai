@@ -92,8 +92,8 @@ def fire_case_to_xarray(case: FireCase) -> xr.Dataset:
         "long_name": "Aspect (degrees from north)",
     }
     ds["fuel_model"].attrs = {
-        "long_name": "Fuel type",
-        "description": "0=non-burnable, 1=grass, 2=shrub, 3=timber",
+        "long_name": "Fuel model",
+        "description": "0=non-burnable; positive values preserve burnable LANDFIRE FBFM40 class codes where available",
     }
     ds["fuel_load_kg_m2"].attrs = {"units": "kg/m^2", "long_name": "Fuel load"}
     ds["fuel_moisture_percent"].attrs = {"units": "percent", "long_name": "Fuel moisture"}

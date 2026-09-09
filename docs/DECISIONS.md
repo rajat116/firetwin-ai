@@ -269,6 +269,48 @@ and time-resolved progression remain unfinished.
 
 ---
 
+## Decision 8: Use LANDFIRE LF2022 FBFM40 ImageServer for Phase 4B Fuels
+
+**Date**: 2026-09-09
+**Phase**: 4B - Real Fuel Enrichment
+
+### Context
+
+The pilot fire cases need real fuel-model covariates on the same 100m model grid as the perimeter
+and terrain layers. LANDFIRE provides full extent downloads, product services, image services, and
+WCS/WMS access. Bulk national downloads would add unnecessary storage pressure for the current
+pilot AOIs.
+
+### Decision
+
+Use the public LANDFIRE LF2022 CONUS FBFM40 ArcGIS ImageServer export endpoint for Phase 4B. Export
+each pilot AOI directly to a GeoTIFF in the target CRS, target bounds and target raster dimensions.
+Use nearest-neighbor resampling so categorical FBFM40 class values are preserved.
+
+LANDFIRE non-burnable codes (`91`, `92`, `93`, `98`, `99`) are converted to `0` in FireTwin's
+canonical `fuel_model` grid because existing baselines treat `fuel_model > 0` as burnable. Burnable
+FBFM40 class codes are preserved. Fuel load and moisture companion arrays are deterministic
+class-based proxies until FireTwin adds source-derived fuelbed attributes or live/dead fuel
+moisture.
+
+Generated cases are marked as `target_type=final_burned_extent` and
+`covariate_status=partial_real_terrain_fuels`.
+
+### Rationale
+
+The ImageServer path is reproducible, compact and aligned with FireTwin's current grid-based case
+builder. It avoids manual AOI downloads while keeping categorical fuel semantics intact.
+
+### Consequences
+
+- Pilot Zarrs should now fail validation if fuels remain uniform FBFM 10.
+- Fuel-model provenance records LANDFIRE LF2022 FBFM40.
+- Weather and ignition/progression labels remain unfinished; Phase 4B cases are still not
+  short-horizon forecast samples.
+- Fuel load and moisture proxy limitations must be visible in metadata and reporting.
+
+---
+
 ## Future Decisions
 
 Document all future material decisions here, including:

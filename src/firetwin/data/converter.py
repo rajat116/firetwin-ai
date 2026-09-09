@@ -36,6 +36,22 @@ REAL_TERRAIN_LIMITATIONS = [
     "Target state is final burned extent, not time-resolved fire progression.",
 ]
 
+REAL_FUELS_LIMITATIONS = [
+    "Terrain is placeholder flat elevation, not USGS 3DEP.",
+    "Fuel model is real LANDFIRE LF2022 FBFM40 resampled to the FireTwin grid.",
+    "Fuel load and moisture are deterministic proxies derived from FBFM40 classes, not live fuel observations.",
+    "Weather is a placeholder scalar condition, not ERA5-Land.",
+    "Target state is final burned extent, not time-resolved fire progression.",
+]
+
+REAL_TERRAIN_FUELS_LIMITATIONS = [
+    "Terrain is real USGS 3DEP elevation resampled to the FireTwin grid.",
+    "Fuel model is real LANDFIRE LF2022 FBFM40 resampled to the FireTwin grid.",
+    "Fuel load and moisture are deterministic proxies derived from FBFM40 classes, not live fuel observations.",
+    "Weather is a placeholder scalar condition, not ERA5-Land.",
+    "Target state is final burned extent, not time-resolved fire progression.",
+]
+
 
 class RealFireCaseConverter:
     """Convert real wildfire data to canonical FireCase format.
@@ -175,7 +191,7 @@ class RealFireCaseConverter:
 
         # 6. LANDFIRE fuels
         print("\n6️⃣  Checking LANDFIRE fuels...")
-        print("   ℹ️  LANDFIRE requires manual download (skipped)")
+        print("   ℹ️  LANDFIRE FBFM40 is exported, cached, and aligned after grid creation")
 
         print("\n" + "=" * 70)
         print(f"📊 Data fetch complete: {len(self.raw_data)} sources available")
@@ -294,6 +310,27 @@ class RealFireCaseConverter:
             except Exception as e:
                 print(f"   ⚠️  USGS terrain unavailable; falling back to placeholder terrain: {e}")
 
+            print("\n🌲 Aligning LANDFIRE LF2022 FBFM40 fuels...")
+            landfire_output_dir = Path("data/raw/landfire") / case_id
+            try:
+                fuels = self.landfire.build_fuel_data(
+                    grid_bounds=self.aligned_data["grid_bounds"],
+                    grid_shape=self.aligned_data["grid_shape"],
+                    target_crs=self.target_crs,
+                    resolution_m=self.target_resolution_m,
+                    output_dir=landfire_output_dir,
+                )
+                self.aligned_data["fuels"] = fuels
+                fuel_codes = fuels.fuel_model
+                burnable_fraction = np.count_nonzero(fuel_codes) / fuel_codes.size * 100
+                unique_codes = np.unique(fuel_codes)
+                print(
+                    "   ✅ Real LANDFIRE fuels aligned: "
+                    f"{len(unique_codes)} classes, {burnable_fraction:.1f}% burnable cells"
+                )
+            except Exception as e:
+                print(f"   ⚠️  LANDFIRE fuels unavailable; falling back to placeholder fuels: {e}")
+
         print("   ✅ Layer alignment complete")
 
     def build_fire_case(self) -> FireCase | None:
@@ -315,18 +352,111 @@ class RealFireCaseConverter:
         # 1. Create metadata
         case_id = f"{self.fire_name.lower().replace(' ', '_')}_{self.fire_year}"
         has_real_terrain = "terrain" in self.aligned_data
-        if has_real_terrain:
+        has_real_fuels = "fuels" in self.aligned_data
+        if has_real_terrain and has_real_fuels:
+            description = (
+                f"Real final-extent fire case from {self.fire_name} fire in {self.fire_year}. "
+                "Perimeter is real; terrain is USGS 3DEP; fuel model is LANDFIRE LF2022 FBFM40; "
+                "weather and initial fire state are placeholders."
+            )
+            data_quality = "phase4b_real_terrain_fuels_final_extent"
+            source = "NIFC/MTBS/USGS 3DEP/LANDFIRE"
+            tags = [
+                "real_data",
+                "final_extent_only",
+                "real_terrain",
+                "real_fbfm40",
+                "proxy_fuel_properties",
+                "placeholder_weather",
+                f"year_{self.fire_year}",
+                self.fire_name.lower().replace(" ", "_"),
+            ]
+            covariate_status = "partial_real_terrain_fuels"
+            limitations = REAL_TERRAIN_FUELS_LIMITATIONS
+            covariate_sources = {
+                "terrain": "USGS 3DEP National Elevation Dataset (NED) 1 arc-second GeoTIFF via TNM",
+                "fuel_model": LANDFIREClient.FUEL_MODEL_SOURCE,
+                "fuel_load_kg_m2": "derived_proxy_from_landfire_fbfm40_class",
+                "fuel_moisture_percent": "static_proxy_from_landfire_fbfm40_class",
+                "weather": "placeholder_scalar_moderate_conditions",
+                "initial_state": "placeholder_empty_no_ignition_time",
+            }
+        elif has_real_terrain:
             description = (
                 f"Real final-extent fire case from {self.fire_name} fire in {self.fire_year}. "
                 "Perimeter is real; terrain is USGS 3DEP; fuels and weather are placeholders."
             )
             data_quality = "phase4a_real_terrain_final_extent"
+            source = "NIFC/MTBS/USGS 3DEP"
+            tags = [
+                "real_data",
+                "final_extent_only",
+                "real_terrain",
+                "placeholder_fuels",
+                "placeholder_weather",
+                f"year_{self.fire_year}",
+                self.fire_name.lower().replace(" ", "_"),
+            ]
+            covariate_status = "partial_real_terrain"
+            limitations = REAL_TERRAIN_LIMITATIONS
+            covariate_sources = {
+                "terrain": "USGS 3DEP National Elevation Dataset (NED) 1 arc-second GeoTIFF via TNM",
+                "fuels": "placeholder_uniform_fbfm_10",
+                "weather": "placeholder_scalar_moderate_conditions",
+                "initial_state": "placeholder_empty_no_ignition_time",
+            }
+        elif has_real_fuels:
+            description = (
+                f"Real final-extent fire case from {self.fire_name} fire in {self.fire_year}. "
+                "Perimeter is real; fuel model is LANDFIRE LF2022 FBFM40; "
+                "terrain, weather and initial fire state are placeholders."
+            )
+            data_quality = "phase4b_real_fuels_final_extent"
+            source = "NIFC/MTBS/LANDFIRE"
+            tags = [
+                "real_data",
+                "final_extent_only",
+                "placeholder_terrain",
+                "real_fbfm40",
+                "proxy_fuel_properties",
+                "placeholder_weather",
+                f"year_{self.fire_year}",
+                self.fire_name.lower().replace(" ", "_"),
+            ]
+            covariate_status = "partial_real_fuels"
+            limitations = REAL_FUELS_LIMITATIONS
+            covariate_sources = {
+                "terrain": "placeholder_flat_1000m",
+                "fuel_model": LANDFIREClient.FUEL_MODEL_SOURCE,
+                "fuel_load_kg_m2": "derived_proxy_from_landfire_fbfm40_class",
+                "fuel_moisture_percent": "static_proxy_from_landfire_fbfm40_class",
+                "weather": "placeholder_scalar_moderate_conditions",
+                "initial_state": "placeholder_empty_no_ignition_time",
+            }
         else:
             description = (
                 f"Real final-extent fire case from {self.fire_name} fire in {self.fire_year}. "
                 "Perimeter is real; terrain, fuels, and weather are placeholders."
             )
             data_quality = "phase3_final_extent_only"
+            source = "NIFC/MTBS"
+            tags = [
+                "real_data",
+                "final_extent_only",
+                "placeholder_covariates",
+                "placeholder_fuels",
+                "placeholder_weather",
+                f"year_{self.fire_year}",
+                self.fire_name.lower().replace(" ", "_"),
+            ]
+            covariate_status = "placeholder"
+            limitations = PLACEHOLDER_COVARIATE_LIMITATIONS
+            covariate_sources = {
+                "terrain": "placeholder_flat_1000m",
+                "fuels": "placeholder_uniform_fbfm_10",
+                "weather": "placeholder_scalar_moderate_conditions",
+                "initial_state": "placeholder_empty_no_ignition_time",
+            }
 
         metadata = FireCaseMetadata(
             case_id=case_id,
@@ -334,31 +464,13 @@ class RealFireCaseConverter:
             description=description,
             is_synthetic=False,
             creation_timestamp=datetime.utcnow(),
-            source="NIFC/MTBS/USGS 3DEP" if has_real_terrain else "NIFC/MTBS",
-            tags=[
-                "real_data",
-                "final_extent_only",
-                "real_terrain" if has_real_terrain else "placeholder_covariates",
-                "placeholder_fuels",
-                "placeholder_weather",
-                f"year_{self.fire_year}",
-                self.fire_name.lower().replace(" ", "_"),
-            ],
+            source=source,
+            tags=tags,
             target_type="final_burned_extent",
             data_quality=data_quality,
-            covariate_status="partial_real_terrain" if has_real_terrain else "placeholder",
-            limitations=REAL_TERRAIN_LIMITATIONS
-            if has_real_terrain
-            else PLACEHOLDER_COVARIATE_LIMITATIONS,
-            covariate_sources={
-                "terrain": (
-                    "USGS 3DEP National Elevation Dataset (NED) 1 arc-second GeoTIFF via TNM"
-                    if has_real_terrain
-                    else "placeholder_flat_1000m"
-                ),
-                "fuels": "placeholder_uniform_fbfm_10",
-                "weather": "placeholder_scalar_moderate_conditions",
-            },
+            covariate_status=covariate_status,
+            limitations=limitations,
+            covariate_sources=covariate_sources,
         )
 
         # Create BoundingBox from aligned grid bounds
@@ -387,14 +499,18 @@ class RealFireCaseConverter:
                 bbox=bbox_obj,
             )
 
-        # 3. Create FuelData (placeholder with moderate fuel load)
-        print("   ⚠️  Using placeholder fuels (uniform FBFM 10)")
-        fuels = FuelData(
-            fuel_model=np.full((height, width), 10, dtype=np.int32),  # FBFM 10: Timber
-            fuel_load_kg_m2=np.full((height, width), 2.0, dtype=np.float32),
-            fuel_moisture_percent=np.full((height, width), 8.0, dtype=np.float32),
-            resolution_m=self.target_resolution_m,
-        )
+        # 3. Create FuelData
+        if has_real_fuels:
+            print("   ✅ Using real LANDFIRE LF2022 FBFM40 fuel model")
+            fuels = self.aligned_data["fuels"]
+        else:
+            print("   ⚠️  Using placeholder fuels (uniform FBFM 10)")
+            fuels = FuelData(
+                fuel_model=np.full((height, width), 10, dtype=np.int32),  # FBFM 10: Timber
+                fuel_load_kg_m2=np.full((height, width), 2.0, dtype=np.float32),
+                fuel_moisture_percent=np.full((height, width), 8.0, dtype=np.float32),
+                resolution_m=self.target_resolution_m,
+            )
 
         # 4. Create WeatherData (placeholder with moderate conditions)
         print("   ⚠️  Using placeholder weather (moderate wind/temp)")

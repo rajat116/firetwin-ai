@@ -34,7 +34,7 @@ def test_creek_fire_2020():
         fetch_nifc=True,
         fetch_mtbs=True,
         fetch_era5=False,  # Skip ERA5 for quick test (requires credentials)
-        fetch_landfire=False,  # Skip LANDFIRE (manual download)
+        fetch_landfire=False,  # Skip LANDFIRE in this quick pre-grid test
         fetch_3dep=False,  # Skip 3DEP for quick test (large files)
     )
 

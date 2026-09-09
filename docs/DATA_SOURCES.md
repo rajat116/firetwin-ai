@@ -14,7 +14,7 @@ Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources
 | NIFC/WFIGS | ✅ Implemented | 13 tests passing | 96% | ArcGIS REST / GeoJSON |
 | MTBS | ✅ Implemented | 13 tests passing | 96% | ArcGIS REST / GeoJSON |
 | ERA5-Land | ✅ Implemented | 8 tests passing | 94% | CDS API (`cdsapi`) |
-| LANDFIRE | ✅ Implemented | 5 tests passing | 100% | Web portal (manual AOI) |
+| LANDFIRE | ✅ Implemented | 8 tests passing | 90% | LF Product Service ImageServer |
 | USGS 3DEP | ✅ Implemented | 5 tests passing | 93% | National Map API |
 
 ## Data Source Registry
@@ -150,25 +150,32 @@ Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources
 **Official Links**:
 - Homepage: https://www.landfire.gov/
 - Data: https://www.landfire.gov/data
-- Fuel Vegetation Type: https://www.landfire.gov/fuel/fvt
+- FBFM40: https://landfire.gov/fuel/fbfm40
+- WCS/WMS Services: https://www.landfire.gov/data/lf_wcs_wms
 
-**Access Method**: Area-of-interest download / REST services  
-**Spatial Resolution**: 30m  
+**Access Method**: LF Product Service ArcGIS ImageServer export for LF2022 FBFM40
+**Default Product in FireTwin**: `LANDFIRE LF2022 FBFM40 CONUS ImageServer`
+**Spatial Resolution**: 30m source product exported/resampled to the 100m FireTwin modeling grid
 **Temporal Coverage**: Periodic updates (check version)  
 **License/Terms**: Public domain (U.S. government work)
 
 **Variables Used**:
-- Fire Behavior Fuel Model (FBFM)
-- Existing Vegetation Type (EVT)
-- Existing Vegetation Cover (EVC)
-- Existing Vegetation Height (EVH)
-- Canopy cover, height, base height, bulk density
-- Disturbance layers
+- Fire Behavior Fuel Model 40 (FBFM40) class code
+- Derived deterministic proxy fuel load, grouped by FBFM40 class family
+- Derived deterministic proxy fuel moisture, grouped by FBFM40 class family
+
+**Available But Not Yet Used**:
+- Existing Vegetation Type (EVT), Cover (EVC), Height (EVH)
+- Canopy cover, height, base height and bulk density
+- Disturbance layers and seasonal fuels
 
 **Known Limitations**:
 - May not represent conditions at fire date (temporal lag)
 - Product version and year must be recorded
 - Static snapshots, not daily vegetation moisture
+- FireTwin currently preserves burnable FBFM40 class codes and maps non-burnable LANDFIRE classes
+  to `0` for canonical burnability semantics
+- Fuel load and moisture are class-based proxies, not observed live/dead fuel conditions
 
 **Citation**: LANDFIRE. (2026). LANDFIRE Product Data. Retrieved from https://www.landfire.gov/
 

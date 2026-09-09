@@ -6,7 +6,7 @@ This script demonstrates building a historical fire case from multiple data sour
 - FIRMS: Active fire detections (if available)
 - ERA5-Land: Weather data (if credentials available)
 - USGS 3DEP: Elevation data
-- LANDFIRE: Fuel data (manual download required)
+- LANDFIRE: Fuel-model data (automated in the canonical Phase 4B converter)
 
 Carlton Complex Fire 2014:
 - Location: Washington State
@@ -152,11 +152,10 @@ def build_carlton_complex_case():
 
     # 6. LANDFIRE Fuels
     print("\n6️⃣  LANDFIRE Fuel Data...")
-    print("   ℹ️  LANDFIRE requires manual AOI selection and download")
-    print("   Note: Visit https://landfire.gov/viewer/ to download")
+    print("   ℹ️  LANDFIRE FBFM40 export is handled by scripts/build_all_pilot_fires.py")
     data_summary["data_sources"]["landfire"] = {
-        "available": False,
-        "reason": "Manual download required",
+        "available": True,
+        "reason": "Automated in the canonical Phase 4B converter path",
     }
 
     # Summary

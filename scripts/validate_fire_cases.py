@@ -18,6 +18,7 @@ def validate_fire_case(
     expected_acres: float,
     expected_crs: str,
     require_real_terrain: bool = False,
+    require_real_fuels: bool = False,
 ) -> dict:
     """Validate a single fire case.
 
@@ -26,6 +27,7 @@ def validate_fire_case(
         expected_acres: Expected fire size in acres
         expected_crs: Expected target CRS
         require_real_terrain: If True, fail flat placeholder terrain
+        require_real_fuels: If True, fail uniform placeholder fuels
 
     Returns:
         Dictionary with validation results
@@ -60,16 +62,28 @@ def validate_fire_case(
         else:
             results["failed"].append("❌ Target type is not marked as final_burned_extent")
 
-        if ds.attrs.get("covariate_status") == "placeholder":
+        covariate_status = ds.attrs.get("covariate_status")
+        if covariate_status == "placeholder":
             results["passed"].append("✅ Placeholder covariates explicitly marked")
-        elif ds.attrs.get("covariate_status") == "partial_real_terrain":
+        elif covariate_status == "partial_real_terrain":
             results["passed"].append("✅ Partial real covariates explicitly marked")
+        elif covariate_status == "partial_real_fuels":
+            results["passed"].append("✅ Partial real fuel covariates explicitly marked")
+        elif covariate_status == "partial_real_terrain_fuels":
+            results["passed"].append("✅ Partial real terrain/fuel covariates explicitly marked")
         else:
             results["failed"].append("❌ Covariate status is not explicit")
 
-        if require_real_terrain and ds.attrs.get("covariate_status") != "partial_real_terrain":
+        if require_real_terrain and covariate_status not in (
+            "partial_real_terrain",
+            "partial_real_terrain_fuels",
+        ):
             results["failed"].append(
-                "❌ Real terrain is required but covariate status is not partial_real_terrain"
+                "❌ Real terrain is required but covariate status does not record real terrain"
+            )
+        if require_real_fuels and covariate_status != "partial_real_terrain_fuels":
+            results["failed"].append(
+                "❌ Real fuels are required but covariate status is not partial_real_terrain_fuels"
             )
 
         covariate_sources = ds.attrs.get("covariate_sources", "")
@@ -77,6 +91,11 @@ def validate_fire_case(
             results["passed"].append("✅ Terrain source provenance records USGS 3DEP")
         elif require_real_terrain:
             results["failed"].append("❌ Terrain source provenance does not record USGS 3DEP")
+
+        if require_real_fuels and "LANDFIRE LF2022 FBFM40" in covariate_sources:
+            results["passed"].append("✅ Fuel source provenance records LANDFIRE LF2022 FBFM40")
+        elif require_real_fuels:
+            results["failed"].append("❌ Fuel source provenance does not record LANDFIRE FBFM40")
 
         if ds.attrs.get("bbox_crs") == expected_crs:
             results["passed"].append(f"✅ CRS matches expected {expected_crs}")
@@ -207,11 +226,46 @@ def validate_fire_case(
 
         # 5. Check fuel data
         if "fuel_model" in ds:
-            fuels = ds["fuel_model"].values
+            fuels = ds["fuel_model"].values.astype(np.int32)
             if np.all(fuels == 10):
-                results["warnings"].append("⚠️  Fuels are placeholder (uniform FBFM 10)")
+                message = "Fuels are placeholder (uniform FBFM 10)"
+                if require_real_fuels:
+                    results["failed"].append(f"❌ {message}")
+                else:
+                    results["warnings"].append(f"⚠️  {message}")
             else:
-                results["passed"].append("✅ Fuels have variation")
+                unique_fuels = np.unique(fuels)
+                burnable = fuels > 0
+                if require_real_fuels:
+                    if unique_fuels.size > 1 and np.count_nonzero(burnable) > 0:
+                        results["passed"].append(
+                            f"✅ Fuels have real class variation ({unique_fuels.size} classes)"
+                        )
+                    else:
+                        results["failed"].append("❌ Real fuels are missing class variation")
+
+                    if "fuel_load_kg_m2" in ds and "fuel_moisture_percent" in ds:
+                        load = ds["fuel_load_kg_m2"].values
+                        moisture = ds["fuel_moisture_percent"].values
+                        if (
+                            np.isfinite(load).all()
+                            and np.isfinite(moisture).all()
+                            and np.all(load[burnable] > 0.0)
+                            and np.all(moisture[burnable] > 0.0)
+                            and np.all(load[~burnable] == 0.0)
+                            and np.all(moisture[~burnable] == 0.0)
+                        ):
+                            results["passed"].append(
+                                "✅ Fuel load/moisture proxies match burnable mask"
+                            )
+                        else:
+                            results["failed"].append(
+                                "❌ Fuel load/moisture proxies are inconsistent with fuel_model"
+                            )
+                    else:
+                        results["failed"].append("❌ Missing fuel load/moisture grids")
+                else:
+                    results["passed"].append("✅ Fuels have variation")
         else:
             results["failed"].append("❌ Missing fuel data")
 
@@ -223,7 +277,7 @@ def validate_fire_case(
 
 def main():
     """Validate all fire cases."""
-    print("🔥 Pilot Fire Case Validation (Phase 4A terrain gate)")
+    print("🔥 Pilot Fire Case Validation (Phase 4B terrain/fuels gate)")
     print("=" * 80)
 
     # Expected sizes (from PHASE3_PILOT_FIRES.md)
@@ -253,6 +307,7 @@ def main():
             expected_acres,
             expected_crs,
             require_real_terrain=True,
+            require_real_fuels=True,
         )
 
         # Print passed checks
@@ -281,7 +336,7 @@ def main():
 
     if all_passed:
         print("✅ ALL VALIDATIONS PASSED")
-        print("   Phase 4A fire cases have real terrain and are ready")
+        print("   Phase 4B fire cases have real terrain and real LANDFIRE fuel models")
         return True
     else:
         print("❌ SOME VALIDATIONS FAILED")

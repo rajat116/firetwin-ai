@@ -190,10 +190,11 @@ class FireCaseBuilder:
                 print(f"    3DEP fetch failed: {e}")
                 self.raw_data["3dep"] = []
 
-        # LANDFIRE requires manual download
+        # LANDFIRE fuel export requires a finalized model grid, so this
+        # early raw-data builder defers fuel raster alignment.
         if self.landfire_client:
-            print("  - LANDFIRE: Manual download required")
-            print("    Visit: https://landfire.gov/getdata.php")
+            print("  - LANDFIRE: Deferred until model-grid alignment")
+            print("    Use LANDFIREClient.build_fuel_data(...) after grid creation")
             print(f"    AOI: {self.config.bbox}")
             self.raw_data["landfire"] = None
 
