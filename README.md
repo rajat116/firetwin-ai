@@ -52,8 +52,8 @@ placeholders, and the cases are not valid 3/6/12/24-hour fire-progression labels
 
 Phase 4E is auditing timestamped observations before any label reconstruction. NIFC/MTBS checks show
 the current 2014 pilots have only one perimeter timestamp each, so hourly perimeter labels are still
-unsupported. Configure `FIRMS_MAP_KEY` in `.env` and run `python3 scripts/audit_progression_labels.py`
-to audit historical MODIS/VIIRS active-fire detections.
+unsupported. FIRMS historical detections are available for all three pilots and support irregular
+hotspot/progression targets after filtering.
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 

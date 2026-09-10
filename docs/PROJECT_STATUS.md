@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-10
-**Current Phase**: Phase 4E 🔎 - Progression/Initial-State Label Audit
+**Current Phase**: Phase 4E 🔎 - FIRMS-Backed Progression Label Design
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -371,33 +371,32 @@ before constructing ignition states, progression targets or ML training samples.
 - [x] Updated FIRMS API validation to the current 1-5 day area/country API window.
 - [x] Added VIIRS standard-processing CSV parsing for `bright_ti4`/`bright_ti5` columns.
 - [x] Added `scripts/audit_progression_labels.py`.
-- [x] Generated `reports/progression_label_audit.md`.
+- [x] Generated `reports/progression_label_audit.md` with configured FIRMS credentials.
 - [x] Added unit tests for chunking, historical source selection, source summaries and report
   rendering.
 
 ### Result-Wise Audit Findings
 
 - Carlton Complex 2014: NIFC has 1 matching perimeter timestamp; MTBS not matched by current query;
-  FIRMS skipped locally because `FIRMS_MAP_KEY` was not visible to settings.
-- King 2014: NIFC has 1 matching perimeter timestamp; MTBS has 1 ignition/final record; FIRMS
-  skipped locally because `FIRMS_MAP_KEY` was not visible to settings.
+  FIRMS has 7,588 detections across 170 unique timestamps and 27 dates.
+- King 2014: NIFC has 1 matching perimeter timestamp; MTBS has 1 ignition/final record; FIRMS has
+  5,584 detections across 88 unique timestamps and 21 dates.
 - Big Cougar 2014: NIFC has 1 matching perimeter timestamp; MTBS has 1 ignition/final record; FIRMS
-  skipped locally because `FIRMS_MAP_KEY` was not visible to settings.
+  has 3,002 detections across 126 unique timestamps and 28 dates.
 
 ### Interpretation
 
 The current NIFC/MTBS evidence does not support hourly perimeter labels for any pilot fire. FIRMS
-historical active-fire detections are the next required data source for irregular hotspot/progression
-labels. Until that audit passes, the pilot artifacts remain valid final-extent cases, not
-short-horizon forecast samples.
+historical active-fire detections do support irregular hotspot/progression targets, but those targets
+must be filtered, uncertainty-aware and clearly distinguished from exact burned perimeters.
 
 ### Remaining Phase 4E Work
 
-- [ ] Put `FIRMS_MAP_KEY` in `.env` or export it in the active shell and rerun
-  `python3 scripts/audit_progression_labels.py`.
-- [ ] If FIRMS has enough detections, design uncertainty-aware irregular hotspot/progression labels.
-- [ ] If FIRMS is too sparse/noisy for these 2014 pilots, select newer pilot fires with denser
-  timestamped observations before Phase 5.
+- [ ] Design uncertainty-aware irregular hotspot/progression labels from FIRMS detections.
+- [ ] Persist/cache FIRMS detections by fire/source/date window with provenance.
+- [ ] Add spatial filtering against final extents and confidence/FRP/sensor-quality rules.
+- [ ] Build an initial ignition/active-front estimate from early detections without using future
+  final extent as a model input.
 
 ## Future Phases
 
@@ -419,7 +418,7 @@ Phase 4A: ████████████████████ 100% ✅
 Phase 4B: ████████████████████ 100% ✅
 Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
-Phase 4E: ████████░░░░░░░░░░░░  40% 🔎
+Phase 4E: ████████████░░░░░░░░  60% 🔎
 ...
 Overall: ████████████░░░░░░░░  60%
 ```
@@ -436,8 +435,8 @@ Overall: ████████████░░░░░░░░  60%
 
 ## Blockers
 
-Phase 4E needs `FIRMS_MAP_KEY` visible to FireTwin settings so historical MODIS/VIIRS detections can
-be audited for the current pilot fire windows.
+No credential blocker remains. Phase 4E now needs label-construction code that converts FIRMS
+detections into uncertainty-aware irregular progression targets.
 
 ## Notes
 

@@ -93,8 +93,9 @@ After discovering NIFC Historical archive (2000-2021+) and validating MTBS cover
 
 > Phase 4E update (2026-09-10): these pilots are valid final-extent artifacts with real covariates,
 > but the earlier assumption of strong perimeter progression was too optimistic. The current audit
-> found only one matching NIFC perimeter timestamp per pilot. FIRMS historical detections still need
-> to be audited with a configured `FIRMS_MAP_KEY`.
+> found only one matching NIFC perimeter timestamp per pilot. FIRMS historical detections are
+> available and support irregular hotspot/progression labels after filtering, not exact hourly
+> perimeter truth.
 
 1. **Carlton Complex (2014)** - Washington State
    - **Size**: 251,965 acres (largest in WA state history at the time)

@@ -72,6 +72,10 @@ Before a real pilot fire can be used for progression modeling:
   not exact hourly perimeter truth.
 - A generated audit report must state supported targets and whether hourly labels are defensible.
 
+Current Phase 4E audit status: all three 2014 pilots have FIRMS detections across 21-28 detection
+dates, so the next defensible real target is irregular hotspot/progression labeling, not hourly
+perimeter regression.
+
 ## Probabilistic Metrics
 
 For probability forecasts:

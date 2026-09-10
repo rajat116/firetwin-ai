@@ -100,9 +100,9 @@ firms_detections = firms_client.get_area_detections(
 ```
 
 Phase 4E audit results show the current 2014 pilot fires have only one matching NIFC perimeter
-timestamp each. That is not enough for hourly perimeter labels. FIRMS historical detections must be
-audited before constructing any progression labels; if they are too sparse/noisy, newer pilot fires
-with denser timestamped observations should be selected.
+timestamp each. That is not enough for hourly perimeter labels. FIRMS historical detections are
+available for all three pilots and can support irregular hotspot/progression targets after sensor,
+confidence, FRP and spatial filtering.
 
 ## Recommended Data Pipeline
 
