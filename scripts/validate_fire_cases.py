@@ -19,6 +19,7 @@ def validate_fire_case(
     expected_crs: str,
     require_real_terrain: bool = False,
     require_real_fuels: bool = False,
+    require_real_weather: bool = False,
 ) -> dict:
     """Validate a single fire case.
 
@@ -28,6 +29,7 @@ def validate_fire_case(
         expected_crs: Expected target CRS
         require_real_terrain: If True, fail flat placeholder terrain
         require_real_fuels: If True, fail uniform placeholder fuels
+        require_real_weather: If True, fail placeholder scalar weather
 
     Returns:
         Dictionary with validation results
@@ -71,19 +73,32 @@ def validate_fire_case(
             results["passed"].append("✅ Partial real fuel covariates explicitly marked")
         elif covariate_status == "partial_real_terrain_fuels":
             results["passed"].append("✅ Partial real terrain/fuel covariates explicitly marked")
+        elif covariate_status == "partial_real_terrain_fuels_weather":
+            results["passed"].append(
+                "✅ Partial real terrain/fuel/weather covariates explicitly marked"
+            )
         else:
             results["failed"].append("❌ Covariate status is not explicit")
 
         if require_real_terrain and covariate_status not in (
             "partial_real_terrain",
             "partial_real_terrain_fuels",
+            "partial_real_terrain_fuels_weather",
         ):
             results["failed"].append(
                 "❌ Real terrain is required but covariate status does not record real terrain"
             )
-        if require_real_fuels and covariate_status != "partial_real_terrain_fuels":
+        if require_real_fuels and covariate_status not in (
+            "partial_real_fuels",
+            "partial_real_terrain_fuels",
+            "partial_real_terrain_fuels_weather",
+        ):
             results["failed"].append(
-                "❌ Real fuels are required but covariate status is not partial_real_terrain_fuels"
+                "❌ Real fuels are required but covariate status does not record real fuels"
+            )
+        if require_real_weather and covariate_status != "partial_real_terrain_fuels_weather":
+            results["failed"].append(
+                "❌ Real weather is required but covariate status does not record real weather"
             )
 
         covariate_sources = ds.attrs.get("covariate_sources", "")
@@ -96,6 +111,11 @@ def validate_fire_case(
             results["passed"].append("✅ Fuel source provenance records LANDFIRE LF2022 FBFM40")
         elif require_real_fuels:
             results["failed"].append("❌ Fuel source provenance does not record LANDFIRE FBFM40")
+
+        if require_real_weather and "ERA5-Land hourly reanalysis" in covariate_sources:
+            results["passed"].append("✅ Weather source provenance records ERA5-Land")
+        elif require_real_weather:
+            results["failed"].append("❌ Weather source provenance does not record ERA5-Land")
 
         if ds.attrs.get("bbox_crs") == expected_crs:
             results["passed"].append(f"✅ CRS matches expected {expected_crs}")
@@ -268,6 +288,47 @@ def validate_fire_case(
                     results["passed"].append("✅ Fuels have variation")
         else:
             results["failed"].append("❌ Missing fuel data")
+
+        # 6. Check scalar weather attrs
+        weather_attrs = {
+            "temperature_c": ds.attrs.get("temperature_c"),
+            "relative_humidity_percent": ds.attrs.get("relative_humidity_percent"),
+            "wind_speed_m_s": ds.attrs.get("wind_speed_m_s"),
+            "wind_direction_degrees": ds.attrs.get("wind_direction_degrees"),
+            "weather_timestamp": ds.attrs.get("weather_timestamp"),
+        }
+        if any(value is None for value in weather_attrs.values()):
+            results["failed"].append("❌ Missing weather metadata attrs")
+        else:
+            temperature_c = float(weather_attrs["temperature_c"])
+            rh_percent = float(weather_attrs["relative_humidity_percent"])
+            wind_speed = float(weather_attrs["wind_speed_m_s"])
+            wind_direction = float(weather_attrs["wind_direction_degrees"])
+
+            if (
+                np.isfinite(temperature_c)
+                and -80.0 <= temperature_c <= 70.0
+                and np.isfinite(rh_percent)
+                and 0.0 <= rh_percent <= 100.0
+                and np.isfinite(wind_speed)
+                and wind_speed >= 0.0
+                and np.isfinite(wind_direction)
+                and 0.0 <= wind_direction < 360.0
+            ):
+                results["passed"].append("✅ Weather values are finite and physically bounded")
+            else:
+                results["failed"].append("❌ Weather values are invalid")
+
+            is_placeholder_weather = (
+                temperature_c == 25.0
+                and rh_percent == 30.0
+                and wind_speed == 5.0
+                and wind_direction == 270.0
+            )
+            if require_real_weather and is_placeholder_weather:
+                results["failed"].append("❌ Weather is placeholder scalar moderate conditions")
+            elif is_placeholder_weather:
+                results["warnings"].append("⚠️  Weather is placeholder scalar moderate conditions")
 
     except Exception as e:
         results["failed"].append(f"❌ Error loading fire case: {e}")

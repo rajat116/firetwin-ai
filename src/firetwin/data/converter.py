@@ -4,7 +4,7 @@ This module orchestrates the transformation of raw data from multiple sources
 (NIFC, MTBS, FIRMS, ERA5, USGS, LANDFIRE) into the canonical FireCase schema.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import numpy as np
@@ -21,6 +21,7 @@ from firetwin.data.clients import (
 )
 from firetwin.schemas.core import FireState, FuelData, TerrainData, WeatherData
 from firetwin.schemas.fire_case import FireCase, FireCaseMetadata
+from firetwin.settings import settings
 
 PLACEHOLDER_COVARIATE_LIMITATIONS = [
     "Terrain is placeholder flat elevation, not USGS 3DEP.",
@@ -52,6 +53,15 @@ REAL_TERRAIN_FUELS_LIMITATIONS = [
     "Target state is final burned extent, not time-resolved fire progression.",
 ]
 
+REAL_TERRAIN_FUELS_WEATHER_LIMITATIONS = [
+    "Terrain is real USGS 3DEP elevation resampled to the FireTwin grid.",
+    "Fuel model is real LANDFIRE LF2022 FBFM40 resampled to the FireTwin grid.",
+    "Fuel load and moisture are deterministic proxies derived from FBFM40 classes, not live fuel observations.",
+    "Weather is real ERA5-Land hourly reanalysis summarized to a scalar AOI mean.",
+    "Target state is final burned extent, not time-resolved fire progression.",
+    "Initial state is still an empty placeholder until ignition/progression observations are reconstructed.",
+]
+
 
 class RealFireCaseConverter:
     """Convert real wildfire data to canonical FireCase format.
@@ -71,6 +81,8 @@ class RealFireCaseConverter:
         bbox: tuple[float, float, float, float],
         target_resolution_m: float = 100.0,
         target_crs: str = "EPSG:32610",  # UTM Zone 10N for Western US
+        weather_start: datetime | None = None,
+        weather_end: datetime | None = None,
     ) -> None:
         """Initialize converter.
 
@@ -80,12 +92,16 @@ class RealFireCaseConverter:
             bbox: Bounding box (min_lon, min_lat, max_lon, max_lat) in WGS84
             target_resolution_m: Target grid resolution in meters
             target_crs: Target CRS for modeling (should be projected, not geographic)
+            weather_start: Optional weather reference/window start time
+            weather_end: Optional weather window end time (default: start + 23 hours)
         """
         self.fire_name = fire_name
         self.fire_year = fire_year
         self.bbox = bbox
         self.target_resolution_m = target_resolution_m
         self.target_crs = target_crs
+        self.weather_start = weather_start
+        self.weather_end = weather_end
 
         # Initialize clients (some are optional)
         self.nifc_historical = NIFCHistoricalClient()
@@ -100,7 +116,10 @@ class RealFireCaseConverter:
 
         self.era5: ERA5LandClient | None
         try:
-            self.era5 = ERA5LandClient()
+            if settings.cds_api_key:
+                self.era5 = ERA5LandClient(url=settings.cds_api_url, key=settings.cds_api_key)
+            else:
+                self.era5 = ERA5LandClient()
         except Exception:
             self.era5 = None  # No CDS credentials
 
@@ -110,6 +129,22 @@ class RealFireCaseConverter:
         # Data storage
         self.raw_data: dict = {}
         self.aligned_data: dict = {}
+
+    def _weather_window(self) -> tuple[datetime, datetime] | None:
+        """Return the weather download/summarization window if one can be inferred."""
+        if self.weather_start is not None:
+            weather_end = self.weather_end or (self.weather_start + timedelta(hours=23))
+            return self.weather_start, weather_end
+
+        mtbs = self.raw_data.get("mtbs_fires")
+        if mtbs is not None and "ignition_date" in mtbs:
+            ignition_dates = mtbs["ignition_date"].dropna()
+            if len(ignition_dates) > 0:
+                earliest = min(ignition_dates)
+                start = earliest.to_pydatetime() if hasattr(earliest, "to_pydatetime") else earliest
+                return start, start + timedelta(hours=23)
+
+        return None
 
     def fetch_all_data(self) -> None:
         """Fetch raw data from all sources."""
@@ -183,7 +218,32 @@ class RealFireCaseConverter:
         if self.era5 is None:
             print("   ℹ️  ERA5 requires CDS credentials (skipped)")
         else:
-            print("   ℹ️  ERA5 client available but not fetched yet")
+            weather_window = self._weather_window()
+            if weather_window is None:
+                print("   ℹ️  No defensible weather reference time available (skipped)")
+            else:
+                start, end = weather_window
+                case_id = f"{self.fire_name.lower().replace(' ', '_')}_{self.fire_year}"
+                output_path = (
+                    Path("data/raw/era5") / case_id / f"era5land_{start:%Y%m%d%H}_{end:%Y%m%d%H}.nc"
+                )
+                try:
+                    weather = self.era5.build_weather_data(
+                        bbox=self.bbox,
+                        start_datetime=start,
+                        end_datetime=end,
+                        output_path=output_path,
+                    )
+                    self.aligned_data["weather"] = weather
+                    print(
+                        "   ✅ Real ERA5-Land weather summarized: "
+                        f"{weather.temperature_c:.1f}°C, RH {weather.relative_humidity_percent:.0f}%, "
+                        f"wind {weather.wind_speed_m_s:.1f} m/s from {weather.wind_direction_degrees:.0f}°"
+                    )
+                except Exception as e:
+                    print(
+                        f"   ⚠️  ERA5 weather unavailable; falling back to placeholder weather: {e}"
+                    )
 
         # 5. USGS 3DEP elevation
         print("\n5️⃣  Checking USGS 3DEP elevation...")
@@ -353,7 +413,38 @@ class RealFireCaseConverter:
         case_id = f"{self.fire_name.lower().replace(' ', '_')}_{self.fire_year}"
         has_real_terrain = "terrain" in self.aligned_data
         has_real_fuels = "fuels" in self.aligned_data
-        if has_real_terrain and has_real_fuels:
+        has_real_weather = "weather" in self.aligned_data
+        if has_real_terrain and has_real_fuels and has_real_weather:
+            description = (
+                f"Real final-extent fire case from {self.fire_name} fire in {self.fire_year}. "
+                "Perimeter is real; terrain is USGS 3DEP; fuel model is LANDFIRE LF2022 FBFM40; "
+                "weather is ERA5-Land; initial fire state is a placeholder."
+            )
+            data_quality = "phase4c_real_terrain_fuels_weather_final_extent"
+            source = "NIFC/MTBS/USGS 3DEP/LANDFIRE/ERA5-Land"
+            tags = [
+                "real_data",
+                "final_extent_only",
+                "real_terrain",
+                "real_fbfm40",
+                "real_weather",
+                "proxy_fuel_properties",
+                f"year_{self.fire_year}",
+                self.fire_name.lower().replace(" ", "_"),
+            ]
+            covariate_status = "partial_real_terrain_fuels_weather"
+            limitations = REAL_TERRAIN_FUELS_WEATHER_LIMITATIONS
+            covariate_sources = {
+                "terrain": "USGS 3DEP National Elevation Dataset (NED) 1 arc-second GeoTIFF via TNM",
+                "fuel_model": LANDFIREClient.FUEL_MODEL_SOURCE,
+                "fuel_load_kg_m2": "derived_proxy_from_landfire_fbfm40_class",
+                "fuel_moisture_percent": "static_proxy_from_landfire_fbfm40_class",
+                "weather": ERA5LandClient.WEATHER_SOURCE,
+                "weather_spatial_resolution": "0.1 degree grid; native resolution about 9 km",
+                "weather_summary": "AOI mean at nearest requested hourly timestamp",
+                "initial_state": "placeholder_empty_no_ignition_time",
+            }
+        elif has_real_terrain and has_real_fuels:
             description = (
                 f"Real final-extent fire case from {self.fire_name} fire in {self.fire_year}. "
                 "Perimeter is real; terrain is USGS 3DEP; fuel model is LANDFIRE LF2022 FBFM40; "
@@ -512,15 +603,19 @@ class RealFireCaseConverter:
                 resolution_m=self.target_resolution_m,
             )
 
-        # 4. Create WeatherData (placeholder with moderate conditions)
-        print("   ⚠️  Using placeholder weather (moderate wind/temp)")
-        weather = WeatherData(
-            temperature_c=25.0,  # Scalar, not array
-            relative_humidity_percent=30.0,
-            wind_speed_m_s=5.0,
-            wind_direction_degrees=270.0,  # West
-            timestamp=datetime(self.fire_year, 7, 1),  # Placeholder date
-        )
+        # 4. Create WeatherData
+        if has_real_weather:
+            print("   ✅ Using real ERA5-Land weather")
+            weather = self.aligned_data["weather"]
+        else:
+            print("   ⚠️  Using placeholder weather (moderate wind/temp)")
+            weather = WeatherData(
+                temperature_c=25.0,  # Scalar, not array
+                relative_humidity_percent=30.0,
+                wind_speed_m_s=5.0,
+                wind_direction_degrees=270.0,  # West
+                timestamp=datetime(self.fire_year, 7, 1),  # Placeholder date
+            )
 
         # 5. Create initial FireState (no fire initially)
         print("   ✅ Creating initial state (no fire)")

@@ -311,6 +311,44 @@ builder. It avoids manual AOI downloads while keeping categorical fuel semantics
 
 ---
 
+## Decision 9: Use ERA5-Land Hourly AOI Mean Weather for Phase 4C
+
+**Date**: 2026-09-10
+**Phase**: 4C - Real Weather Enrichment
+
+### Context
+
+The current FireTwin schema stores `WeatherData` as scalar forcing values, while ERA5-Land is an
+hourly gridded reanalysis product on a coarse 0.1 degree grid. The pilot cases are still
+final-burned-extent artifacts, not time-resolved forecast samples, so weather should be treated as
+an initialization/conditioning covariate rather than a progression label.
+
+### Decision
+
+Use ERA5-Land hourly data from the Copernicus Climate Data Store API. For the current schema,
+download/cache a small NetCDF window around a documented ignition or discovery reference time,
+select the nearest hourly timestamp, and summarize the AOI by spatial mean. Store temperature in
+Celsius, relative humidity derived from 2m temperature and dewpoint, wind speed from 10m u/v
+components, and meteorological wind direction degrees from north.
+
+Generated real-weather cases will be marked as `target_type=final_burned_extent` and
+`covariate_status=partial_real_terrain_fuels_weather`.
+
+### Rationale
+
+This replaces placeholder weather without inventing fine-scale meteorology. It also keeps the code
+compatible with the current scalar schema while leaving room for a future time-varying weather cube
+when the model/label design justifies it.
+
+### Consequences
+
+- Phase 4C completion is credential-gated by CDS account setup and accepted ERA5-Land terms.
+- Resampling or summarizing ERA5-Land does not create 30m/100m weather truth.
+- Forecast experiments must still refuse to use final burned extent as an hourly progression label.
+- A later schema revision should add time-varying weather arrays for real forecast windows.
+
+---
+
 ## Future Decisions
 
 Document all future material decisions here, including:

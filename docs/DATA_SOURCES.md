@@ -2,7 +2,7 @@
 
 This document maintains a verified registry of all data sources used in FireTwin.
 
-**Last Updated**: 2026-09-09
+**Last Updated**: 2026-09-10
 
 Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources.yaml)
 
@@ -13,7 +13,7 @@ Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources
 | NASA FIRMS | ✅ Implemented | 17 tests passing | 92% | REST API with MAP_KEY |
 | NIFC/WFIGS | ✅ Implemented | 13 tests passing | 96% | ArcGIS REST / GeoJSON |
 | MTBS | ✅ Implemented | 13 tests passing | 96% | ArcGIS REST / GeoJSON |
-| ERA5-Land | ✅ Implemented | 8 tests passing | 94% | CDS API (`cdsapi`) |
+| ERA5-Land | ✅ Implemented | 13 tests passing | 91% | CDS API (`cdsapi`) |
 | LANDFIRE | ✅ Implemented | 8 tests passing | 90% | LF Product Service ImageServer |
 | USGS 3DEP | ✅ Implemented | 5 tests passing | 93% | National Map API |
 
@@ -126,6 +126,9 @@ Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources
 **Temporal Resolution**: Hourly  
 **License/Terms**: [Copernicus license](https://cds.climate.copernicus.eu/api/v2/terms/static/licence-to-use-copernicus-products.pdf)
 
+**Default FireTwin Processing**: Download a small NetCDF weather window for the fire AOI and
+summarize the nearest hourly field to scalar `WeatherData` values for the current schema.
+
 **Variables Used**:
 - 10m u- and v-components of wind
 - 2m temperature
@@ -139,6 +142,8 @@ Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources
 - Coarser than 30m terrain/fuel data (resampling does not create fine-scale weather)
 - Reanalysis, not real-time forecasts
 - Uncertainty in complex terrain
+- Requires a CDS API token and accepted dataset terms before real local artifacts can be generated
+- Current FireTwin schema stores scalar weather; time-varying weather cubes are deferred
 
 **Citation**: Muñoz Sabater, J. (2021). ERA5-Land hourly data from 1950 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS).
 
@@ -236,7 +241,7 @@ Store in `.env` (never commit):
 FIRMS_MAP_KEY=your_key_here
 
 # Copernicus CDS
-CDS_API_URL=https://cds.climate.copernicus.eu/api/v2
+CDS_API_URL=https://cds.climate.copernicus.eu/api
 CDS_API_KEY=your_uid:your_api_key
 ```
 

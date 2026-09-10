@@ -40,13 +40,14 @@ This project answers **measurable research questions** about hybrid physics-ML f
 - ✅ **Phase 3**: Historical final-extent case builder (3 pilot fires with validated area/CRS metadata)
 - ✅ **Phase 4A**: Real USGS 3DEP terrain enrichment with derived slope/aspect
 - ✅ **Phase 4B**: Real LANDFIRE LF2022 FBFM40 fuel-model enrichment
-- 🚧 **Phase 4C**: Real ERA5-Land/weather covariates (next)
+- 🚧 **Phase 4C**: ERA5-Land weather covariates (client processing added; credential-gated)
 
 Current pilot cases contain real NIFC/MTBS-derived final perimeter masks and real USGS 3DEP
 terrain-derived elevation, slope and aspect. They also contain real LANDFIRE LF2022 FBFM40 fuel
 model classes aligned to the model grid. Fuel load and fuel moisture are deterministic class-based
-proxies; weather and initial ignition state fields are still placeholders. The cases are not valid
-3/6/12/24-hour fire-progression labels yet.
+proxies; weather remains placeholder locally until CDS credentials are configured and cases are
+rebuilt. Initial ignition state fields are still placeholders. The cases are not valid 3/6/12/24-hour
+fire-progression labels yet.
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -230,7 +231,7 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 3**: Historical case builder (3 validated pilot fires with real perimeters)
 - [x] **Phase 4A**: Real USGS 3DEP terrain covariates
 - [x] **Phase 4B**: Real LANDFIRE FBFM40 fuel-model covariates
-- [ ] **Phase 4C**: Real weather and real-data baselines
+- [ ] **Phase 4C**: Real ERA5-Land weather artifacts and real-data baselines
 - [ ] **Phase 5**: Simulation corpus and surrogate
 - [ ] **Phase 6**: Hybrid model
 - [ ] **Phase 7**: Assimilation and calibrated uncertainty

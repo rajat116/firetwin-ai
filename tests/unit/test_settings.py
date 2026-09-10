@@ -8,6 +8,7 @@ def test_settings_defaults():
     settings = FireTwinSettings()
     assert settings.data_root.name == "data"
     assert settings.mlflow_tracking_uri == "./mlruns"
+    assert settings.cds_api_url == "https://cds.climate.copernicus.eu/api"
 
 
 def test_get_system_info():

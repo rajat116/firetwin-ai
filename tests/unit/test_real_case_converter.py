@@ -1,15 +1,18 @@
 """Tests for real fire case conversion semantics."""
 
+from datetime import datetime
+
 import numpy as np
 
 from firetwin.data.converter import (
     PLACEHOLDER_COVARIATE_LIMITATIONS,
     REAL_FUELS_LIMITATIONS,
     REAL_TERRAIN_FUELS_LIMITATIONS,
+    REAL_TERRAIN_FUELS_WEATHER_LIMITATIONS,
     REAL_TERRAIN_LIMITATIONS,
     RealFireCaseConverter,
 )
-from firetwin.schemas import BoundingBox, CoordinateSystem, FuelData, TerrainData
+from firetwin.schemas import BoundingBox, CoordinateSystem, FuelData, TerrainData, WeatherData
 
 
 def test_real_case_converter_preserves_target_crs_and_limitations():
@@ -176,3 +179,61 @@ def test_real_case_converter_marks_fuel_only_fallback_honestly():
     assert fire_case.metadata.limitations == REAL_FUELS_LIMITATIONS
     assert fire_case.metadata.covariate_sources["terrain"] == "placeholder_flat_1000m"
     assert "LANDFIRE LF2022 FBFM40" in fire_case.metadata.covariate_sources["fuel_model"]
+
+
+def test_real_case_converter_uses_real_weather_when_aligned():
+    """Aligned ERA5 weather should replace placeholder weather and update metadata."""
+    converter = RealFireCaseConverter(
+        fire_name="KING",
+        fire_year=2014,
+        bbox=(-121.5, 38.5, -120.0, 39.5),
+        target_resolution_m=100.0,
+        target_crs="EPSG:32610",
+    )
+    bbox = BoundingBox(
+        min_x=500000.0,
+        max_x=500500.0,
+        min_y=5000000.0,
+        max_y=5000400.0,
+        crs=CoordinateSystem.UTM_10N,
+    )
+    terrain = TerrainData(
+        elevation_m=np.arange(20, dtype=np.float32).reshape(4, 5) + 1000.0,
+        slope_degrees=np.full((4, 5), 12.0, dtype=np.float32),
+        aspect_degrees=np.full((4, 5), 180.0, dtype=np.float32),
+        resolution_m=100.0,
+        bbox=bbox,
+    )
+    fuels = FuelData(
+        fuel_model=np.full((4, 5), 101, dtype=np.int32),
+        fuel_load_kg_m2=np.full((4, 5), 0.25, dtype=np.float32),
+        fuel_moisture_percent=np.full((4, 5), 6.0, dtype=np.float32),
+        resolution_m=100.0,
+    )
+    weather = WeatherData(
+        temperature_c=27.0,
+        relative_humidity_percent=20.0,
+        wind_speed_m_s=6.0,
+        wind_direction_degrees=225.0,
+        timestamp=datetime(2014, 9, 13, 23),
+    )
+    converter.aligned_data = {
+        "grid_shape": (4, 5),
+        "grid_bounds": (500000.0, 5000000.0, 500500.0, 5000400.0),
+        "burned_mask": np.ones((4, 5), dtype=np.uint8),
+        "terrain": terrain,
+        "fuels": fuels,
+        "weather": weather,
+    }
+
+    fire_case = converter.build_fire_case()
+
+    assert fire_case is not None
+    assert fire_case.weather is weather
+    assert fire_case.metadata.source == "NIFC/MTBS/USGS 3DEP/LANDFIRE/ERA5-Land"
+    assert fire_case.metadata.covariate_status == "partial_real_terrain_fuels_weather"
+    assert fire_case.metadata.data_quality == "phase4c_real_terrain_fuels_weather_final_extent"
+    assert "real_weather" in fire_case.metadata.tags
+    assert "placeholder_weather" not in fire_case.metadata.tags
+    assert fire_case.metadata.limitations == REAL_TERRAIN_FUELS_WEATHER_LIMITATIONS
+    assert "ERA5-Land hourly reanalysis" in fire_case.metadata.covariate_sources["weather"]

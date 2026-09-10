@@ -24,7 +24,7 @@ class FireTwinSettings(BaseSettings):
         description="NASA FIRMS MAP_KEY for active fire data",
     )
     cds_api_url: str | None = Field(
-        default="https://cds.climate.copernicus.eu/api/v2",
+        default="https://cds.climate.copernicus.eu/api",
         description="Copernicus Climate Data Store API URL",
     )
     cds_api_key: str | None = Field(

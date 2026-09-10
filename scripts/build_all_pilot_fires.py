@@ -1,19 +1,23 @@
-"""Build all 3 pilot fire cases with real terrain and LANDFIRE fuel models.
+"""Build all 3 pilot fire cases with real terrain, fuels, and optional weather.
 
 This script builds complete FireCase objects for:
 1. Carlton Complex 2014 (WA, 252k acres) - Pacific NW
 2. King Fire 2014 (CA, 98k acres) - Sierra Nevada
 3. Big Cougar 2014 (OR/ID, 65k acres) - Northern Rockies
 
-Each fire demonstrates the end-to-end Phase 4B pipeline:
+Each fire demonstrates the end-to-end Phase 4B pipeline and the credential-gated Phase 4C weather
+path:
 - Multi-source data fetching (NIFC, MTBS, FIRMS, ERA5, USGS, LANDFIRE)
 - Spatial alignment and reprojection
 - USGS 3DEP DEM resampling to the FireTwin grid
 - LANDFIRE LF2022 FBFM40 resampling to the FireTwin grid
+- ERA5-Land weather summarization when CDS credentials are configured
 - Rasterization to canonical grid
-- FireCase construction with real perimeters, real terrain, and real fuel models
+- FireCase construction with real perimeters, real terrain, real fuel models, and optional real
+  weather
 """
 
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from firetwin.data.converter import RealFireCaseConverter
@@ -24,6 +28,7 @@ def build_pilot_fire(
     fire_year: int,
     bbox: tuple[float, float, float, float],
     target_crs: str = "EPSG:32610",
+    weather_start: datetime | None = None,
 ) -> bool:
     """Build a single pilot fire case.
 
@@ -32,6 +37,7 @@ def build_pilot_fire(
         fire_year: Fire year
         bbox: Bounding box (min_lon, min_lat, max_lon, max_lat) in WGS84
         target_crs: Target CRS for modeling
+        weather_start: Optional ignition/discovery weather reference time
 
     Returns:
         True if successful, False otherwise
@@ -46,6 +52,8 @@ def build_pilot_fire(
         bbox=bbox,
         target_resolution_m=100.0,
         target_crs=target_crs,
+        weather_start=weather_start,
+        weather_end=weather_start + timedelta(hours=23) if weather_start else None,
     )
 
     # Fetch data
@@ -69,7 +77,7 @@ def build_pilot_fire(
 
 def main():
     """Build all 3 pilot fire cases."""
-    print("🚀 Building All Pilot Fire Cases (Phase 4B: Real Terrain + Fuels)")
+    print("🚀 Building All Pilot Fire Cases (Phase 4B + credential-gated Phase 4C)")
     print("=" * 70)
 
     # Define pilot fires (from PHASE3_PILOT_FIRES.md)
@@ -79,18 +87,21 @@ def main():
             "year": 2014,
             "bbox": (-120.5, 47.5, -119.5, 48.5),  # Washington
             "crs": "EPSG:32610",  # UTM 10N
+            "weather_start": datetime(2014, 7, 14, 12),
         },
         {
             "name": "KING",  # Must use uppercase for API
             "year": 2014,
             "bbox": (-121.5, 38.5, -120.0, 39.5),  # California Sierra Nevada
             "crs": "EPSG:32610",  # UTM 10N
+            "weather_start": datetime(2014, 9, 13, 23),
         },
         {
             "name": "Big Cougar",
             "year": 2014,
             "bbox": (-117.5, 45.4, -116.2, 46.6),  # Oregon/Idaho (corrected bounds)
             "crs": "EPSG:32611",  # UTM 11N (further east)
+            "weather_start": datetime(2014, 8, 2, 12),
         },
     ]
 
@@ -101,6 +112,7 @@ def main():
             fire_year=fire["year"],
             bbox=fire["bbox"],
             target_crs=fire["crs"],
+            weather_start=fire["weather_start"],
         )
         results.append((fire["name"], success))
 
@@ -120,7 +132,7 @@ def main():
 
     if successful == total:
         print("\n✅ ALL PILOT FIRES COMPLETE!")
-        print("   Phase 4B pilot case building successful")
+        print("   Pilot case building successful")
         print("   FireCases saved to: data/fire_cases/")
         return True
     else:

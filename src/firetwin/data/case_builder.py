@@ -43,7 +43,7 @@ class CaseBuilderConfig:
     fetch_nifc: bool = True
     fetch_mtbs: bool = True
     fetch_era5: bool = True
-    fetch_landfire: bool = False  # Manual download required
+    fetch_landfire: bool = False  # Deferred until model-grid alignment
     fetch_3dep: bool = True
 
 
@@ -160,7 +160,7 @@ class FireCaseBuilder:
                 output_path.parent.mkdir(parents=True, exist_ok=True)
 
                 weather_path = self.era5_client.download_area(
-                    bbox=self.config.bbox,
+                    bbox=ERA5LandClient.wgs84_bbox_to_cds_area(self.config.bbox),
                     start_date=self.config.start_date,
                     end_date=self.config.end_date,
                     output_path=output_path,

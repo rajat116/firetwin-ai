@@ -1,6 +1,6 @@
 metadata:
   registry_version: 1
-  last_updated: "2026-09-09"
+  last_updated: "2026-09-10"
   scope: "Western United States wildfire research prototype"
   warning: "Research prototype. Not for operational wildfire response, evacuation planning or safety-critical decision-making."
 
@@ -131,12 +131,13 @@ sources:
       dataset: "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-land"
       portal: "https://cds.climate.copernicus.eu/"
       doi: "https://doi.org/10.24381/cds.e2161bac"
-    access_date: "2026-09-08"
-    version: "Dataset update date 2026-09-08 observed on CDS page"
+    access_date: "2026-09-10"
+    version: "Dataset update date 2026-09-10 observed on CDS page"
     checksum: null
     known_limitations:
       - "Coarse reanalysis data; resampling to the fire grid does not create fine-scale weather truth."
       - "Requires CDS account and accepted terms."
+      - "Current FireTwin schema stores scalar AOI-mean weather; time-varying weather cubes are deferred."
 
   landfire:
     provider: "LANDFIRE"
