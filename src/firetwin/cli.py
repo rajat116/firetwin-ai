@@ -1,5 +1,7 @@
 """Command-line interface for FireTwin."""
 
+from pathlib import Path
+
 import click
 from rich.console import Console
 from rich.panel import Panel
@@ -9,6 +11,11 @@ from firetwin import __version__
 from firetwin.settings import check_optional_dependencies, get_system_info, settings
 
 console = Console()
+
+
+def _has_cds_credentials(cdsapirc_path: Path | None = None) -> bool:
+    """Return True when CDS credentials are available without exposing secrets."""
+    return bool(settings.cds_api_key) or (cdsapirc_path or Path.home() / ".cdsapirc").exists()
 
 
 @click.group()
@@ -95,7 +102,7 @@ def doctor():
 
     # Credentials status (never show actual values)
     firms_status = "[green]✓ Set[/green]" if settings.firms_map_key else "[yellow]Not set[/yellow]"
-    cds_status = "[green]✓ Set[/green]" if settings.cds_api_key else "[yellow]Not set[/yellow]"
+    cds_status = "[green]✓ Set[/green]" if _has_cds_credentials() else "[yellow]Not set[/yellow]"
 
     config_table.add_row("FIRMS API Key", firms_status)
     config_table.add_row("CDS API Key", cds_status)
@@ -113,8 +120,10 @@ def doctor():
     if not settings.firms_map_key:
         warnings.append("[yellow]FIRMS API key not configured. See .env.example[/yellow]")
 
-    if not settings.cds_api_key:
-        warnings.append("[yellow]CDS API key not configured. See .env.example[/yellow]")
+    if not _has_cds_credentials():
+        warnings.append(
+            "[yellow]CDS API key not configured. See .env.example or ~/.cdsapirc[/yellow]"
+        )
 
     if not deps["torch"]["available"]:
         warnings.append("[red]PyTorch not found. Install with: conda install pytorch[/red]")

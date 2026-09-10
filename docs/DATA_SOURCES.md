@@ -142,7 +142,7 @@ summarize the nearest hourly field to scalar `WeatherData` values for the curren
 - Coarser than 30m terrain/fuel data (resampling does not create fine-scale weather)
 - Reanalysis, not real-time forecasts
 - Uncertainty in complex terrain
-- Requires a CDS API token and accepted dataset terms before real local artifacts can be generated
+- Requires a CDS API token and accepted dataset terms before local artifacts can be regenerated
 - Current FireTwin schema stores scalar weather; time-varying weather cubes are deferred
 
 **Citation**: Muñoz Sabater, J. (2021). ERA5-Land hourly data from 1950 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS).

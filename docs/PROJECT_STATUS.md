@@ -252,7 +252,7 @@ covariates aligned to the canonical FireTwin grid.
 
 ### Remaining Phase 4 Work
 
-- [ ] Phase 4C: Replace scalar placeholder weather with real ERA5-Land/weather covariates.
+- [x] Phase 4C: Replace scalar placeholder weather with real ERA5-Land/weather covariates.
 - [ ] Phase 4D: Add real-data baselines that respect `target_type=final_burned_extent`.
 
 ## Phase 4B: Real LANDFIRE Fuel Enrichment ✅
@@ -284,14 +284,13 @@ LANDFIRE LF2022 FBFM40 categorical fuel-model rasters aligned to the canonical F
 
 ### Remaining Phase 4 Work
 
-- [ ] Phase 4C: Replace scalar placeholder weather with real ERA5-Land/weather covariates.
 - [ ] Phase 4D: Add real-data baselines that respect `target_type=final_burned_extent`.
 - [ ] Replace fuel-load and fuel-moisture proxies with source-derived/live fuel attributes when
   that data source is selected.
 
-## Phase 4C: Real ERA5-Land Weather Enrichment 🚧
+## Phase 4C: Real ERA5-Land Weather Enrichment ✅
 
-**Status**: IN PROGRESS (started 2026-09-10)
+**Status**: COMPLETE (2026-09-10)
 
 **Purpose**: Replace scalar placeholder weather in pilot fire cases with real ERA5-Land hourly
 reanalysis summarized at the ignition/discovery weather reference time.
@@ -309,13 +308,16 @@ reanalysis summarized at the ignition/discovery weather reference time.
 - [x] Add unit tests for ERA5 request structure, weather math, cache behavior, converter metadata
   and real-weather validation.
 
-### Pending Before Completion
+### Artifact Verification
 
-- [ ] Configure CDS credentials outside Git (`~/.cdsapirc` or environment variables).
-- [ ] Rebuild all three pilot cases with ERA5-Land NetCDF downloads.
-- [ ] Run `scripts/validate_fire_cases.py` with the real-weather gate enabled.
-- [ ] Inspect result-wise weather values for each pilot case and record them here.
-- [ ] Mark generated Zarrs with `covariate_status=partial_real_terrain_fuels_weather`.
+- [x] Configured CDS credentials outside Git using `~/.cdsapirc`.
+- [x] Rebuilt all three pilot cases with ERA5-Land NetCDF downloads.
+- [x] Enabled and passed `scripts/validate_fire_cases.py` with the real-weather gate.
+- [x] Marked generated Zarrs with `covariate_status=partial_real_terrain_fuels_weather`.
+- [x] Result-wise weather values inspected:
+  - Carlton Complex: 2014-07-14T12:00:00, 26.9C, RH 31%, wind 0.9 m/s from 306 deg.
+  - King: 2014-09-13T23:00:00, 22.8C, RH 29%, wind 0.7 m/s from 185 deg.
+  - Big Cougar: 2014-08-02T12:00:00, 26.3C, RH 32%, wind 0.1 m/s from 140 deg.
 
 ## Future Phases
 
@@ -336,17 +338,15 @@ Phase 2: ████████████████████ 100% ✅
 Phase 3: ████████████████████ 100% ✅
 Phase 4A: ████████████████████ 100% ✅
 Phase 4B: ████████████████████ 100% ✅
-Phase 4C: ████████░░░░░░░░░░░░  40%
+Phase 4C: ████████████████████ 100% ✅
 ...
-Overall: ██████████░░░░░░░░░░  50%
+Overall: ███████████░░░░░░░░░  55%
 ```
 
 ## Known Issues
 
-- Pilot cases are final-burned-extent artifacts with real terrain and real fuel-model classes, but
-  placeholder weather and placeholder empty initial fire states.
-- ERA5-Land weather code is implemented and tested, but local real-weather artifacts require CDS
-  credentials and accepted dataset terms.
+- Pilot cases are final-burned-extent artifacts with real terrain, real fuel-model classes and real
+  ERA5-Land scalar weather, but placeholder empty initial fire states.
 - Fuel load and fuel moisture are class-based static proxies, not observed live/dead fuel moisture.
 - Real-data baseline evaluation must not treat these final masks as hourly progression labels.
 - `python` on the local machine resolves to Python 2.7 outside conda; use `conda activate firetwin`
@@ -354,8 +354,8 @@ Overall: ██████████░░░░░░░░░░  50%
 
 ## Blockers
 
-Phase 4C artifact completion requires CDS credentials and accepted ERA5-Land dataset terms outside
-Git.
+No active blocker for Phase 4C. The next development blocker is reconstructing time-resolved
+progression/initial-state labels without pretending final perimeters are forecast targets.
 
 ## Notes
 

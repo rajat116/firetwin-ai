@@ -32,7 +32,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 4B Complete - Real Terrain + Fuel Enrichment ✅
+**Current Phase**: Phase 4C Complete - Real Terrain + Fuel + Weather Enrichment ✅
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
@@ -40,14 +40,13 @@ This project answers **measurable research questions** about hybrid physics-ML f
 - ✅ **Phase 3**: Historical final-extent case builder (3 pilot fires with validated area/CRS metadata)
 - ✅ **Phase 4A**: Real USGS 3DEP terrain enrichment with derived slope/aspect
 - ✅ **Phase 4B**: Real LANDFIRE LF2022 FBFM40 fuel-model enrichment
-- 🚧 **Phase 4C**: ERA5-Land weather covariates (client processing added; credential-gated)
+- ✅ **Phase 4C**: ERA5-Land hourly weather enrichment
 
-Current pilot cases contain real NIFC/MTBS-derived final perimeter masks and real USGS 3DEP
-terrain-derived elevation, slope and aspect. They also contain real LANDFIRE LF2022 FBFM40 fuel
-model classes aligned to the model grid. Fuel load and fuel moisture are deterministic class-based
-proxies; weather remains placeholder locally until CDS credentials are configured and cases are
-rebuilt. Initial ignition state fields are still placeholders. The cases are not valid 3/6/12/24-hour
-fire-progression labels yet.
+Current pilot cases contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
+terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes, and real
+ERA5-Land hourly weather summarized at documented ignition/discovery reference times. Fuel load and
+fuel moisture remain deterministic class-based proxies. Initial ignition state fields are still
+placeholders, and the cases are not valid 3/6/12/24-hour fire-progression labels yet.
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -114,10 +113,10 @@ perimeters = nifc.get_fire_by_name("King", year=2014)
 gdf = nifc.perimeters_to_geodataframe(perimeters)
 ```
 
-**Phase 4B: Historical Final-Extent Fire Cases With Real Terrain + Fuels** ✨ NEW
+**Phase 4C: Historical Final-Extent Fire Cases With Real Terrain + Fuels + Weather** ✨ NEW
 
-Build canonical FireCase objects from real historical perimeter data plus USGS 3DEP terrain and
-LANDFIRE LF2022 FBFM40 fuel models:
+Build canonical FireCase objects from real historical perimeter data plus USGS 3DEP terrain,
+LANDFIRE LF2022 FBFM40 fuel models, and ERA5-Land hourly weather:
 
 ```bash
 # Build all 3 pilot fires (Carlton Complex, King Fire, Big Cougar)
@@ -128,12 +127,12 @@ python3 scripts/validate_fire_cases.py
 ```
 
 Generated local fire cases are written to ignored data storage under `data/fire_cases/`:
-- Carlton Complex 2014 (WA): 275k acres, 21 LANDFIRE fuel classes
-- King Fire 2014 (CA): 98k acres, 26 LANDFIRE fuel classes
-- Big Cougar 2014 (OR/ID): 65k acres, 21 LANDFIRE fuel classes
+- Carlton Complex 2014 (WA): 275k acres, 21 LANDFIRE fuel classes, ERA5 weather 26.9C/RH 31%
+- King Fire 2014 (CA): 98k acres, 26 LANDFIRE fuel classes, ERA5 weather 22.8C/RH 29%
+- Big Cougar 2014 (OR/ID): 65k acres, 21 LANDFIRE fuel classes, ERA5 weather 26.3C/RH 32%
 
 These artifacts are explicitly marked with `target_type=final_burned_extent` and
-`covariate_status=partial_real_terrain_fuels` so downstream evaluation can use terrain/fuel
+`covariate_status=partial_real_terrain_fuels_weather` so downstream evaluation can use real
 covariates while still refusing to treat final extent as short-horizon progression.
 
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
@@ -148,7 +147,7 @@ cp .env.example .env
 
 Required credentials:
 - **NASA FIRMS**: Get your MAP_KEY from [https://firms.modaps.eosdis.nasa.gov/api/](https://firms.modaps.eosdis.nasa.gov/api/)
-- **Copernicus CDS**: Register at [https://cds.climate.copernicus.eu/](https://cds.climate.copernicus.eu/)
+- **Copernicus CDS**: Register at [https://cds.climate.copernicus.eu/](https://cds.climate.copernicus.eu/) and accept ERA5-Land terms before rebuilding real-weather cases
 
 ## Development
 

@@ -338,7 +338,7 @@ def validate_fire_case(
 
 def main():
     """Validate all fire cases."""
-    print("🔥 Pilot Fire Case Validation (Phase 4B terrain/fuels gate)")
+    print("🔥 Pilot Fire Case Validation (Phase 4C terrain/fuels/weather gate)")
     print("=" * 80)
 
     # Expected sizes (from PHASE3_PILOT_FIRES.md)
@@ -369,6 +369,7 @@ def main():
             expected_crs,
             require_real_terrain=True,
             require_real_fuels=True,
+            require_real_weather=True,
         )
 
         # Print passed checks
@@ -397,7 +398,7 @@ def main():
 
     if all_passed:
         print("✅ ALL VALIDATIONS PASSED")
-        print("   Phase 4B fire cases have real terrain and real LANDFIRE fuel models")
+        print("   Phase 4C fire cases have real terrain, LANDFIRE fuels, and ERA5 weather")
         return True
     else:
         print("❌ SOME VALIDATIONS FAILED")

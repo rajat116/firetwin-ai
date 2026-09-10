@@ -114,14 +114,7 @@ class RealFireCaseConverter:
         except ValueError:
             self.firms = None  # No API key
 
-        self.era5: ERA5LandClient | None
-        try:
-            if settings.cds_api_key:
-                self.era5 = ERA5LandClient(url=settings.cds_api_url, key=settings.cds_api_key)
-            else:
-                self.era5 = ERA5LandClient()
-        except Exception:
-            self.era5 = None  # No CDS credentials
+        self.era5: ERA5LandClient | None = None
 
         self.usgs = USGS3DEPClient()
         self.landfire = LANDFIREClient()
@@ -129,6 +122,21 @@ class RealFireCaseConverter:
         # Data storage
         self.raw_data: dict = {}
         self.aligned_data: dict = {}
+
+    def _get_era5_client(self) -> ERA5LandClient | None:
+        """Create the ERA5 client only when weather data is actually fetched."""
+        if self.era5 is not None:
+            return self.era5
+
+        try:
+            if settings.cds_api_key:
+                self.era5 = ERA5LandClient(url=settings.cds_api_url, key=settings.cds_api_key)
+            else:
+                self.era5 = ERA5LandClient()
+        except Exception:
+            self.era5 = None
+
+        return self.era5
 
     def _weather_window(self) -> tuple[datetime, datetime] | None:
         """Return the weather download/summarization window if one can be inferred."""
@@ -215,7 +223,8 @@ class RealFireCaseConverter:
 
         # 4. ERA5-Land weather (skip if no credentials)
         print("\n4️⃣  Checking ERA5-Land weather...")
-        if self.era5 is None:
+        era5 = self._get_era5_client()
+        if era5 is None:
             print("   ℹ️  ERA5 requires CDS credentials (skipped)")
         else:
             weather_window = self._weather_window()
@@ -228,7 +237,7 @@ class RealFireCaseConverter:
                     Path("data/raw/era5") / case_id / f"era5land_{start:%Y%m%d%H}_{end:%Y%m%d%H}.nc"
                 )
                 try:
-                    weather = self.era5.build_weather_data(
+                    weather = era5.build_weather_data(
                         bbox=self.bbox,
                         start_datetime=start,
                         end_datetime=end,

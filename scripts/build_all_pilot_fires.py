@@ -1,20 +1,18 @@
-"""Build all 3 pilot fire cases with real terrain, fuels, and optional weather.
+"""Build all 3 pilot fire cases with real terrain, fuels, and ERA5 weather.
 
 This script builds complete FireCase objects for:
 1. Carlton Complex 2014 (WA, 252k acres) - Pacific NW
 2. King Fire 2014 (CA, 98k acres) - Sierra Nevada
 3. Big Cougar 2014 (OR/ID, 65k acres) - Northern Rockies
 
-Each fire demonstrates the end-to-end Phase 4B pipeline and the credential-gated Phase 4C weather
-path:
+Each fire demonstrates the end-to-end Phase 4C pipeline:
 - Multi-source data fetching (NIFC, MTBS, FIRMS, ERA5, USGS, LANDFIRE)
 - Spatial alignment and reprojection
 - USGS 3DEP DEM resampling to the FireTwin grid
 - LANDFIRE LF2022 FBFM40 resampling to the FireTwin grid
 - ERA5-Land weather summarization when CDS credentials are configured
 - Rasterization to canonical grid
-- FireCase construction with real perimeters, real terrain, real fuel models, and optional real
-  weather
+- FireCase construction with real perimeters, real terrain, real fuel models, and real weather
 """
 
 from datetime import datetime, timedelta
@@ -77,7 +75,7 @@ def build_pilot_fire(
 
 def main():
     """Build all 3 pilot fire cases."""
-    print("🚀 Building All Pilot Fire Cases (Phase 4B + credential-gated Phase 4C)")
+    print("🚀 Building All Pilot Fire Cases (Phase 4C real terrain/fuels/weather)")
     print("=" * 70)
 
     # Define pilot fires (from PHASE3_PILOT_FIRES.md)

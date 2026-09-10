@@ -1,6 +1,7 @@
 """Tests for real fire case conversion semantics."""
 
 from datetime import datetime
+from unittest.mock import patch
 
 import numpy as np
 
@@ -13,6 +14,21 @@ from firetwin.data.converter import (
     RealFireCaseConverter,
 )
 from firetwin.schemas import BoundingBox, CoordinateSystem, FuelData, TerrainData, WeatherData
+
+
+def test_real_case_converter_does_not_create_era5_client_until_fetch():
+    """Constructing a converter for schema work should not initialize external weather clients."""
+    with patch("firetwin.data.converter.ERA5LandClient") as era5_client:
+        converter = RealFireCaseConverter(
+            fire_name="KING",
+            fire_year=2014,
+            bbox=(-121.5, 38.5, -120.0, 39.5),
+            target_resolution_m=100.0,
+            target_crs="EPSG:32610",
+        )
+
+    assert converter.era5 is None
+    era5_client.assert_not_called()
 
 
 def test_real_case_converter_preserves_target_crs_and_limitations():

@@ -89,17 +89,19 @@ The current validation gate checks that each local pilot Zarr case:
 - Uses the expected projected CRS.
 - Contains initial and target fire-state arrays on the stored time axis.
 - Produces a final burned area within tolerance of the documented fire size.
-- Explicitly marks `covariate_status=partial_real_terrain_fuels`.
-- Records covariate-source provenance, including USGS 3DEP terrain and LANDFIRE FBFM40 fuels.
+- Explicitly marks `covariate_status=partial_real_terrain_fuels_weather`.
+- Records covariate-source provenance, including USGS 3DEP terrain, LANDFIRE FBFM40 fuels and
+  ERA5-Land weather.
 - Contains finite, non-flat USGS 3DEP elevation and derived slope/aspect.
 - Contains non-uniform LANDFIRE FBFM40 fuel-model classes.
-- Still warns that weather and initial fire state are placeholders, and that fuel load/moisture are
+- Contains finite, physically bounded ERA5-Land scalar weather.
+- Still warns that the initial fire state is a placeholder, and that fuel load/moisture are
   class-based proxies.
 
-Passing this gate means the cases are valid **final-extent artifacts with terrain and fuel-model
-covariates**, not forecast-ready real-data progression samples.
+Passing this gate means the cases are valid **final-extent artifacts with real terrain, fuel-model
+and scalar weather covariates**, not forecast-ready real-data progression samples.
 
-## Phase 4B Entry Criteria
+## Phase 4D Entry Criteria
 
 Do not start real-data model evaluation until:
 
@@ -107,9 +109,9 @@ Do not start real-data model evaluation until:
 - All Phase 0-3 unit tests pass.
 - `scripts/validate_fire_cases.py` passes against regenerated pilot fire artifacts.
 - The generated artifacts carry `target_type=final_burned_extent` and
-  `covariate_status=partial_real_terrain_fuels`.
+  `covariate_status=partial_real_terrain_fuels_weather`.
 - Any baseline evaluation script refuses to treat final extent as hourly progression.
-- Fuel and weather enrichment status is explicit in metadata and validation output.
+- Fuel, weather and initial-state limitations are explicit in metadata and validation output.
 
 ## Reporting
 

@@ -342,7 +342,8 @@ when the model/label design justifies it.
 
 ### Consequences
 
-- Phase 4C completion is credential-gated by CDS account setup and accepted ERA5-Land terms.
+- Phase 4C artifact rebuilding requires local CDS account setup and accepted ERA5-Land terms.
+- The pilot Zarrs rebuilt on 2026-09-10 now store real ERA5-Land scalar weather.
 - Resampling or summarizing ERA5-Land does not create 30m/100m weather truth.
 - Forecast experiments must still refuse to use final burned extent as an hourly progression label.
 - A later schema revision should add time-varying weather arrays for real forecast windows.
