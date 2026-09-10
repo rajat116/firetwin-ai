@@ -1,7 +1,7 @@
 """Unit tests for the CLI module."""
 
 from click.testing import CliRunner
-from tests.unit.test_final_extent_evaluation import make_final_extent_case
+from final_extent_helpers import make_final_extent_case
 
 from firetwin import __version__
 from firetwin.cli import _has_cds_credentials, main

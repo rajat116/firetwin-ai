@@ -1,7 +1,7 @@
 # FireTwin Data Strategy
 
-**Last Updated**: 2026-09-09
-**Status**: Production-Ready
+**Last Updated**: 2026-09-10
+**Status**: Data clients implemented; progression labels still under audit
 
 ## Overview
 
@@ -81,23 +81,28 @@ def get_fire_data(fire_id: str, year: int):
 
 **Problem**: Need time-resolved fire spread for modeling.
 
-**Solution**: ✅ **Multi-Source Reconstruction**
+**Status**: 🔎 **Under Audit Before Reconstruction**
 
 ```python
 # Approach 1: NIFC Historical (when available)
 # - Multiple perimeters for same fire at different dates
 perimeters = nifc_hist_client.get_fire_by_name("Carlton Complex", 2014)
-# Returns progression over time
+# May return multiple timestamps, but current 2014 pilots only have one each
 
 # Approach 2: FIRMS Active Fire Detections
-# - Daily hotspots can reconstruct spread
+# - Daily hotspots can support irregular hotspot/progression labels after filtering
 firms_detections = firms_client.get_area_detections(
     bbox=fire_bbox,
     start_date=fire_start,
     end_date=fire_end
 )
-# Cluster detections by date to infer progression
+# Cluster detections by date to infer uncertain progression observations
 ```
+
+Phase 4E audit results show the current 2014 pilot fires have only one matching NIFC perimeter
+timestamp each. That is not enough for hourly perimeter labels. FIRMS historical detections must be
+audited before constructing any progression labels; if they are too sparse/noisy, newer pilot fires
+with denser timestamped observations should be selected.
 
 ## Recommended Data Pipeline
 
@@ -179,7 +184,7 @@ def build_recent_fire_case(fire_name: str, bbox: tuple):
 ### 1. API Rate Limiting
 
 - **ESRI Services (NIFC, MTBS)**: 2000 records/query max
-- **FIRMS**: 10-day window limit, requires MAP_KEY
+- **FIRMS**: 5-day Area API window limit, requires MAP_KEY
 - **ERA5 CDS**: Account required, queue system
 
 ### 2. Data Caching Strategy
@@ -213,7 +218,7 @@ Error: Insufficient data
 ```
 ✅ Found 11 large fires (>50k acres)
 ✅ Carlton Complex: 251,965 acres
-✅ Multiple perimeters for progression
+⚠️ Current pilot-fire audit found only one matching NIFC perimeter timestamp per 2014 pilot
 ✅ Agency attribution working
 ✅ Date parsing functional
 ✅ GeoDataFrame conversion successful
@@ -230,14 +235,15 @@ Error: Insufficient data
 
 ## Conclusion
 
-**All major data limitations have been addressed with production-ready solutions.**
+**All major data clients are implemented, but progression-label construction is not solved yet.**
 
 The FireTwin project now has:
 - ✅ Access to 20+ years of historical fire perimeters
 - ✅ Multiple data sources for validation/cross-referencing
 - ✅ Strategies for recent vs. historical fires
-- ✅ Fallback mechanisms for data gaps
+- 🔎 A Phase 4E audit gate before progression labels or ML forecast training
 - ✅ Validated clients for all 6 core data sources
 
-**Status**: Phase 3 historical case building is complete; Phase 4A real terrain enrichment and
-Phase 4B LANDFIRE FBFM40 fuel-model enrichment are complete. Weather enrichment remains next.
+**Status**: Phase 3 historical case building, Phase 4A terrain enrichment, Phase 4B LANDFIRE
+FBFM40 fuel-model enrichment, Phase 4C ERA5-Land weather enrichment and Phase 4D final-extent
+diagnostics are complete. Phase 4E is auditing FIRMS-backed progression-label feasibility.

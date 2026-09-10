@@ -6,7 +6,7 @@ canonical format for model training and evaluation.
 """
 
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -18,7 +18,7 @@ from firetwin.data.clients import (
     NIFCClient,
     USGS3DEPClient,
 )
-from firetwin.data.clients.firms import FIRMSSatellite
+from firetwin.data.clients.firms import FIRMS_MAX_DAY_RANGE, FIRMSSatellite
 from firetwin.schemas.fire_case import FireCase
 
 
@@ -110,19 +110,23 @@ class FireCaseBuilder:
             print("  - Fetching FIRMS detections...")
             try:
                 minx, miny, maxx, maxy = self.config.bbox
-                # FIRMS uses day_range parameter
-                days = (self.config.end_date - self.config.start_date).days + 1
-
-                # FIRMS get_area_detections signature: satellite, min_lon, min_lat, max_lon, max_lat
-                detections = self.firms_client.get_area_detections(
-                    satellite=FIRMSSatellite.MODIS_C6_1,
-                    min_lon=minx,
-                    min_lat=miny,
-                    max_lon=maxx,
-                    max_lat=maxy,
-                    date=self.config.start_date,
-                    day_range=min(days, 10),  # FIRMS limits to 10 days
-                )
+                detections = []
+                chunk_start = self.config.start_date
+                while chunk_start <= self.config.end_date:
+                    remaining_days = (self.config.end_date - chunk_start).days + 1
+                    day_range = min(remaining_days, FIRMS_MAX_DAY_RANGE)
+                    detections.extend(
+                        self.firms_client.get_area_detections(
+                            satellite=FIRMSSatellite.MODIS_C6_1,
+                            min_lon=minx,
+                            min_lat=miny,
+                            max_lon=maxx,
+                            max_lat=maxy,
+                            date=chunk_start,
+                            day_range=day_range,
+                        )
+                    )
+                    chunk_start += timedelta(days=day_range)
 
                 self.raw_data["firms"] = detections
                 print(f"    Found {len(detections)} detections")

@@ -91,12 +91,17 @@
 
 After discovering NIFC Historical archive (2000-2021+) and validating MTBS coverage for 2014, we selected 2014 fires for better data completeness:
 
+> Phase 4E update (2026-09-10): these pilots are valid final-extent artifacts with real covariates,
+> but the earlier assumption of strong perimeter progression was too optimistic. The current audit
+> found only one matching NIFC perimeter timestamp per pilot. FIRMS historical detections still need
+> to be audited with a configured `FIRMS_MAP_KEY`.
+
 1. **Carlton Complex (2014)** - Washington State
    - **Size**: 251,965 acres (largest in WA state history at the time)
    - **Region**: Pacific Northwest
    - **Dates**: July 2014
    - **Data**: NIFC Historical ✅, MTBS ✅, FIRMS ✅
-   - **Why**: Massive complex, multiple merged fires, excellent progression data
+   - **Why**: Massive complex, multiple merged fires, geographically useful final-extent case
 
 2. **King Fire (2014)** - California
    - **Size**: 97,685 acres
@@ -114,7 +119,8 @@ After discovering NIFC Historical archive (2000-2021+) and validating MTBS cover
 
 **Benefits of 2014 Selection:**
 - Fully validated MTBS data (2-3 year lag means 2014 is complete)
-- NIFC Historical perimeters with progression data
+- NIFC Historical perimeters available, but current audit does not show enough perimeter timestamps
+  for hourly progression labels
 - FIRMS daily detections available
 - ERA5-Land weather reanalysis complete
 - Geographic diversity: WA, CA, OR/ID

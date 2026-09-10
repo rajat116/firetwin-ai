@@ -32,7 +32,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 4D Complete - Honest Final-Extent Baseline Diagnostics ✅
+**Current Phase**: Phase 4E In Progress - Progression Label Audit
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
@@ -42,12 +42,18 @@ This project answers **measurable research questions** about hybrid physics-ML f
 - ✅ **Phase 4B**: Real LANDFIRE LF2022 FBFM40 fuel-model enrichment
 - ✅ **Phase 4C**: ERA5-Land hourly weather enrichment
 - ✅ **Phase 4D**: Final-extent baseline diagnostics and forecast-label guardrails
+- 🔎 **Phase 4E**: Progression/initial-state label audit
 
 Current pilot cases contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
 terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes, and real
 ERA5-Land hourly weather summarized at documented ignition/discovery reference times. Fuel load and
 fuel moisture remain deterministic class-based proxies. Initial ignition state fields are still
 placeholders, and the cases are not valid 3/6/12/24-hour fire-progression labels yet.
+
+Phase 4E is auditing timestamped observations before any label reconstruction. NIFC/MTBS checks show
+the current 2014 pilots have only one perimeter timestamp each, so hourly perimeter labels are still
+unsupported. Configure `FIRMS_MAP_KEY` in `.env` and run `python3 scripts/audit_progression_labels.py`
+to audit historical MODIS/VIIRS active-fire detections.
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -140,6 +146,12 @@ Run non-temporal real-data diagnostics with:
 
 ```bash
 firetwin evaluate-final-extent data/fire_cases/king_2014.zarr
+```
+
+Audit whether the current pilots can support progression labels:
+
+```bash
+python3 scripts/audit_progression_labels.py
 ```
 
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
@@ -239,6 +251,7 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 4B**: Real LANDFIRE FBFM40 fuel-model covariates
 - [x] **Phase 4C**: Real ERA5-Land weather artifacts
 - [x] **Phase 4D**: Final-extent baseline diagnostics and guardrails
+- [ ] **Phase 4E**: Progression/initial-state label audit and reconstruction plan
 - [ ] **Phase 5**: Simulation corpus and surrogate
 - [ ] **Phase 6**: Hybrid model
 - [ ] **Phase 7**: Assimilation and calibrated uncertainty

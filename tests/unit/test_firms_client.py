@@ -203,8 +203,23 @@ def test_get_area_detections_invalid_day_range(firms_client: FIRMSClient) -> Non
             min_lat=38.0,
             max_lon=-120.0,
             max_lat=39.0,
-            day_range=15,  # Invalid (max is 10)
+            day_range=6,  # Invalid (max is 5)
         )
+
+
+def test_parse_viirs_standard_processing_csv(firms_client: FIRMSClient) -> None:
+    """VIIRS standard-processing CSV uses bright_ti4/bright_ti5 column names."""
+    csv_text = (
+        "latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,"
+        "instrument,confidence,version,bright_ti5,frp,daynight\n"
+        "38.5,-120.3,330.2,0.4,0.4,2014-09-13,1830,N,VIIRS,nominal,2.0,290.5,25.3,D\n"
+    )
+
+    detections = firms_client._parse_csv_response(csv_text)
+
+    assert len(detections) == 1
+    assert detections[0].brightness == 330.2
+    assert detections[0].bright_t31 == 290.5
 
 
 @patch("firetwin.data.clients.firms.requests.get")

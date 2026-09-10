@@ -1,7 +1,7 @@
 # FireTwin Evaluation Protocol
 
 **Last Updated**: 2026-09-10
-**Status**: Phase 4D final-extent diagnostics before progression model work
+**Status**: Phase 4E progression-label audit before progression model work
 
 > Research prototype. Not for operational wildfire response, evacuation planning or safety-critical decision-making.
 
@@ -58,6 +58,19 @@ For burned masks and perimeter-style outputs:
 - Fire-arrival-time MAE only when valid arrival-time labels exist.
 
 Hourly horizons such as 3, 6, 12 and 24 hours may only be reported when observation cadence supports those horizons.
+
+## Phase 4E Progression-Label Gate
+
+Before a real pilot fire can be used for progression modeling:
+
+- NIFC perimeter observations must contain multiple meaningful timestamps for the same incident, or
+  FIRMS historical detections must provide enough timestamped active-fire observations for an
+  uncertainty-aware target.
+- MTBS final perimeter and ignition metadata may validate final extent and timing context, but must
+  not be treated as fire progression.
+- FIRMS detections may support `active_fire_detection_probability` or irregular hotspot progression,
+  not exact hourly perimeter truth.
+- A generated audit report must state supported targets and whether hourly labels are defensible.
 
 ## Probabilistic Metrics
 

@@ -10,7 +10,7 @@ Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources
 
 | Data Source | Client Status | Tests | Coverage | Access Method |
 |------------|--------------|-------|----------|---------------|
-| NASA FIRMS | ✅ Implemented | 17 tests passing | 92% | REST API with MAP_KEY |
+| NASA FIRMS | ✅ Implemented | 18 tests passing | 92% | REST API with MAP_KEY |
 | NIFC/WFIGS | ✅ Implemented | 13 tests passing | 96% | ArcGIS REST / GeoJSON |
 | MTBS | ✅ Implemented | 13 tests passing | 96% | ArcGIS REST / GeoJSON |
 | ERA5-Land | ✅ Implemented | 13 tests passing | 91% | CDS API (`cdsapi`) |
@@ -31,7 +31,8 @@ Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources
 **Access Method**: REST API with MAP_KEY  
 **Registration**: Free at https://firms.modaps.eosdis.nasa.gov/api/  
 **Spatial Resolution**: MODIS ~1km, VIIRS ~375m nominal  
-**Temporal Resolution**: Near real-time, multiple passes per day  
+**Temporal Resolution**: Near real-time and historical standard-processing archives; multiple
+passes per day  
 **License/Terms**: [NASA data policy](https://earthdata.nasa.gov/earth-observation-data/data-use-policy)
 
 **Variables Used**:
@@ -43,11 +44,19 @@ Machine-readable registry: [`configs/data_sources.yaml`](../configs/data_sources
 - Fire radiative power (FRP)
 - Day/night indicator
 
+**FireTwin Source Selection**:
+- Near-real-time sources are used for current fires.
+- Historical 2014 pilot audits use standard-processing archive sources: `VIIRS_SNPP_SP` and
+  `MODIS_SP`.
+- FIRMS Area API requests are chunked into 1-5 day windows.
+
 **Known Limitations**:
 - Cloud, smoke, and orbit timing create gaps
 - Detection points are not exact fire perimeters
 - Non-detection does not prove absence of fire
 - Resolution varies by sensor and viewing geometry
+- A MAP_KEY must be visible in `.env` or the active shell before historical progression audits can
+  query detections
 
 **Citation**: NASA FIRMS. (2026). Fire Information for Resource Management System. Retrieved from https://firms.modaps.eosdis.nasa.gov/
 

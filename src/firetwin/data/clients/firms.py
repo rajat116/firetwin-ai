@@ -24,13 +24,19 @@ from shapely.geometry import Point
 
 from firetwin.settings import settings
 
+FIRMS_MAX_DAY_RANGE = 5
+
 
 class FIRMSSatellite(StrEnum):
     """Available FIRMS satellite instruments."""
 
     MODIS_C6_1 = "MODIS_NRT"  # MODIS Collection 6.1 NRT
+    MODIS_SP = "MODIS_SP"  # MODIS Standard Processing archive
     VIIRS_SNPP = "VIIRS_SNPP_NRT"  # VIIRS S-NPP NRT
+    VIIRS_SNPP_SP = "VIIRS_SNPP_SP"  # VIIRS S-NPP Standard Processing archive
     VIIRS_NOAA20 = "VIIRS_NOAA20_NRT"  # VIIRS NOAA-20 NRT
+    VIIRS_NOAA20_SP = "VIIRS_NOAA20_SP"  # VIIRS NOAA-20 Standard Processing archive
+    VIIRS_NOAA21 = "VIIRS_NOAA21_NRT"  # VIIRS NOAA-21 NRT
 
 
 class FIRMSDetection(BaseModel):
@@ -118,7 +124,7 @@ class FIRMSClient:
             min_lat: Minimum latitude (south bound)
             max_lon: Maximum longitude (east bound)
             max_lat: Maximum latitude (north bound)
-            day_range: Number of days to fetch (1-10)
+            day_range: Number of days to fetch (1-5)
             date: Specific date to query. If None, uses most recent data
 
         Returns:
@@ -132,8 +138,8 @@ class FIRMSClient:
             raise ValueError("Longitude must be between -180 and 180")
         if not (-90 <= min_lat <= 90) or not (-90 <= max_lat <= 90):
             raise ValueError("Latitude must be between -90 and 90")
-        if not 1 <= day_range <= 10:
-            raise ValueError("day_range must be between 1 and 10")
+        if not 1 <= day_range <= FIRMS_MAX_DAY_RANGE:
+            raise ValueError(f"day_range must be between 1 and {FIRMS_MAX_DAY_RANGE}")
 
         # Build URL
         if date:
@@ -167,7 +173,7 @@ class FIRMSClient:
         Args:
             satellite: Satellite instrument to query
             country_code: Two-letter ISO country code (e.g., 'US', 'CA')
-            day_range: Number of days to fetch (1-10)
+            day_range: Number of days to fetch (1-5)
             date: Specific date to query. If None, uses most recent data
 
         Returns:
@@ -179,8 +185,8 @@ class FIRMSClient:
         """
         if len(country_code) != 2:
             raise ValueError("country_code must be 2-letter ISO code (e.g., 'US')")
-        if not 1 <= day_range <= 10:
-            raise ValueError("day_range must be between 1 and 10")
+        if not 1 <= day_range <= FIRMS_MAX_DAY_RANGE:
+            raise ValueError(f"day_range must be between 1 and {FIRMS_MAX_DAY_RANGE}")
 
         # Build URL
         country_upper = country_code.upper()
@@ -225,10 +231,12 @@ class FIRMSClient:
         # Convert to detection objects
         detections = []
         for _, row in df.iterrows():
+            brightness = row.get("brightness", row.get("bright_ti4"))
+            bright_t31 = row.get("bright_t31", row.get("bright_ti5"))
             detection = FIRMSDetection(
                 latitude=row["latitude"],
                 longitude=row["longitude"],
-                brightness=row["brightness"],
+                brightness=brightness,
                 scan=row["scan"],
                 track=row["track"],
                 acq_date=pd.to_datetime(row["acq_date"]).date(),
@@ -236,8 +244,8 @@ class FIRMSClient:
                 satellite=row["satellite"],
                 instrument=row["instrument"],
                 confidence=row["confidence"],
-                version=row["version"],
-                bright_t31=row.get("bright_t31"),
+                version=str(row["version"]),
+                bright_t31=bright_t31,
                 frp=row["frp"],
                 daynight=row["daynight"],
             )
