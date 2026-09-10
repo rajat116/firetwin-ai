@@ -1,7 +1,7 @@
 # FireTwin Evaluation Protocol
 
-**Last Updated**: 2026-09-09
-**Status**: Phase 0-4B baseline protocol before real weather/progression model work
+**Last Updated**: 2026-09-10
+**Status**: Phase 4D final-extent diagnostics before progression model work
 
 > Research prototype. Not for operational wildfire response, evacuation planning or safety-critical decision-making.
 
@@ -18,8 +18,9 @@ The current pilot fire cases are **final-burned-extent cases**:
 - Big Cougar 2014
 
 They currently contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
-terrain-derived elevation/slope/aspect, and real LANDFIRE LF2022 FBFM40 fuel-model classes.
-Fuel load/moisture are class-based proxies; weather and initial-state fields remain placeholders.
+terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes and real
+ERA5-Land scalar weather.
+Fuel load/moisture are class-based proxies; initial-state fields remain placeholders.
 They must not be used as 3-, 6-, 12- or 24-hour fire-progression labels until time-stamped
 observations are reconstructed and validated.
 

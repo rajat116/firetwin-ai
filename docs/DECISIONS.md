@@ -350,6 +350,40 @@ when the model/label design justifies it.
 
 ---
 
+## Decision 10: Separate Final-Extent Diagnostics From Forecast Evaluation
+
+**Date**: 2026-09-10
+**Phase**: 4D - Final-Extent Baseline Diagnostics
+
+### Context
+
+The current real pilot cases contain final burned extent targets with real terrain, fuel and scalar
+weather covariates. They do not yet contain reconstructed ignition states or time-resolved
+progression labels. Running the existing 3/6/12/24-hour forecast baseline commands on these cases
+would silently imply a forecast task that the labels do not support.
+
+### Decision
+
+Add a separate final-extent diagnostic evaluator for non-temporal real-data artifacts, and make the
+short-horizon `run-baselines` and `evaluate` commands reject `target_type=final_burned_extent`
+cases. The diagnostic evaluator reports simple covariate baselines without using target burned area
+as an input: initial state, burnable fuel mask and top fuel-potential mask.
+
+### Rationale
+
+This creates a real measurable baseline surface for the current artifacts while preserving
+scientific honesty. Weak final-extent IoU from covariate-only masks is a useful signal: the project
+needs ignition/progression reconstruction before ML forecast training can be meaningful.
+
+### Consequences
+
+- Final-extent cases can be evaluated with `firetwin evaluate-final-extent`.
+- Forecast-horizon commands now fail loudly on final-extent-only cases.
+- Phase 5 modeling should start only after progression/initial-state labels are audited or
+  reconstructed.
+
+---
+
 ## Future Decisions
 
 Document all future material decisions here, including:

@@ -18,6 +18,16 @@ def _has_cds_credentials(cdsapirc_path: Path | None = None) -> bool:
     return bool(settings.cds_api_key) or (cdsapirc_path or Path.home() / ".cdsapirc").exists()
 
 
+def _raise_if_final_extent_case(case, command_name: str) -> None:
+    """Refuse short-horizon forecast workflows for final-extent-only real cases."""
+    if case.metadata.target_type == "final_burned_extent":
+        raise click.ClickException(
+            f"{command_name} is for time-resolved forecast targets, but this case is "
+            "target_type=final_burned_extent. Use evaluate-final-extent for non-temporal "
+            "real-data diagnostics, or build progression labels before running horizon forecasts."
+        )
+
+
 @click.group()
 @click.version_option(version=__version__, prog_name="firetwin")
 def main():
@@ -204,6 +214,7 @@ def run_baselines(case_path, horizons, output_dir):
 
     console.print(f"[cyan]Case:[/cyan] {case.metadata.name} ({case.metadata.case_id})")
     console.print(f"[cyan]Grid:[/cyan] {case.grid_shape} @ {case.resolution_m}m")
+    _raise_if_final_extent_case(case, "run-baselines")
 
     # Parse horizons
     forecast_hours = [float(h) for h in horizons.split(",")]
@@ -270,6 +281,7 @@ def evaluate(case_path, forecasts_dir, horizons):
         case = FireCase.load_from_zarr(Path(case_path))
 
     console.print(f"[cyan]Case:[/cyan] {case.metadata.name}")
+    _raise_if_final_extent_case(case, "evaluate")
 
     # Parse horizons
     forecast_hours = [float(h) for h in horizons.split(",")]
@@ -324,6 +336,62 @@ def evaluate(case_path, forecasts_dir, horizons):
     console.print()
     console.print(results_table)
     console.print("\n[green]✓ Evaluation complete[/green]\n")
+
+
+@main.command("evaluate-final-extent")
+@click.argument("case_path", type=click.Path(exists=True))
+@click.option(
+    "--fuel-potential-quantile",
+    default=0.70,
+    show_default=True,
+    type=click.FloatRange(0.0, 1.0),
+    help="Quantile cutoff for the fuel-potential spatial prior.",
+)
+def evaluate_final_extent(case_path, fuel_potential_quantile):
+    """Evaluate non-temporal baselines against a final burned extent."""
+    from pathlib import Path
+
+    from firetwin.evaluation import evaluate_final_extent_baselines
+    from firetwin.schemas import FireCase
+
+    console.print("\n[bold cyan]🔥 Evaluating Final-Extent Baselines[/bold cyan]\n")
+
+    with console.status(f"[bold green]Loading case from {case_path}..."):
+        case = FireCase.load_from_zarr(Path(case_path))
+
+    try:
+        results = evaluate_final_extent_baselines(
+            case,
+            fuel_potential_quantile=fuel_potential_quantile,
+        )
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+
+    console.print(f"[cyan]Case:[/cyan] {case.metadata.name} ({case.metadata.case_id})")
+    console.print(f"[cyan]Target:[/cyan] {case.metadata.target_type}")
+    console.print("[cyan]Baselines:[/cyan] " + ", ".join(str(row["baseline"]) for row in results))
+    console.print("[yellow]Diagnostic only: these are not hourly fire-spread forecasts.[/yellow]\n")
+
+    results_table = Table(title="Final Extent Baselines", box=None, padding=(0, 1))
+    results_table.add_column("Baseline", style="cyan", no_wrap=True)
+    results_table.add_column("IoU", style="green")
+    results_table.add_column("Dice", style="green")
+    results_table.add_column("Bdry m", style="magenta")
+    results_table.add_column("Pred/Target ac", style="yellow")
+    results_table.add_column("Area Err", style="red")
+
+    for result in results:
+        results_table.add_row(
+            str(result["baseline"]),
+            f"{result['iou']:.3f}",
+            f"{result['dice']:.3f}",
+            f"{result['boundary_distance_mean_m']:.1f}",
+            f"{result['predicted_area_acres']:,.0f}/{result['target_area_acres']:,.0f}",
+            f"{result['relative_area_error'] * 100.0:+.1f}%",
+        )
+
+    console.print(results_table)
+    console.print("\n[green]✓ Final-extent baseline evaluation complete[/green]\n")
 
 
 if __name__ == "__main__":

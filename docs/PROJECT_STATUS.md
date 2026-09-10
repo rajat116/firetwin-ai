@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-10
-**Current Phase**: Phase 4C 🚧 - ERA5-Land Weather Enrichment
+**Current Phase**: Phase 4D ✅ - Final-Extent Baseline Diagnostics
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -253,7 +253,7 @@ covariates aligned to the canonical FireTwin grid.
 ### Remaining Phase 4 Work
 
 - [x] Phase 4C: Replace scalar placeholder weather with real ERA5-Land/weather covariates.
-- [ ] Phase 4D: Add real-data baselines that respect `target_type=final_burned_extent`.
+- [x] Phase 4D: Add real-data baselines that respect `target_type=final_burned_extent`.
 
 ## Phase 4B: Real LANDFIRE Fuel Enrichment ✅
 
@@ -284,7 +284,7 @@ LANDFIRE LF2022 FBFM40 categorical fuel-model rasters aligned to the canonical F
 
 ### Remaining Phase 4 Work
 
-- [ ] Phase 4D: Add real-data baselines that respect `target_type=final_burned_extent`.
+- [x] Phase 4D: Add real-data baselines that respect `target_type=final_burned_extent`.
 - [ ] Replace fuel-load and fuel-moisture proxies with source-derived/live fuel attributes when
   that data source is selected.
 
@@ -319,9 +319,47 @@ reanalysis summarized at the ignition/discovery weather reference time.
   - King: 2014-09-13T23:00:00, 22.8C, RH 29%, wind 0.7 m/s from 185 deg.
   - Big Cougar: 2014-08-02T12:00:00, 26.3C, RH 32%, wind 0.1 m/s from 140 deg.
 
+## Phase 4D: Final-Extent Baseline Diagnostics ✅
+
+**Status**: COMPLETE (2026-09-10)
+
+**Purpose**: Provide honest real-data baseline diagnostics for final burned extent artifacts while
+blocking accidental use of final masks as 3/6/12/24-hour forecast labels.
+
+### Completed Tasks
+
+- [x] Added `evaluate_final_extent_baselines` for non-temporal final-extent evaluation.
+- [x] Added covariate-only baselines: initial state, burnable fuel mask and top fuel-potential
+  mask.
+- [x] Added `firetwin evaluate-final-extent` CLI command.
+- [x] Added guardrails so `firetwin run-baselines` and `firetwin evaluate` reject
+  `target_type=final_burned_extent` cases.
+- [x] Added unit tests covering final-extent evaluation, CLI command behavior and forecast-label
+  rejection.
+
+### Result-Wise Baseline Diagnostics
+
+These are spatial diagnostics, not hourly spread forecasts.
+
+- Carlton Complex:
+  - Burnable fuel mask: IoU 0.338, Dice 0.505, area error +159.1%.
+  - Top fuel-potential 30%: IoU 0.142, Dice 0.249, area error -16.3%.
+- King:
+  - Burnable fuel mask: IoU 0.280, Dice 0.438, area error +248.4%.
+  - Top fuel-potential 30%: IoU 0.103, Dice 0.186, area error +84.7%.
+- Big Cougar:
+  - Burnable fuel mask: IoU 0.314, Dice 0.478, area error +200.7%.
+  - Top fuel-potential 30%: IoU 0.068, Dice 0.127, area error -2.2%.
+
+### Interpretation
+
+The weak IoU values are expected: without observed ignition/progression, fuel and terrain
+covariates alone cannot localize the final perimeter. This confirms the next scientific step is
+progression/initial-state reconstruction rather than training a model on fake hourly labels.
+
 ## Future Phases
 
-- **Phase 4C**: Real weather covariates and real-data baselines
+- **Phase 4E**: Progression/initial-state reconstruction audit
 - **Phase 5**: Simulation corpus and surrogate
 - **Phase 6**: Hybrid model
 - **Phase 7**: Assimilation and calibrated uncertainty
@@ -339,8 +377,9 @@ Phase 3: ████████████████████ 100% ✅
 Phase 4A: ████████████████████ 100% ✅
 Phase 4B: ████████████████████ 100% ✅
 Phase 4C: ████████████████████ 100% ✅
+Phase 4D: ████████████████████ 100% ✅
 ...
-Overall: ███████████░░░░░░░░░  55%
+Overall: ████████████░░░░░░░░  58%
 ```
 
 ## Known Issues
@@ -348,13 +387,14 @@ Overall: ███████████░░░░░░░░░  55%
 - Pilot cases are final-burned-extent artifacts with real terrain, real fuel-model classes and real
   ERA5-Land scalar weather, but placeholder empty initial fire states.
 - Fuel load and fuel moisture are class-based static proxies, not observed live/dead fuel moisture.
-- Real-data baseline evaluation must not treat these final masks as hourly progression labels.
+- Real-data baseline evaluation now rejects attempts to treat final masks as hourly progression
+  labels.
 - `python` on the local machine resolves to Python 2.7 outside conda; use `conda activate firetwin`
   or `python3` for scripts.
 
 ## Blockers
 
-No active blocker for Phase 4C. The next development blocker is reconstructing time-resolved
+No active blocker for Phase 4D. The next development blocker is reconstructing time-resolved
 progression/initial-state labels without pretending final perimeters are forecast targets.
 
 ## Notes

@@ -32,7 +32,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 4C Complete - Real Terrain + Fuel + Weather Enrichment ✅
+**Current Phase**: Phase 4D Complete - Honest Final-Extent Baseline Diagnostics ✅
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
@@ -41,6 +41,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 - ✅ **Phase 4A**: Real USGS 3DEP terrain enrichment with derived slope/aspect
 - ✅ **Phase 4B**: Real LANDFIRE LF2022 FBFM40 fuel-model enrichment
 - ✅ **Phase 4C**: ERA5-Land hourly weather enrichment
+- ✅ **Phase 4D**: Final-extent baseline diagnostics and forecast-label guardrails
 
 Current pilot cases contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
 terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes, and real
@@ -134,6 +135,12 @@ Generated local fire cases are written to ignored data storage under `data/fire_
 These artifacts are explicitly marked with `target_type=final_burned_extent` and
 `covariate_status=partial_real_terrain_fuels_weather` so downstream evaluation can use real
 covariates while still refusing to treat final extent as short-horizon progression.
+
+Run non-temporal real-data diagnostics with:
+
+```bash
+firetwin evaluate-final-extent data/fire_cases/king_2014.zarr
+```
 
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
@@ -230,7 +237,8 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 3**: Historical case builder (3 validated pilot fires with real perimeters)
 - [x] **Phase 4A**: Real USGS 3DEP terrain covariates
 - [x] **Phase 4B**: Real LANDFIRE FBFM40 fuel-model covariates
-- [ ] **Phase 4C**: Real ERA5-Land weather artifacts and real-data baselines
+- [x] **Phase 4C**: Real ERA5-Land weather artifacts
+- [x] **Phase 4D**: Final-extent baseline diagnostics and guardrails
 - [ ] **Phase 5**: Simulation corpus and surrogate
 - [ ] **Phase 6**: Hybrid model
 - [ ] **Phase 7**: Assimilation and calibrated uncertainty
