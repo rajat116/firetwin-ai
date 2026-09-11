@@ -32,7 +32,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 4E In Progress - Progression Label Audit
+**Current Phase**: Phase 4E In Progress - FIRMS Label Artifacts and Initial-State Reconstruction
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
@@ -42,7 +42,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 - ✅ **Phase 4B**: Real LANDFIRE LF2022 FBFM40 fuel-model enrichment
 - ✅ **Phase 4C**: ERA5-Land hourly weather enrichment
 - ✅ **Phase 4D**: Final-extent baseline diagnostics and forecast-label guardrails
-- 🔎 **Phase 4E**: Progression/initial-state label audit
+- 🔎 **Phase 4E**: FIRMS-backed progression labels and initial-state reconstruction
 
 Current pilot cases contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
 terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes, and real
@@ -53,7 +53,8 @@ placeholders, and the cases are not valid 3/6/12/24-hour fire-progression labels
 Phase 4E is auditing timestamped observations before any label reconstruction. NIFC/MTBS checks show
 the current 2014 pilots have only one perimeter timestamp each, so hourly perimeter labels are still
 unsupported. FIRMS historical detections are available for all three pilots and support irregular
-hotspot/progression targets after filtering.
+hotspot/progression targets after filtering. Daily-binned FIRMS label artifacts can now be built as
+companion Zarr products under `data/labels/`.
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -154,6 +155,12 @@ Audit whether the current pilots can support progression labels:
 python3 scripts/audit_progression_labels.py
 ```
 
+Build FIRMS hotspot/progression label artifacts:
+
+```bash
+python3 scripts/build_firms_progression_labels.py
+```
+
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
 ### Configuration
@@ -251,7 +258,7 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 4B**: Real LANDFIRE FBFM40 fuel-model covariates
 - [x] **Phase 4C**: Real ERA5-Land weather artifacts
 - [x] **Phase 4D**: Final-extent baseline diagnostics and guardrails
-- [ ] **Phase 4E**: Progression/initial-state label audit and reconstruction plan
+- [ ] **Phase 4E**: FIRMS-backed progression labels and initial-state reconstruction
 - [ ] **Phase 5**: Simulation corpus and surrogate
 - [ ] **Phase 6**: Hybrid model
 - [ ] **Phase 7**: Assimilation and calibrated uncertainty
@@ -268,6 +275,7 @@ FireTwin is designed to answer measurable questions:
 - [Data Validation](docs/DATA_VALIDATION.md)
 - [Evaluation Protocol](docs/EVALUATION_PROTOCOL.md)
 - [Data Availability Audit](reports/data_availability_audit.md)
+- [FIRMS Label Artifact Report](reports/firms_label_artifacts.md)
 - [Product Specification](docs/PRODUCT_SPEC.md)
 - [UI/UX Specification](docs/UI_UX_SPEC.md)
 - [Demo Script](docs/DEMO_SCRIPT.md)

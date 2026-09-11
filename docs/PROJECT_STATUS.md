@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-10
-**Current Phase**: Phase 4E 🔎 - FIRMS-Backed Progression Label Design
+**Current Phase**: Phase 4E 🔎 - FIRMS-Backed Progression Label Artifacts
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -357,7 +357,7 @@ The weak IoU values are expected: without observed ignition/progression, fuel an
 covariates alone cannot localize the final perimeter. This confirms the next scientific step is
 progression/initial-state reconstruction rather than training a model on fake hourly labels.
 
-## Phase 4E: Progression/Initial-State Label Audit 🔎
+## Phase 4E: FIRMS-Backed Progression Label Artifacts 🔎
 
 **Status**: IN PROGRESS (2026-09-10)
 
@@ -374,6 +374,11 @@ before constructing ignition states, progression targets or ML training samples.
 - [x] Generated `reports/progression_label_audit.md` with configured FIRMS credentials.
 - [x] Added unit tests for chunking, historical source selection, source summaries and report
   rendering.
+- [x] Added FIRMS label-artifact builder with cached detection records and FireTwin-grid
+  rasterization.
+- [x] Generated daily-binned FIRMS hotspot/progression label artifacts under ignored `data/labels/`.
+- [x] Generated `reports/firms_label_artifacts.md`.
+- [x] Added unit tests for confidence scoring, grid indexing, final-extent QC and label metadata.
 
 ### Result-Wise Audit Findings
 
@@ -390,13 +395,31 @@ The current NIFC/MTBS evidence does not support hourly perimeter labels for any 
 historical active-fire detections do support irregular hotspot/progression targets, but those targets
 must be filtered, uncertainty-aware and clearly distinguished from exact burned perimeters.
 
+### FIRMS Label Artifact Results
+
+Generated artifacts are daily-binned companion Zarr products, not replacements for the final-extent
+FireCase targets.
+
+- Carlton Complex 2014: 7,588 input detections, 6,495 retained after QC, 25 daily slices,
+  115,861 positive observation cells and 1,746,994 cumulative positive cells.
+- King 2014: 5,584 input detections, 4,977 retained after QC, 14 daily slices,
+  80,793 positive observation cells and 399,856 cumulative positive cells.
+- Big Cougar 2014: 3,002 input detections, 1,441 retained after QC, 9 daily slices,
+  26,056 positive observation cells and 123,901 cumulative positive cells.
+
+All label artifacts record `label_type=irregular_firms_hotspot_progression`,
+`target_type=active_fire_detection_probability`, `time_bin=date`,
+`not_hourly_perimeter_truth=true` and
+`non_detection_semantics=missing_or_unobserved_not_unburned`.
+
 ### Remaining Phase 4E Work
 
-- [ ] Design uncertainty-aware irregular hotspot/progression labels from FIRMS detections.
-- [ ] Persist/cache FIRMS detections by fire/source/date window with provenance.
-- [ ] Add spatial filtering against final extents and confidence/FRP/sensor-quality rules.
 - [ ] Build an initial ignition/active-front estimate from early detections without using future
   final extent as a model input.
+- [ ] Add validation/visualization for FIRMS label artifacts against final extent and source
+  detections.
+- [ ] Decide whether Phase 5 consumes daily FIRMS labels directly or a simulator-conditioned
+  arrival-time field derived from them.
 
 ## Future Phases
 
@@ -418,7 +441,7 @@ Phase 4A: ████████████████████ 100% ✅
 Phase 4B: ████████████████████ 100% ✅
 Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
-Phase 4E: ████████████░░░░░░░░  60% 🔎
+Phase 4E: ████████████████░░░░  80% 🔎
 ...
 Overall: ████████████░░░░░░░░  60%
 ```
@@ -435,8 +458,8 @@ Overall: ████████████░░░░░░░░  60%
 
 ## Blockers
 
-No credential blocker remains. Phase 4E now needs label-construction code that converts FIRMS
-detections into uncertainty-aware irregular progression targets.
+No credential blocker remains. Phase 4E now needs initial-state reconstruction and label-artifact
+validation/visualization before Phase 5 modeling.
 
 ## Notes
 

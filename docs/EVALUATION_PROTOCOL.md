@@ -1,7 +1,7 @@
 # FireTwin Evaluation Protocol
 
 **Last Updated**: 2026-09-10
-**Status**: Phase 4E progression-label audit before progression model work
+**Status**: Phase 4E FIRMS label artifacts before progression model work
 
 > Research prototype. Not for operational wildfire response, evacuation planning or safety-critical decision-making.
 
@@ -75,6 +75,11 @@ Before a real pilot fire can be used for progression modeling:
 Current Phase 4E audit status: all three 2014 pilots have FIRMS detections across 21-28 detection
 dates, so the next defensible real target is irregular hotspot/progression labeling, not hourly
 perimeter regression.
+
+Current Phase 4E label-artifact status: daily-binned FIRMS labels now exist as companion Zarr
+artifacts under `data/labels/`. They may be used for active-fire detection probability,
+assimilation and irregular progression experiments. They must not be scored as exact burned
+perimeters, and cells without detections must not be interpreted as known unburned cells.
 
 ## Probabilistic Metrics
 

@@ -104,6 +104,11 @@ timestamp each. That is not enough for hourly perimeter labels. FIRMS historical
 available for all three pilots and can support irregular hotspot/progression targets after sensor,
 confidence, FRP and spatial filtering.
 
+The first FireTwin progression artifacts are daily-binned FIRMS hotspot/progression Zarr products
+under `data/labels/`. They store positive active-fire evidence, cumulative detection probability and
+FRP summaries on the same grid as the final-extent FireCase. Non-detection is explicitly treated as
+missing/unobserved, not unburned.
+
 ## Recommended Data Pipeline
 
 ### For Historical Case Building (2000-2020)
@@ -246,4 +251,5 @@ The FireTwin project now has:
 
 **Status**: Phase 3 historical case building, Phase 4A terrain enrichment, Phase 4B LANDFIRE
 FBFM40 fuel-model enrichment, Phase 4C ERA5-Land weather enrichment and Phase 4D final-extent
-diagnostics are complete. Phase 4E is auditing FIRMS-backed progression-label feasibility.
+diagnostics are complete. Phase 4E now has daily-binned FIRMS progression label artifacts and is
+moving to initial-state reconstruction.

@@ -384,6 +384,47 @@ needs ignition/progression reconstruction before ML forecast training can be mea
 
 ---
 
+## Decision 11: Build Daily-Binned FIRMS Hotspot Labels as Companion Artifacts
+
+**Date**: 2026-09-11
+**Phase**: 4E - FIRMS-Backed Progression Labels
+
+### Context
+
+The 2014 pilot fire cases have real final burned extents and real terrain/fuel/weather covariates,
+but NIFC/MTBS provide only one matching perimeter timestamp per pilot. NASA FIRMS provides many
+timestamped active-fire detections, but those detections are point-like sensor observations, not
+continuous perimeter truth.
+
+### Decision
+
+Build FIRMS progression labels as separate companion Zarr artifacts under `data/labels/`, aligned to
+the existing FireTwin grid. The first production artifacts are daily-binned by default. They store
+positive active-fire evidence, cumulative detection probability, detection counts and maximum FRP,
+with metadata stating `not_hourly_perimeter_truth=true` and
+`non_detection_semantics=missing_or_unobserved_not_unburned`.
+
+Final burned extent may be used as label-construction quality control to remove unrelated FIRMS
+detections inside broad bounding boxes, but it must not be used as a model input for forecast
+experiments.
+
+### Rationale
+
+Daily FIRMS labels give the project real time-resolved supervision without pretending that satellite
+overpasses are hourly burned perimeters. Keeping labels as companion artifacts preserves the honest
+`final_burned_extent` FireCase target while opening a valid path toward active-fire detection
+probability, assimilation and irregular progression experiments.
+
+### Consequences
+
+- Phase 5 can consume real irregular progression observations without reclassifying final extents as
+  forecast labels.
+- Exact hourly perimeter metrics remain unsupported.
+- Initial-state reconstruction should use early FIRMS detections and documented uncertainty, not
+  future final perimeter leakage.
+
+---
+
 ## Future Decisions
 
 Document all future material decisions here, including:
