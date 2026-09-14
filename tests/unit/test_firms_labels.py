@@ -8,10 +8,13 @@ import pytest
 import xarray as xr
 
 from firetwin.data.firms_labels import (
+    FIRMSInitialStateConfig,
     FIRMSLabelConfig,
     add_grid_indices,
+    build_firms_initial_state_artifact,
     build_firms_label_artifact,
     confidence_score,
+    estimate_initial_state_dataset,
     filter_firms_records,
     rasterize_firms_records,
     read_case_grid,
@@ -180,5 +183,51 @@ def test_build_firms_label_artifact_writes_zarr_summary(tmp_path: Path) -> None:
     try:
         assert ds.attrs["target_type"] == "active_fire_detection_probability"
         assert "cumulative_detection_probability" in ds
+    finally:
+        ds.close()
+
+
+def test_estimate_initial_state_does_not_use_final_extent_qc(tmp_path: Path) -> None:
+    """Initial-state estimates should avoid future final-extent masking."""
+    case_path = tmp_path / "case.zarr"
+    write_test_case_zarr(case_path)
+    grid = read_case_grid(case_path)
+
+    ds = estimate_initial_state_dataset(
+        sample_records(),
+        grid,
+        FIRMSInitialStateConfig(use_detection_footprint=False),
+    )
+
+    assert ds.attrs["label_type"] == "firms_initial_state_estimate"
+    assert ds.attrs["uses_final_extent_for_qc"] == "false"
+    assert ds.attrs["reference_timestamp"] == "2014-01-01T10:00:00"
+    assert ds.attrs["window_detection_count"] == 2
+    assert int(ds["initial_active_front"].sum().item()) == 2
+    assert float(ds["initial_burned_probability"].max().item()) == pytest.approx(0.90)
+
+
+def test_build_firms_initial_state_artifact_writes_zarr_summary(tmp_path: Path) -> None:
+    """The initial-state artifact builder should save an aligned Zarr product."""
+    case_path = tmp_path / "case.zarr"
+    output_path = tmp_path / "initial_state.zarr"
+    write_test_case_zarr(case_path)
+
+    summary = build_firms_initial_state_artifact(
+        case_path,
+        sample_records(),
+        output_path,
+        FIRMSInitialStateConfig(use_detection_footprint=False),
+    )
+
+    assert output_path.exists()
+    assert summary.case_id == "label_test"
+    assert summary.window_detection_count == 2
+    assert summary.active_cell_count == 2
+
+    ds = xr.open_zarr(output_path)
+    try:
+        assert ds.attrs["target_type"] == "initial_active_fire_state"
+        assert "initial_burned_probability" in ds
     finally:
         ds.close()

@@ -425,6 +425,41 @@ probability, assimilation and irregular progression experiments.
 
 ---
 
+## Decision 12: Build FIRMS Initial-State Estimates as Companion Artifacts
+
+**Date**: 2026-09-14
+**Phase**: 4E - FIRMS-Backed Initial-State Reconstruction
+
+### Context
+
+The pilot FireCase Zarrs contain final burned extent targets and placeholder time-zero fire-state
+arrays. Phase 5 needs a defensible initialization signal, but using final burned extent to seed an
+initial state would leak future information.
+
+### Decision
+
+Build separate FIRMS initial-state Zarr artifacts under `data/initial_states/`, aligned to the same
+FireTwin grid as each pilot case. Use the earliest retained FIRMS detection timestamp as the
+reference time and the first 24 hours of retained detections as positive active-fire evidence. Store
+initial burned/active-fire probability, active-front mask, central-cell detection counts and maximum
+FRP. Do not use final burned extent for initial-state quality control.
+
+### Rationale
+
+This gives Phase 5 a real observation-derived initialization product while avoiding final-extent
+leakage. Keeping the product as a companion artifact preserves the existing FireCase target
+semantics and makes the uncertainty explicit.
+
+### Consequences
+
+- Initial-state artifacts can be used for initialization and assimilation experiments that model
+  FIRMS observation uncertainty.
+- They are not exact ignition maps and are not hourly perimeter truth.
+- The canonical FireCase schema still needs a later integration decision if these companion
+  products become standard model inputs.
+
+---
+
 ## Future Decisions
 
 Document all future material decisions here, including:

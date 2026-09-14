@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
-**Last Updated**: 2026-09-10
-**Current Phase**: Phase 4E 🔎 - FIRMS-Backed Progression Label Artifacts
+**Last Updated**: 2026-09-14
+**Current Phase**: Phase 4E 🔎 - FIRMS-Backed Label and Initial-State Artifacts
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -357,9 +357,9 @@ The weak IoU values are expected: without observed ignition/progression, fuel an
 covariates alone cannot localize the final perimeter. This confirms the next scientific step is
 progression/initial-state reconstruction rather than training a model on fake hourly labels.
 
-## Phase 4E: FIRMS-Backed Progression Label Artifacts 🔎
+## Phase 4E: FIRMS-Backed Label and Initial-State Artifacts 🔎
 
-**Status**: IN PROGRESS (2026-09-10)
+**Status**: IN PROGRESS (2026-09-14)
 
 **Purpose**: Decide what real time-resolved labels the current pilot fires can honestly support
 before constructing ignition states, progression targets or ML training samples.
@@ -379,6 +379,11 @@ before constructing ignition states, progression targets or ML training samples.
 - [x] Generated daily-binned FIRMS hotspot/progression label artifacts under ignored `data/labels/`.
 - [x] Generated `reports/firms_label_artifacts.md`.
 - [x] Added unit tests for confidence scoring, grid indexing, final-extent QC and label metadata.
+- [x] Added shared pilot-fire definitions for repeatable Phase 4E artifact builders.
+- [x] Added FIRMS-derived initial-state estimation from earliest active-fire detections.
+- [x] Generated initial active-fire state artifacts under ignored `data/initial_states/`.
+- [x] Generated `reports/firms_initial_state_artifacts.md`.
+- [x] Added tests proving initial-state estimation does not use final burned extent as QC.
 
 ### Result-Wise Audit Findings
 
@@ -412,12 +417,27 @@ All label artifacts record `label_type=irregular_firms_hotspot_progression`,
 `not_hourly_perimeter_truth=true` and
 `non_detection_semantics=missing_or_unobserved_not_unburned`.
 
+### FIRMS Initial-State Artifact Results
+
+Generated initial-state artifacts are earliest-window companion Zarr products for initialization
+experiments. They do not replace the canonical FireCase final-extent target.
+
+- Carlton Complex 2014: 7,588 input detections, 6,723 retained after basic QC, 6 earliest-window
+  detections, 213 active cells, reference 2014-07-14T19:12:00.
+- King 2014: 5,584 input detections, 5,441 retained after basic QC, 264 earliest-window detections,
+  4,351 active cells, reference 2014-09-14T10:41:00.
+- Big Cougar 2014: 3,002 input detections, 1,491 retained after basic QC, 63 earliest-window
+  detections, 1,641 active cells, reference 2014-08-03T08:45:00.
+
+All initial-state artifacts record `label_type=firms_initial_state_estimate`,
+`target_type=initial_active_fire_state`, `uses_final_extent_for_qc=false`,
+`not_hourly_perimeter_truth=true` and
+`non_detection_semantics=missing_or_unobserved_not_unburned`.
+
 ### Remaining Phase 4E Work
 
-- [ ] Build an initial ignition/active-front estimate from early detections without using future
-  final extent as a model input.
 - [ ] Add validation/visualization for FIRMS label artifacts against final extent and source
-  detections.
+  detections, including initial-state overlays.
 - [ ] Decide whether Phase 5 consumes daily FIRMS labels directly or a simulator-conditioned
   arrival-time field derived from them.
 
@@ -441,15 +461,16 @@ Phase 4A: ████████████████████ 100% ✅
 Phase 4B: ████████████████████ 100% ✅
 Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
-Phase 4E: ████████████████░░░░  80% 🔎
+Phase 4E: ██████████████████░░  90% 🔎
 ...
 Overall: ████████████░░░░░░░░  60%
 ```
 
 ## Known Issues
 
-- Pilot cases are final-burned-extent artifacts with real terrain, real fuel-model classes and real
-  ERA5-Land scalar weather, but placeholder empty initial fire states.
+- Pilot FireCase Zarrs are still final-burned-extent artifacts. Real FIRMS-derived initial-state
+  companion artifacts exist separately under `data/initial_states/`, but the canonical case schema
+  has not yet been rewritten to embed them as time-zero forecast inputs.
 - Fuel load and fuel moisture are class-based static proxies, not observed live/dead fuel moisture.
 - Real-data baseline evaluation now rejects attempts to treat final masks as hourly progression
   labels.
@@ -458,8 +479,8 @@ Overall: ████████████░░░░░░░░  60%
 
 ## Blockers
 
-No credential blocker remains. Phase 4E now needs initial-state reconstruction and label-artifact
-validation/visualization before Phase 5 modeling.
+No credential blocker remains. Phase 4E now needs label-artifact validation/visualization and a
+Phase 5 input decision before simulator/surrogate modeling.
 
 ## Notes
 

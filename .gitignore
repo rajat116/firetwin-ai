@@ -64,6 +64,7 @@ data/raw/*
 data/interim/*
 data/processed/*
 data/labels/**
+data/initial_states/**
 !data/raw/.gitkeep
 !data/interim/.gitkeep
 !data/processed/.gitkeep

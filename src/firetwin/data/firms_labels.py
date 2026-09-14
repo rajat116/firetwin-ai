@@ -71,6 +71,39 @@ class FIRMSLabelSummary:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class FIRMSInitialStateConfig:
+    """Configuration for FIRMS-derived initial-state estimation."""
+
+    initial_window_hours: float = 24.0
+    min_confidence_score: float = 0.30
+    min_frp_mw: float = 0.0
+    use_detection_footprint: bool = True
+    min_footprint_radius_cells: int = 1
+    max_footprint_radius_cells: int = 4
+
+
+@dataclass(frozen=True)
+class FIRMSInitialStateSummary:
+    """Summary of one generated FIRMS initial-state artifact."""
+
+    case_id: str
+    output_path: str
+    input_detection_count: int
+    retained_detection_count: int
+    window_detection_count: int
+    active_cell_count: int
+    reference_timestamp: str | None
+    window_end_timestamp: str | None
+    initial_window_hours: float
+    min_confidence_score: float
+    min_frp_mw: float
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a serializable summary."""
+        return asdict(self)
+
+
 def confidence_score(confidence: int | float | str) -> float:
     """Normalize FIRMS confidence values to a 0-1 score."""
     if isinstance(confidence, int | float):
@@ -249,6 +282,24 @@ def _footprint_radius_cells(record: pd.Series, grid: CaseGrid, config: FIRMSLabe
     )
 
 
+def _initial_footprint_radius_cells(
+    record: pd.Series, grid: CaseGrid, config: FIRMSInitialStateConfig
+) -> int:
+    """Estimate an initial-state footprint radius from FIRMS scan/track size."""
+    if not config.use_detection_footprint:
+        return 0
+
+    footprint_m = max(float(record["scan"]), float(record["track"])) * 1000.0
+    radius = int(np.ceil((footprint_m / 2.0) / grid.resolution_m))
+    return int(
+        np.clip(
+            max(radius, config.min_footprint_radius_cells),
+            config.min_footprint_radius_cells,
+            config.max_footprint_radius_cells,
+        )
+    )
+
+
 def rasterize_firms_records(
     records: pd.DataFrame, grid: CaseGrid, config: FIRMSLabelConfig
 ) -> xr.Dataset:
@@ -359,6 +410,104 @@ def rasterize_firms_records(
     return ds
 
 
+def estimate_initial_state_dataset(
+    records: pd.DataFrame, grid: CaseGrid, config: FIRMSInitialStateConfig
+) -> xr.Dataset:
+    """Estimate an initial active-fire state from earliest FIRMS detections."""
+    filter_config = FIRMSLabelConfig(
+        min_confidence_score=config.min_confidence_score,
+        min_frp_mw=config.min_frp_mw,
+        mask_to_final_extent=False,
+        use_detection_footprint=False,
+    )
+    filtered = filter_firms_records(records, grid, filter_config)
+
+    if filtered.empty:
+        reference_time = None
+        window_end = None
+        window_records = filtered
+    else:
+        reference_time = pd.Timestamp(filtered["acquisition_datetime"].min())
+        window_end = reference_time + pd.Timedelta(hours=config.initial_window_hours)
+        window_records = filtered[
+            (filtered["acquisition_datetime"] >= reference_time)
+            & (filtered["acquisition_datetime"] < window_end)
+        ].copy()
+
+    burned_probability = np.zeros((grid.height, grid.width), dtype=np.float32)
+    active_front = np.zeros((grid.height, grid.width), dtype=np.uint8)
+    detection_count = np.zeros((grid.height, grid.width), dtype=np.uint16)
+    frp_max = np.zeros((grid.height, grid.width), dtype=np.float32)
+
+    for _, record in window_records.iterrows():
+        row = int(record["row"])
+        col = int(record["col"])
+        score = float(record["confidence_score"])
+        frp = float(record["frp"])
+        radius = _initial_footprint_radius_cells(record, grid, config)
+
+        detection_count[row, col] += 1
+        for rr in range(max(0, row - radius), min(grid.height, row + radius + 1)):
+            for cc in range(max(0, col - radius), min(grid.width, col + radius + 1)):
+                distance = float(np.hypot(rr - row, cc - col))
+                if distance > radius + 0.5:
+                    continue
+                spatial_weight = 1.0 if radius == 0 else max(0.25, 1.0 - distance / (radius + 1))
+                burned_probability[rr, cc] = max(
+                    burned_probability[rr, cc],
+                    np.float32(score * spatial_weight),
+                )
+                active_front[rr, cc] = 1
+                frp_max[rr, cc] = max(frp_max[rr, cc], np.float32(frp))
+
+    ds = xr.Dataset(
+        data_vars={
+            "initial_burned_probability": (["y", "x"], burned_probability),
+            "initial_active_front": (["y", "x"], active_front),
+            "detection_count": (["y", "x"], detection_count),
+            "frp_max_mw": (["y", "x"], frp_max),
+        },
+        coords={"y": np.arange(grid.height), "x": np.arange(grid.width)},
+        attrs={
+            "case_id": grid.case_id,
+            "case_name": grid.name,
+            "label_version": FIRMS_LABEL_VERSION,
+            "label_type": "firms_initial_state_estimate",
+            "source": "NASA FIRMS earliest active-fire detections",
+            "target_type": "initial_active_fire_state",
+            "reference_timestamp": reference_time.isoformat() if reference_time is not None else "",
+            "window_end_timestamp": window_end.isoformat() if window_end is not None else "",
+            "initial_window_hours": config.initial_window_hours,
+            "uses_final_extent_for_qc": "false",
+            "not_hourly_perimeter_truth": "true",
+            "non_detection_semantics": "missing_or_unobserved_not_unburned",
+            "grid_crs": grid.crs,
+            "resolution_m": grid.resolution_m,
+            "bbox_min_x": grid.min_x,
+            "bbox_min_y": grid.min_y,
+            "bbox_max_x": grid.max_x,
+            "bbox_max_y": grid.max_y,
+            "input_detection_count": int(len(records)),
+            "retained_detection_count": int(len(filtered)),
+            "window_detection_count": int(len(window_records)),
+            "active_cell_count": int(active_front.sum()),
+            "min_confidence_score": config.min_confidence_score,
+            "min_frp_mw": config.min_frp_mw,
+            "creation_timestamp": datetime.utcnow().isoformat(),
+        },
+    )
+    ds["initial_burned_probability"].attrs = {
+        "long_name": "Initial burned/active-fire probability proxy",
+        "description": "Earliest-window FIRMS positive evidence; not final extent and not confirmed perimeter.",
+    }
+    ds["initial_active_front"].attrs = {
+        "description": "1 where earliest-window FIRMS detections imply active-fire evidence."
+    }
+    ds["detection_count"].attrs = {"long_name": "FIRMS detections per central grid cell"}
+    ds["frp_max_mw"].attrs = {"units": "MW", "long_name": "Maximum fire radiative power"}
+    return ds
+
+
 def save_firms_label_dataset(ds: xr.Dataset, output_path: Path) -> None:
     """Save a FIRMS label dataset to Zarr."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -398,6 +547,33 @@ def build_firms_label_artifact(
     )
 
 
+def build_firms_initial_state_artifact(
+    case_path: Path,
+    records: pd.DataFrame,
+    output_path: Path,
+    config: FIRMSInitialStateConfig | None = None,
+) -> FIRMSInitialStateSummary:
+    """Build and save a FIRMS initial-state artifact aligned to an existing FireCase."""
+    initial_config = config or FIRMSInitialStateConfig()
+    grid = read_case_grid(case_path)
+    ds = estimate_initial_state_dataset(records, grid, initial_config)
+    save_firms_label_dataset(ds, output_path)
+
+    return FIRMSInitialStateSummary(
+        case_id=grid.case_id,
+        output_path=str(output_path),
+        input_detection_count=int(ds.attrs["input_detection_count"]),
+        retained_detection_count=int(ds.attrs["retained_detection_count"]),
+        window_detection_count=int(ds.attrs["window_detection_count"]),
+        active_cell_count=int(ds.attrs["active_cell_count"]),
+        reference_timestamp=str(ds.attrs["reference_timestamp"]) or None,
+        window_end_timestamp=str(ds.attrs["window_end_timestamp"]) or None,
+        initial_window_hours=initial_config.initial_window_hours,
+        min_confidence_score=initial_config.min_confidence_score,
+        min_frp_mw=initial_config.min_frp_mw,
+    )
+
+
 def render_firms_label_summary_markdown(summaries: list[FIRMSLabelSummary]) -> str:
     """Render generated FIRMS label summaries as Markdown."""
     lines = [
@@ -428,6 +604,42 @@ def render_firms_label_summary_markdown(summaries: list[FIRMSLabelSummary]) -> s
             "- `positive_observation_mask=0` means missing/unobserved, not confirmed unburned.",
             "- Final burned extent is used only as target-construction quality control to remove unrelated detections inside broad bounding boxes.",
             "- These labels support irregular hotspot/progression learning and assimilation experiments, not exact hourly perimeter evaluation.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def render_firms_initial_state_summary_markdown(
+    summaries: list[FIRMSInitialStateSummary],
+) -> str:
+    """Render generated FIRMS initial-state summaries as Markdown."""
+    lines = [
+        "# FireTwin FIRMS Initial-State Artifacts",
+        "",
+        "These artifacts estimate the initial active-fire state from earliest FIRMS detections.",
+        "",
+        "| Case | Input detections | Retained | Window detections | Active cells | Reference | Window end | Artifact |",
+        "|---|---:|---:|---:|---:|---|---|---|",
+    ]
+    for summary in summaries:
+        lines.append(
+            f"| {summary.case_id} | {summary.input_detection_count:,} | "
+            f"{summary.retained_detection_count:,} | {summary.window_detection_count:,} | "
+            f"{summary.active_cell_count:,} | {summary.reference_timestamp or '-'} | "
+            f"{summary.window_end_timestamp or '-'} | `{summary.output_path}` |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Semantics",
+            "",
+            "- `initial_burned_probability` is an earliest-window FIRMS confidence proxy.",
+            "- `initial_active_front=1` marks cells with early active-fire evidence after footprint expansion.",
+            "- Final burned extent is not used for initial-state quality control.",
+            "- Non-detection means missing/unobserved, not known unburned.",
+            "- These artifacts are suitable for initialization experiments, not operational ignition mapping.",
             "",
         ]
     )

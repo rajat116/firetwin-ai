@@ -1,7 +1,7 @@
 # FireTwin Data Strategy
 
-**Last Updated**: 2026-09-10
-**Status**: Data clients implemented; progression labels still under audit
+**Last Updated**: 2026-09-14
+**Status**: Data clients implemented; FIRMS label and initial-state artifacts available
 
 ## Overview
 
@@ -109,6 +109,10 @@ under `data/labels/`. They store positive active-fire evidence, cumulative detec
 FRP summaries on the same grid as the final-extent FireCase. Non-detection is explicitly treated as
 missing/unobserved, not unburned.
 
+FIRMS-derived initial-state artifacts are also generated under `data/initial_states/`. They use the
+first 24 hours of retained FIRMS detections to estimate initial active-fire probability/front cells
+without final-extent quality control. They are initialization evidence, not exact ignition maps.
+
 ## Recommended Data Pipeline
 
 ### For Historical Case Building (2000-2020)
@@ -168,6 +172,7 @@ def build_recent_fire_case(fire_name: str, bbox: tuple):
 
 - [ ] Perimeter data available (MTBS or NIFC Historical)
 - [ ] Fire progression data (NIFC multiple dates or FIRMS)
+- [ ] Initial active-fire state artifact available when building forecast samples
 - [ ] Weather data coverage (ERA5-Land for bbox/dates)
 - [ ] Terrain data available (USGS 3DEP for bbox)
 - [ ] Fuel data available (LANDFIRE for bbox)
@@ -251,5 +256,6 @@ The FireTwin project now has:
 
 **Status**: Phase 3 historical case building, Phase 4A terrain enrichment, Phase 4B LANDFIRE
 FBFM40 fuel-model enrichment, Phase 4C ERA5-Land weather enrichment and Phase 4D final-extent
-diagnostics are complete. Phase 4E now has daily-binned FIRMS progression label artifacts and is
-moving to initial-state reconstruction.
+diagnostics are complete. Phase 4E now has daily-binned FIRMS progression label artifacts and
+FIRMS-derived initial-state artifacts. The remaining Phase 4E work is validation/visualization and
+the Phase 5 input decision.

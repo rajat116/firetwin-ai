@@ -1,7 +1,7 @@
 # FireTwin Evaluation Protocol
 
-**Last Updated**: 2026-09-10
-**Status**: Phase 4E FIRMS label artifacts before progression model work
+**Last Updated**: 2026-09-14
+**Status**: Phase 4E FIRMS label and initial-state artifacts before progression model work
 
 > Research prototype. Not for operational wildfire response, evacuation planning or safety-critical decision-making.
 
@@ -20,7 +20,9 @@ The current pilot fire cases are **final-burned-extent cases**:
 They currently contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
 terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes and real
 ERA5-Land scalar weather.
-Fuel load/moisture are class-based proxies; initial-state fields remain placeholders.
+Fuel load/moisture are class-based proxies. The canonical FireCase initial-state fields remain
+placeholders, but separate FIRMS-derived initial-state artifacts now exist under
+`data/initial_states/`.
 They must not be used as 3-, 6-, 12- or 24-hour fire-progression labels until time-stamped
 observations are reconstructed and validated.
 
@@ -81,6 +83,12 @@ artifacts under `data/labels/`. They may be used for active-fire detection proba
 assimilation and irregular progression experiments. They must not be scored as exact burned
 perimeters, and cells without detections must not be interpreted as known unburned cells.
 
+Current Phase 4E initial-state status: earliest-window FIRMS initial-state estimates now exist as
+companion Zarr artifacts under `data/initial_states/`. They are valid initialization evidence for
+experiments that explicitly model FIRMS observation uncertainty. They are not exact ignition points,
+do not use final burned extent for quality control, and do not convert the pilot cases into hourly
+perimeter truth.
+
 ## Probabilistic Metrics
 
 For probability forecasts:
@@ -118,7 +126,8 @@ The current validation gate checks that each local pilot Zarr case:
 - Contains finite, non-flat USGS 3DEP elevation and derived slope/aspect.
 - Contains non-uniform LANDFIRE FBFM40 fuel-model classes.
 - Contains finite, physically bounded ERA5-Land scalar weather.
-- Still warns that the initial fire state is a placeholder, and that fuel load/moisture are
+- Still warns that the embedded FireCase initial fire state is a placeholder, that FIRMS-derived
+  initial-state artifacts are external companion products, and that fuel load/moisture are
   class-based proxies.
 
 Passing this gate means the cases are valid **final-extent artifacts with real terrain, fuel-model
