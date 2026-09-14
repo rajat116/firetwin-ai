@@ -384,6 +384,8 @@ before constructing ignition states, progression targets or ML training samples.
 - [x] Generated initial active-fire state artifacts under ignored `data/initial_states/`.
 - [x] Generated `reports/firms_initial_state_artifacts.md`.
 - [x] Added tests proving initial-state estimation does not use final burned extent as QC.
+- [x] Added FIRMS artifact validation diagnostics and overlay figures.
+- [x] Generated `reports/firms_artifact_validation.md` and figures under `reports/figures/`.
 
 ### Result-Wise Audit Findings
 
@@ -434,10 +436,21 @@ All initial-state artifacts record `label_type=firms_initial_state_estimate`,
 `not_hourly_perimeter_truth=true` and
 `non_detection_semantics=missing_or_unobserved_not_unburned`.
 
+### FIRMS Artifact Validation Results
+
+Generated validation overlays compare FIRMS companion artifacts with final extent for context only.
+They do not turn FIRMS observations into perimeter truth.
+
+- Carlton Complex 2014: cumulative FIRMS precision 1.000 vs final extent, recall 0.747; initial
+  active-state precision 1.000, recall 0.002.
+- King 2014: cumulative FIRMS precision 1.000 vs final extent, recall 0.952; initial active-state
+  precision 0.895, recall 0.098, with 457 earliest-window cells outside final extent because
+  initial-state construction avoids future final-extent QC.
+- Big Cougar 2014: cumulative FIRMS precision 1.000 vs final extent, recall 0.776; initial
+  active-state precision 1.000, recall 0.062.
+
 ### Remaining Phase 4E Work
 
-- [ ] Add validation/visualization for FIRMS label artifacts against final extent and source
-  detections, including initial-state overlays.
 - [ ] Decide whether Phase 5 consumes daily FIRMS labels directly or a simulator-conditioned
   arrival-time field derived from them.
 
@@ -461,7 +474,7 @@ Phase 4A: ████████████████████ 100% ✅
 Phase 4B: ████████████████████ 100% ✅
 Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
-Phase 4E: ██████████████████░░  90% 🔎
+Phase 4E: ███████████████████░  95% 🔎
 ...
 Overall: ████████████░░░░░░░░  60%
 ```
@@ -479,8 +492,8 @@ Overall: ████████████░░░░░░░░  60%
 
 ## Blockers
 
-No credential blocker remains. Phase 4E now needs label-artifact validation/visualization and a
-Phase 5 input decision before simulator/surrogate modeling.
+No credential blocker remains. Phase 4E now needs the Phase 5 input decision before
+simulator/surrogate modeling.
 
 ## Notes
 

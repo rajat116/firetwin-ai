@@ -89,6 +89,11 @@ experiments that explicitly model FIRMS observation uncertainty. They are not ex
 do not use final burned extent for quality control, and do not convert the pilot cases into hourly
 perimeter truth.
 
+Current Phase 4E validation status: FIRMS companion artifacts now have context-only overlap
+diagnostics and overlay figures under `reports/firms_artifact_validation.md` and `reports/figures/`.
+These diagnostics may identify coverage gaps and obvious spatial mismatches, but they are not
+forecast scores.
+
 ## Probabilistic Metrics
 
 For probability forecasts:

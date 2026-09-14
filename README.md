@@ -169,6 +169,12 @@ Build FIRMS-derived initial active-fire state artifacts:
 python3 scripts/build_firms_initial_states.py
 ```
 
+Validate FIRMS companion artifacts and generate overlay figures:
+
+```bash
+python3 scripts/validate_firms_artifacts.py
+```
+
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
 ### Configuration
@@ -285,6 +291,7 @@ FireTwin is designed to answer measurable questions:
 - [Data Availability Audit](reports/data_availability_audit.md)
 - [FIRMS Label Artifact Report](reports/firms_label_artifacts.md)
 - [FIRMS Initial-State Artifact Report](reports/firms_initial_state_artifacts.md)
+- [FIRMS Artifact Validation Report](reports/firms_artifact_validation.md)
 - [Product Specification](docs/PRODUCT_SPEC.md)
 - [UI/UX Specification](docs/UI_UX_SPEC.md)
 - [Demo Script](docs/DEMO_SCRIPT.md)

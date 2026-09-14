@@ -5,6 +5,12 @@ from firetwin.evaluation.final_extent import (
     fuel_potential_mask,
     get_final_extent_target,
 )
+from firetwin.evaluation.firms_artifacts import (
+    FIRMSArtifactValidationSummary,
+    render_firms_artifact_validation_markdown,
+    validate_firms_artifacts,
+    write_firms_overlay_figure,
+)
 from firetwin.evaluation.metrics import (
     area_error,
     boundary_distance,
@@ -22,4 +28,8 @@ __all__ = [
     "evaluate_forecast",
     "fuel_potential_mask",
     "get_final_extent_target",
+    "FIRMSArtifactValidationSummary",
+    "validate_firms_artifacts",
+    "write_firms_overlay_figure",
+    "render_firms_artifact_validation_markdown",
 ]
