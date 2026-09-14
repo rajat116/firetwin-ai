@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-14
-**Current Phase**: Phase 5A 🔎 - Next-Day FIRMS Active-Fire Samples
+**Current Phase**: Phase 5A 🔎 - Next-Day FIRMS Active-Fire Learning
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -455,7 +455,7 @@ They do not turn FIRMS observations into perimeter truth.
 - [x] Simulator-conditioned arrival-time fields are deferred until after direct FIRMS
   observation-learning baselines exist.
 
-## Phase 5A: Next-Day FIRMS Active-Fire Samples 🔎
+## Phase 5A: Next-Day FIRMS Active-Fire Learning 🔎
 
 **Status**: IN PROGRESS (2026-09-14)
 
@@ -477,6 +477,11 @@ samples for next-calendar-day active-fire probability modeling.
   fuel/terrain prior.
 - [x] Added `scripts/evaluate_firms_next_day_baselines.py`.
 - [x] Generated `reports/firms_next_day_baselines.md`.
+- [x] Added first calibrated observed-label logistic model for next-day FIRMS active-fire
+  probability.
+- [x] Added leave-one-fire-out learned-model evaluation against persistence.
+- [x] Added `scripts/train_firms_next_day_model.py`.
+- [x] Generated `reports/firms_next_day_learned_model.md`.
 
 ### Result-Wise Sample Artifacts
 
@@ -508,15 +513,32 @@ Interpretation: persistence is the strongest first baseline by observed Brier/MA
 fuel/terrain priors produce broad, high-recall maps but overpredict heavily, which confirms the
 need for learned spatiotemporal models rather than covariates-only maps.
 
+### Result-Wise Learned-Model Diagnostics
+
+The first learned model is a calibrated observed-label logistic model trained on terrain, fuel,
+weather, FIRMS initial-state, current-day FIRMS and cumulative-history features. It is evaluated
+with leave-one-fire-out validation and does not use final burned extent as an input.
+
+- Carlton Complex 2014 holdout: learned Brier 0.00279 vs persistence Brier 0.00362, improvement
+  +0.00083; precision 0.277, recall 0.049.
+- King 2014 holdout: learned Brier 0.00345 vs persistence Brier 0.00462, improvement +0.00116;
+  precision 0.551, recall 0.026.
+- Big Cougar 2014 holdout: learned Brier 0.01023 vs persistence Brier 0.01033, improvement
+  +0.00010; precision 0.167, recall 0.075.
+
+Interpretation: the calibrated learned model now beats persistence on probabilistic Brier score
+for every held-out pilot fire, but thresholded recall remains conservative. This is a credible first
+forecasting baseline, not yet a public-facing spread visualization product.
+
 ### Remaining Phase 5A Work
 
-- [ ] Add evaluation metrics that respect positive-unlabeled target semantics.
 - [ ] Generate forecast artifacts suitable for a public FireTwin Explorer demo.
-- [ ] Train a first learned next-day active-fire model and compare it with persistence.
+- [ ] Tune/choose public-demo thresholds separately from probability calibration.
+- [ ] Add calibration and reliability diagnostics for positive-unlabeled observation labels.
 
 ## Future Phases
 
-- **Phase 5A**: Next-day FIRMS active-fire samples and baselines
+- **Phase 5A**: Next-day FIRMS active-fire samples, baselines and learned model
 - **Phase 5B**: Simulation corpus and surrogate
 - **Phase 6**: Hybrid model
 - **Phase 7**: Assimilation and calibrated uncertainty
@@ -536,7 +558,7 @@ Phase 4B: ████████████████████ 100% ✅
 Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
-Phase 5A: ████████████░░░░░░░░  60% 🔎
+Phase 5A: ███████████████░░░░░  75% 🔎
 ...
 Overall: █████████████░░░░░░░  65%
 ```
@@ -554,8 +576,8 @@ Overall: █████████████░░░░░░░  65%
 
 ## Blockers
 
-No credential blocker remains. Phase 5A now needs a first learned model and forecast artifacts
-before simulator/surrogate modeling.
+No credential blocker remains. Phase 5A now needs forecast artifact packaging, calibration plots and
+demo-oriented threshold selection before simulator/surrogate modeling.
 
 ## Notes
 

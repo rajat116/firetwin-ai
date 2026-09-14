@@ -32,7 +32,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 5A In Progress - Next-Day FIRMS Active-Fire Samples
+**Current Phase**: Phase 5A In Progress - Next-Day FIRMS Active-Fire Learning
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
@@ -43,7 +43,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 - ✅ **Phase 4C**: ERA5-Land hourly weather enrichment
 - ✅ **Phase 4D**: Final-extent baseline diagnostics and forecast-label guardrails
 - ✅ **Phase 4E**: FIRMS-backed progression labels, initial-state artifacts and validation overlays
-- 🔎 **Phase 5A**: Leakage-safe next-day FIRMS active-fire sample artifacts
+- 🔎 **Phase 5A**: Leakage-safe next-day FIRMS active-fire samples, baselines and learned model
 
 Current pilot cases contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
 terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes, and real
@@ -58,6 +58,9 @@ unsupported. FIRMS historical detections are available for all three pilots and 
 hotspot/progression targets after filtering. Daily-binned FIRMS label artifacts can now be built as
 companion Zarr products under `data/labels/`, with earliest-window initial-state estimates under
 `data/initial_states/` and Phase 5A next-day learning samples under `data/training/firms_next_day/`.
+A first calibrated observed-label logistic model now beats persistence on held-out pilot fires by
+Brier score, while remaining explicitly scoped to next-day FIRMS active-fire evidence rather than
+exact burned-perimeter spread.
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -188,6 +191,12 @@ Evaluate next-day FIRMS baseline diagnostics:
 python3 scripts/evaluate_firms_next_day_baselines.py
 ```
 
+Train and evaluate the first learned next-day FIRMS active-fire model:
+
+```bash
+python3 scripts/train_firms_next_day_model.py
+```
+
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
 ### Configuration
@@ -286,7 +295,7 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 4C**: Real ERA5-Land weather artifacts
 - [x] **Phase 4D**: Final-extent baseline diagnostics and guardrails
 - [x] **Phase 4E**: FIRMS-backed progression labels and initial-state artifacts
-- [ ] **Phase 5A**: Next-day FIRMS active-fire sample artifacts and baselines
+- [ ] **Phase 5A**: Next-day FIRMS active-fire sample artifacts, baselines and learned model
 - [ ] **Phase 5B**: Simulation corpus and surrogate
 - [ ] **Phase 6**: Hybrid model
 - [ ] **Phase 7**: Assimilation and calibrated uncertainty
@@ -308,6 +317,7 @@ FireTwin is designed to answer measurable questions:
 - [FIRMS Artifact Validation Report](reports/firms_artifact_validation.md)
 - [FIRMS Next-Day Sample Report](reports/firms_next_day_samples.md)
 - [FIRMS Next-Day Baseline Report](reports/firms_next_day_baselines.md)
+- [FIRMS Next-Day Learned Model Report](reports/firms_next_day_learned_model.md)
 - [Product Specification](docs/PRODUCT_SPEC.md)
 - [UI/UX Specification](docs/UI_UX_SPEC.md)
 - [Demo Script](docs/DEMO_SCRIPT.md)

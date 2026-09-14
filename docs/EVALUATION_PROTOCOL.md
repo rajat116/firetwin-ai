@@ -1,7 +1,7 @@
 # FireTwin Evaluation Protocol
 
 **Last Updated**: 2026-09-14
-**Status**: Phase 4E FIRMS label and initial-state artifacts before progression model work
+**Status**: Phase 5A next-day FIRMS active-fire observation learning
 
 > Research prototype. Not for operational wildfire response, evacuation planning or safety-critical decision-making.
 
@@ -103,6 +103,12 @@ Current Phase 5A baseline status: persistence, cumulative-history and fuel/terra
 now exist for next-day FIRMS observation labels. Brier/MAE are observation-label diagnostics, and
 threshold precision/recall/IoU are computed against positive FIRMS observations only. They must not
 be presented as perimeter accuracy.
+
+Current Phase 5A learned-model status: a calibrated observed-label logistic model now exists for
+next-day FIRMS active-fire probability. In leave-one-fire-out validation it beats persistence on
+Brier score for all three pilot fires, but thresholded recall is conservative. It should be reported
+as active-fire observation forecasting, not as exact burned-area spread or operational perimeter
+prediction.
 
 ## Probabilistic Metrics
 
