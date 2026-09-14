@@ -460,6 +460,42 @@ semantics and makes the uncertainty explicit.
 
 ---
 
+## Decision 13: Use Direct Next-Day FIRMS Targets for Phase 5A
+
+**Date**: 2026-09-14
+**Phase**: 5A - Next-Day Active-Fire Modeling
+
+### Context
+
+FireTwin needs a real supervised-learning task before building a public-facing explorer or more
+advanced hybrid simulator. The current pilot fires do not support exact hourly perimeter labels, but
+they do have real terrain, fuel, weather, FIRMS initial-state estimates and daily FIRMS progression
+artifacts.
+
+### Decision
+
+Build Phase 5A sample artifacts that predict next-calendar-day FIRMS active-fire observation
+evidence directly. Each sample includes only information available at the reference day: terrain,
+fuel covariates, scalar ERA5 weather, FIRMS initial state and FIRMS history. Final burned extent is
+excluded as a model input. Targets use positive-unlabeled semantics: no positive FIRMS evidence is
+not treated as confirmed unburned.
+
+### Rationale
+
+This creates an honest, testable, public-demo-friendly ML task without inventing perimeter truth.
+It is realistic enough for professional geospatial AI work and avoids the false precision of
+simulator-conditioned arrival-time fields before basic observation-learning baselines exist.
+
+### Consequences
+
+- Phase 5A can train and evaluate persistence and learned active-fire probability baselines.
+- Metrics must respect positive-unlabeled target semantics.
+- Simulator-conditioned arrival-time fields move to a later phase after direct FIRMS baselines.
+- Public demos should present forecasts as satellite-visible active-fire probability, not
+  operational perimeter prediction.
+
+---
+
 ## Future Decisions
 
 Document all future material decisions here, including:

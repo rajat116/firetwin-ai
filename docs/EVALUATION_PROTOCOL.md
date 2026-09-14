@@ -94,6 +94,11 @@ diagnostics and overlay figures under `reports/firms_artifact_validation.md` and
 These diagnostics may identify coverage gaps and obvious spatial mismatches, but they are not
 forecast scores.
 
+Current Phase 5A sample status: next-day FIRMS active-fire sample artifacts now exist under
+`data/training/firms_next_day/`. They exclude final burned extent as a model input and use
+positive-unlabeled target semantics: target zeros mean no positive FIRMS evidence in that daily bin,
+not confirmed unburned.
+
 ## Probabilistic Metrics
 
 For probability forecasts:

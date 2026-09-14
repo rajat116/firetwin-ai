@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-14
-**Current Phase**: Phase 4E 🔎 - FIRMS-Backed Label and Initial-State Artifacts
+**Current Phase**: Phase 5A 🔎 - Next-Day FIRMS Active-Fire Samples
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -357,9 +357,9 @@ The weak IoU values are expected: without observed ignition/progression, fuel an
 covariates alone cannot localize the final perimeter. This confirms the next scientific step is
 progression/initial-state reconstruction rather than training a model on fake hourly labels.
 
-## Phase 4E: FIRMS-Backed Label and Initial-State Artifacts 🔎
+## Phase 4E: FIRMS-Backed Label and Initial-State Artifacts ✅
 
-**Status**: IN PROGRESS (2026-09-14)
+**Status**: COMPLETE (2026-09-14)
 
 **Purpose**: Decide what real time-resolved labels the current pilot fires can honestly support
 before constructing ignition states, progression targets or ML training samples.
@@ -449,14 +449,56 @@ They do not turn FIRMS observations into perimeter truth.
 - Big Cougar 2014: cumulative FIRMS precision 1.000 vs final extent, recall 0.776; initial
   active-state precision 1.000, recall 0.062.
 
-### Remaining Phase 4E Work
+### Completed Phase 4E Decision
 
-- [ ] Decide whether Phase 5 consumes daily FIRMS labels directly or a simulator-conditioned
-  arrival-time field derived from them.
+- [x] Phase 5A will consume daily FIRMS active-fire observation labels directly.
+- [x] Simulator-conditioned arrival-time fields are deferred until after direct FIRMS
+  observation-learning baselines exist.
+
+## Phase 5A: Next-Day FIRMS Active-Fire Samples 🔎
+
+**Status**: IN PROGRESS (2026-09-14)
+
+**Purpose**: Turn the validated FIRMS companion artifacts into leakage-safe supervised-learning
+samples for next-calendar-day active-fire probability modeling.
+
+### Completed Tasks
+
+- [x] Added `firms_next_day_active_fire_probability` sample dataset builder.
+- [x] Added `scripts/build_firms_next_day_samples.py`.
+- [x] Reindexed sparse FIRMS progression dates to a continuous daily calendar.
+- [x] Included real terrain, LANDFIRE fuel classes/proxies, ERA5 scalar weather, FIRMS initial state
+  and FIRMS history available at each reference day.
+- [x] Excluded final burned extent from sample artifacts as a model input.
+- [x] Added tests for continuous daily reindexing and no-leakage metadata.
+- [x] Generated sample artifacts under ignored `data/training/firms_next_day/`.
+- [x] Generated `reports/firms_next_day_samples.md`.
+
+### Result-Wise Sample Artifacts
+
+- Carlton Complex 2014: 28 samples on a 662x493 grid, 115,685 next-day positive target cells,
+  target positive fraction 0.01266.
+- King 2014: 23 samples on a 462x312 grid, 78,991 next-day positive target cells, target positive
+  fraction 0.02383.
+- Big Cougar 2014: 8 samples on a 349x239 grid, 24,455 next-day positive target cells, target
+  positive fraction 0.03665.
+
+All sample artifacts record `sample_type=firms_next_day_active_fire_probability`,
+`target_type=active_fire_detection_probability`, `excludes_final_extent_as_input=true`,
+`not_hourly_perimeter_truth=true` and
+`positive_unlabeled_semantics=zeros_are_no_positive_firms_evidence_not_confirmed_unburned`.
+
+### Remaining Phase 5A Work
+
+- [ ] Add next-day active-fire baselines: persistence, cumulative-history prior and fuel/terrain
+  prior.
+- [ ] Add evaluation metrics that respect positive-unlabeled target semantics.
+- [ ] Generate forecast artifacts suitable for a public FireTwin Explorer demo.
 
 ## Future Phases
 
-- **Phase 5**: Simulation corpus and surrogate
+- **Phase 5A**: Next-day FIRMS active-fire samples and baselines
+- **Phase 5B**: Simulation corpus and surrogate
 - **Phase 6**: Hybrid model
 - **Phase 7**: Assimilation and calibrated uncertainty
 - **Phase 8**: Simulated intervention planner
@@ -474,9 +516,10 @@ Phase 4A: ████████████████████ 100% ✅
 Phase 4B: ████████████████████ 100% ✅
 Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
-Phase 4E: ███████████████████░  95% 🔎
+Phase 4E: ████████████████████ 100% ✅
+Phase 5A: ████████░░░░░░░░░░░░  40% 🔎
 ...
-Overall: ████████████░░░░░░░░  60%
+Overall: █████████████░░░░░░░  65%
 ```
 
 ## Known Issues
@@ -492,8 +535,8 @@ Overall: ████████████░░░░░░░░  60%
 
 ## Blockers
 
-No credential blocker remains. Phase 4E now needs the Phase 5 input decision before
-simulator/surrogate modeling.
+No credential blocker remains. Phase 5A now needs leakage-safe baselines and positive-unlabeled
+evaluation before simulator/surrogate modeling.
 
 ## Notes
 

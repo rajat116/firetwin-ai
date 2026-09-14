@@ -257,5 +257,6 @@ The FireTwin project now has:
 **Status**: Phase 3 historical case building, Phase 4A terrain enrichment, Phase 4B LANDFIRE
 FBFM40 fuel-model enrichment, Phase 4C ERA5-Land weather enrichment and Phase 4D final-extent
 diagnostics are complete. Phase 4E now has daily-binned FIRMS progression label artifacts and
-FIRMS-derived initial-state artifacts with validation overlays. The remaining Phase 4E work is the
-Phase 5 input decision.
+FIRMS-derived initial-state artifacts with validation overlays. Phase 5A consumes those artifacts as
+next-day FIRMS active-fire sample datasets under `data/training/firms_next_day/`; simulator-derived
+arrival-time fields are deferred until direct observation-learning baselines exist.

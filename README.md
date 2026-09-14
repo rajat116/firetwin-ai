@@ -32,7 +32,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 4E In Progress - FIRMS Label and Initial-State Artifacts
+**Current Phase**: Phase 5A In Progress - Next-Day FIRMS Active-Fire Samples
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
@@ -42,7 +42,8 @@ This project answers **measurable research questions** about hybrid physics-ML f
 - ✅ **Phase 4B**: Real LANDFIRE LF2022 FBFM40 fuel-model enrichment
 - ✅ **Phase 4C**: ERA5-Land hourly weather enrichment
 - ✅ **Phase 4D**: Final-extent baseline diagnostics and forecast-label guardrails
-- 🔎 **Phase 4E**: FIRMS-backed progression labels and initial-state artifacts
+- ✅ **Phase 4E**: FIRMS-backed progression labels, initial-state artifacts and validation overlays
+- 🔎 **Phase 5A**: Leakage-safe next-day FIRMS active-fire sample artifacts
 
 Current pilot cases contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
 terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes, and real
@@ -56,7 +57,7 @@ the current 2014 pilots have only one perimeter timestamp each, so hourly perime
 unsupported. FIRMS historical detections are available for all three pilots and support irregular
 hotspot/progression targets after filtering. Daily-binned FIRMS label artifacts can now be built as
 companion Zarr products under `data/labels/`, with earliest-window initial-state estimates under
-`data/initial_states/`.
+`data/initial_states/` and Phase 5A next-day learning samples under `data/training/firms_next_day/`.
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -175,6 +176,12 @@ Validate FIRMS companion artifacts and generate overlay figures:
 python3 scripts/validate_firms_artifacts.py
 ```
 
+Build leakage-safe next-day FIRMS active-fire sample artifacts:
+
+```bash
+python3 scripts/build_firms_next_day_samples.py
+```
+
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
 ### Configuration
@@ -272,8 +279,9 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 4B**: Real LANDFIRE FBFM40 fuel-model covariates
 - [x] **Phase 4C**: Real ERA5-Land weather artifacts
 - [x] **Phase 4D**: Final-extent baseline diagnostics and guardrails
-- [ ] **Phase 4E**: FIRMS-backed progression labels and initial-state artifacts
-- [ ] **Phase 5**: Simulation corpus and surrogate
+- [x] **Phase 4E**: FIRMS-backed progression labels and initial-state artifacts
+- [ ] **Phase 5A**: Next-day FIRMS active-fire sample artifacts and baselines
+- [ ] **Phase 5B**: Simulation corpus and surrogate
 - [ ] **Phase 6**: Hybrid model
 - [ ] **Phase 7**: Assimilation and calibrated uncertainty
 - [ ] **Phase 8**: Simulated intervention planner
@@ -292,6 +300,7 @@ FireTwin is designed to answer measurable questions:
 - [FIRMS Label Artifact Report](reports/firms_label_artifacts.md)
 - [FIRMS Initial-State Artifact Report](reports/firms_initial_state_artifacts.md)
 - [FIRMS Artifact Validation Report](reports/firms_artifact_validation.md)
+- [FIRMS Next-Day Sample Report](reports/firms_next_day_samples.md)
 - [Product Specification](docs/PRODUCT_SPEC.md)
 - [UI/UX Specification](docs/UI_UX_SPEC.md)
 - [Demo Script](docs/DEMO_SCRIPT.md)
