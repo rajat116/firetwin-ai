@@ -11,6 +11,13 @@ from firetwin.evaluation.firms_artifacts import (
     validate_firms_artifacts,
     write_firms_overlay_figure,
 )
+from firetwin.evaluation.firms_next_day import (
+    FIRMSNextDayBaselineResult,
+    evaluate_firms_next_day_baselines,
+    evaluate_firms_next_day_prediction,
+    fuel_terrain_prior,
+    render_firms_next_day_baseline_report,
+)
 from firetwin.evaluation.metrics import (
     area_error,
     boundary_distance,
@@ -32,4 +39,9 @@ __all__ = [
     "validate_firms_artifacts",
     "write_firms_overlay_figure",
     "render_firms_artifact_validation_markdown",
+    "FIRMSNextDayBaselineResult",
+    "evaluate_firms_next_day_baselines",
+    "evaluate_firms_next_day_prediction",
+    "fuel_terrain_prior",
+    "render_firms_next_day_baseline_report",
 ]

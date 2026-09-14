@@ -473,6 +473,10 @@ samples for next-calendar-day active-fire probability modeling.
 - [x] Added tests for continuous daily reindexing and no-leakage metadata.
 - [x] Generated sample artifacts under ignored `data/training/firms_next_day/`.
 - [x] Generated `reports/firms_next_day_samples.md`.
+- [x] Added next-day active-fire baseline diagnostics: persistence, cumulative-history prior and
+  fuel/terrain prior.
+- [x] Added `scripts/evaluate_firms_next_day_baselines.py`.
+- [x] Generated `reports/firms_next_day_baselines.md`.
 
 ### Result-Wise Sample Artifacts
 
@@ -488,12 +492,27 @@ All sample artifacts record `sample_type=firms_next_day_active_fire_probability`
 `not_hourly_perimeter_truth=true` and
 `positive_unlabeled_semantics=zeros_are_no_positive_firms_evidence_not_confirmed_unburned`.
 
+### Result-Wise Baseline Diagnostics
+
+These are observation-label diagnostics for next-day FIRMS active-fire evidence, not perimeter
+forecast scores.
+
+- Carlton Complex 2014: persistence Brier 0.00362, precision 0.232, recall 0.151; cumulative
+  history Brier 0.04625; fuel/terrain prior Brier 0.10389.
+- King 2014: persistence Brier 0.00462, precision 0.488, recall 0.307; cumulative history Brier
+  0.05117; fuel/terrain prior Brier 0.16213.
+- Big Cougar 2014: persistence Brier 0.01033, precision 0.172, recall 0.108; cumulative history
+  Brier 0.03054; fuel/terrain prior Brier 0.08057.
+
+Interpretation: persistence is the strongest first baseline by observed Brier/MAE. Static
+fuel/terrain priors produce broad, high-recall maps but overpredict heavily, which confirms the
+need for learned spatiotemporal models rather than covariates-only maps.
+
 ### Remaining Phase 5A Work
 
-- [ ] Add next-day active-fire baselines: persistence, cumulative-history prior and fuel/terrain
-  prior.
 - [ ] Add evaluation metrics that respect positive-unlabeled target semantics.
 - [ ] Generate forecast artifacts suitable for a public FireTwin Explorer demo.
+- [ ] Train a first learned next-day active-fire model and compare it with persistence.
 
 ## Future Phases
 
@@ -517,7 +536,7 @@ Phase 4B: ████████████████████ 100% ✅
 Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
-Phase 5A: ████████░░░░░░░░░░░░  40% 🔎
+Phase 5A: ████████████░░░░░░░░  60% 🔎
 ...
 Overall: █████████████░░░░░░░  65%
 ```
@@ -535,8 +554,8 @@ Overall: █████████████░░░░░░░  65%
 
 ## Blockers
 
-No credential blocker remains. Phase 5A now needs leakage-safe baselines and positive-unlabeled
-evaluation before simulator/surrogate modeling.
+No credential blocker remains. Phase 5A now needs a first learned model and forecast artifacts
+before simulator/surrogate modeling.
 
 ## Notes
 

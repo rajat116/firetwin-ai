@@ -182,6 +182,12 @@ Build leakage-safe next-day FIRMS active-fire sample artifacts:
 python3 scripts/build_firms_next_day_samples.py
 ```
 
+Evaluate next-day FIRMS baseline diagnostics:
+
+```bash
+python3 scripts/evaluate_firms_next_day_baselines.py
+```
+
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
 ### Configuration
@@ -301,6 +307,7 @@ FireTwin is designed to answer measurable questions:
 - [FIRMS Initial-State Artifact Report](reports/firms_initial_state_artifacts.md)
 - [FIRMS Artifact Validation Report](reports/firms_artifact_validation.md)
 - [FIRMS Next-Day Sample Report](reports/firms_next_day_samples.md)
+- [FIRMS Next-Day Baseline Report](reports/firms_next_day_baselines.md)
 - [Product Specification](docs/PRODUCT_SPEC.md)
 - [UI/UX Specification](docs/UI_UX_SPEC.md)
 - [Demo Script](docs/DEMO_SCRIPT.md)

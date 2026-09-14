@@ -99,6 +99,11 @@ Current Phase 5A sample status: next-day FIRMS active-fire sample artifacts now 
 positive-unlabeled target semantics: target zeros mean no positive FIRMS evidence in that daily bin,
 not confirmed unburned.
 
+Current Phase 5A baseline status: persistence, cumulative-history and fuel/terrain-prior baselines
+now exist for next-day FIRMS observation labels. Brier/MAE are observation-label diagnostics, and
+threshold precision/recall/IoU are computed against positive FIRMS observations only. They must not
+be presented as perimeter accuracy.
+
 ## Probabilistic Metrics
 
 For probability forecasts:
