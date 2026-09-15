@@ -1,6 +1,6 @@
 # Demo Script
 
-**Last Updated**: 2026-09-03  
+**Last Updated**: 2026-09-15  
 **Version**: 0.1.0
 
 This document provides scripts for demonstrating FireTwin to different audiences.
@@ -57,6 +57,18 @@ This document provides scripts for demonstrating FireTwin to different audiences
 ✅ **Uncertainty quantification**: Not overconfident  
 ✅ **Reproducible**: Provenance tracked  
 ✅ **Interactive**: No notebooks, no terminal
+
+### Current Phase 5A Honest Demo
+
+Until the production web Explorer exists, use the committed FIRMS Explorer assets as the visual
+demo anchor:
+
+- Show `reports/firms_next_day_explorer_assets.md`.
+- Open the three `*_explorer_forecast_preview.png` figures under `reports/figures/`.
+- Explain that the left panel is learned next-day active-fire probability, the middle panel is the
+  calibrated display threshold and the right panel is next-day FIRMS observation evidence.
+- Say clearly that this is satellite active-fire evidence forecasting, not operational perimeter
+  prediction.
 
 ## Technical Demo (15 minutes)
 

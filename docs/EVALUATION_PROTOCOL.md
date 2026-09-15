@@ -1,7 +1,7 @@
 # FireTwin Evaluation Protocol
 
-**Last Updated**: 2026-09-14
-**Status**: Phase 5A next-day FIRMS active-fire observation learning
+**Last Updated**: 2026-09-15
+**Status**: Phase 5A next-day FIRMS active-fire observation learning and Explorer assets
 
 > Research prototype. Not for operational wildfire response, evacuation planning or safety-critical decision-making.
 
@@ -123,6 +123,11 @@ Current Phase 5A calibration status: forecast calibration and threshold diagnost
 `reports/figures/`. Expected calibration error is computed against observed FIRMS probability
 labels, not confirmed burned/unburned truth. Recommended thresholds are display diagnostics for
 the Explorer layer and must not be used as operational decision thresholds.
+
+Current Phase 5A Explorer asset status: lightweight preview PNGs and a browser-consumable manifest
+now exist in `reports/figures/` and `data/manifests/firms_next_day_explorer_manifest.json`. These
+assets are valid for demo visualization of FIRMS active-fire probability layers, but they inherit
+all positive-unlabeled and non-operational caveats from the learned forecast artifacts.
 
 ## Probabilistic Metrics
 

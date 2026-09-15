@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
-**Last Updated**: 2026-09-14
-**Current Phase**: Phase 5A ✅ - Next-Day FIRMS Active-Fire Learning
+**Last Updated**: 2026-09-15
+**Current Phase**: Phase 5A ✅ - Next-Day FIRMS Active-Fire Learning + Explorer Assets
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -490,6 +490,11 @@ samples for next-calendar-day active-fire probability modeling.
 - [x] Added `scripts/evaluate_firms_next_day_forecasts.py`.
 - [x] Generated reliability figures under `reports/figures/`.
 - [x] Generated `reports/firms_next_day_forecast_calibration.md`.
+- [x] Added Explorer-ready forecast asset export for future public UI layers.
+- [x] Added `scripts/export_firms_explorer_assets.py`.
+- [x] Generated preview PNGs under `reports/figures/`.
+- [x] Generated `data/manifests/firms_next_day_explorer_manifest.json`.
+- [x] Generated `reports/firms_next_day_explorer_assets.md`.
 
 ### Result-Wise Sample Artifacts
 
@@ -572,6 +577,23 @@ Interpretation: a public Explorer should expose probability plus a threshold/opa
 than hard-code one universal threshold. The default diagnostic thresholds are 0.05 for Carlton/King
 and 0.025 for Big Cougar.
 
+### Result-Wise Explorer Assets
+
+The Explorer export selects the sample with the largest learned forecast probability mass for each
+case and writes a compact preview PNG plus a JSON manifest that a future frontend can load without
+understanding Zarr internals.
+
+- Carlton Complex 2014: sample 4, reference 2014-07-18, target 2014-07-19, threshold 0.050,
+  peak probability 0.470, preview `reports/figures/carlton_complex_2014_explorer_forecast_preview.png`.
+- King 2014: sample 4, reference 2014-09-18, target 2014-09-19, threshold 0.050, peak probability
+  0.216, preview `reports/figures/king_2014_explorer_forecast_preview.png`.
+- Big Cougar 2014: sample 5, reference 2014-08-08, target 2014-08-09, threshold 0.025, peak
+  probability 0.753, preview `reports/figures/big_cougar_2014_explorer_forecast_preview.png`.
+
+Interpretation: the repository now has a browser-consumable manifest and visual preview assets for
+the learned FIRMS forecasts. The UI still needs to be built; these assets are the bridge from model
+artifact to public-facing Explorer.
+
 ### Phase 5A Exit Criteria
 
 - [x] Leakage-safe supervised samples exist.
@@ -580,11 +602,12 @@ and 0.025 for Big Cougar.
   fires.
 - [x] Forecast artifacts are packaged for future UI layers.
 - [x] Calibration and threshold diagnostics exist with reliability figures.
+- [x] Explorer-ready manifest and preview assets exist for the learned forecast layers.
 - [x] Guardrails distinguish FIRMS active-fire evidence from exact perimeter spread.
 
 ## Future Phases
 
-- **Phase 5A**: Next-day FIRMS active-fire samples, baselines and learned model
+- **Phase 5A**: Next-day FIRMS active-fire samples, baselines, learned model and Explorer assets
 - **Phase 5B**: Simulation corpus and surrogate
 - **Phase 6**: Hybrid model
 - **Phase 7**: Assimilation and calibrated uncertainty
@@ -622,9 +645,9 @@ Overall: ██████████████░░░░░░  70%
 
 ## Blockers
 
-No credential blocker remains. Phase 5A is complete. The next development decision is whether to
-start Phase 5B simulation-corpus/surrogate work or build an Explorer-facing slice around the
-forecast artifacts first.
+No credential blocker remains. Phase 5A plus the Explorer asset bridge are complete. The next
+development decision is whether to start Phase 5B simulation-corpus/surrogate work or build the
+first actual web Explorer around the committed manifest and preview assets.
 
 ## Notes
 

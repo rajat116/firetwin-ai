@@ -1,0 +1,117 @@
+{
+  "cases": [
+    {
+      "bbox": {
+        "bbox_max_x": 750587.6340603416,
+        "bbox_max_y": 5379305.177791166,
+        "bbox_min_x": 701287.6340603416,
+        "bbox_min_y": 5313105.177791166
+      },
+      "case_id": "carlton_complex_2014",
+      "case_name": "Carlton Complex (2014)",
+      "expected_calibration_error": 0.024617516286837917,
+      "forecast_artifact": "data/forecasts/firms_next_day/carlton_complex_2014_learned_forecast.zarr",
+      "forecast_semantics": "next_calendar_day_firms_active_fire_detection_probability",
+      "grid_crs": "EPSG:32610",
+      "grid_shape": {
+        "height": 662,
+        "width": 493
+      },
+      "observed_brier_score": 0.0027800672687590122,
+      "preview_png": "reports/figures/carlton_complex_2014_explorer_forecast_preview.png",
+      "recommended_f1_score": 0.21310998080090263,
+      "recommended_precision": 0.22494885561435693,
+      "recommended_recall": 0.20245494230021177,
+      "recommended_threshold": 0.05,
+      "reference_time": "2014-07-18T00:00:00",
+      "resolution_m": 100.0,
+      "sample_index": 4,
+      "sample_mean_probability": 0.03988495096564293,
+      "sample_peak_probability": 0.4701940715312958,
+      "sample_predicted_positive_fraction": 0.15376601729346806,
+      "sample_target_positive_fraction": 0.03273012507430308,
+      "selection_rule": "peak_forecast_probability_mass",
+      "target_time": "2014-07-19T00:00:00",
+      "target_type": "active_fire_detection_probability"
+    },
+    {
+      "bbox": {
+        "bbox_max_x": 728760.4471831399,
+        "bbox_max_y": 4337316.143296286,
+        "bbox_min_x": 697560.4471831399,
+        "bbox_min_y": 4291116.143296286
+      },
+      "case_id": "king_2014",
+      "case_name": "KING (2014)",
+      "expected_calibration_error": 0.0187062009570441,
+      "forecast_artifact": "data/forecasts/firms_next_day/king_2014_learned_forecast.zarr",
+      "forecast_semantics": "next_calendar_day_firms_active_fire_detection_probability",
+      "grid_crs": "EPSG:32610",
+      "grid_shape": {
+        "height": 462,
+        "width": 312
+      },
+      "observed_brier_score": 0.003820272861048579,
+      "preview_png": "reports/figures/king_2014_explorer_forecast_preview.png",
+      "recommended_f1_score": 0.37780064549324105,
+      "recommended_precision": 0.49167055576973806,
+      "recommended_recall": 0.30675646592649797,
+      "recommended_threshold": 0.05,
+      "reference_time": "2014-09-18T00:00:00",
+      "resolution_m": 100.0,
+      "sample_index": 4,
+      "sample_mean_probability": 0.0307448897510767,
+      "sample_peak_probability": 0.2158786803483963,
+      "sample_predicted_positive_fraction": 0.08093989343989344,
+      "sample_target_positive_fraction": 0.061500999000999,
+      "selection_rule": "peak_forecast_probability_mass",
+      "target_time": "2014-09-19T00:00:00",
+      "target_type": "active_fire_detection_probability"
+    },
+    {
+      "bbox": {
+        "bbox_max_x": 523748.18972711347,
+        "bbox_max_y": 5111342.1005140655,
+        "bbox_min_x": 499848.18972711347,
+        "bbox_min_y": 5076442.1005140655
+      },
+      "case_id": "big_cougar_2014",
+      "case_name": "Big Cougar (2014)",
+      "expected_calibration_error": 0.01018182583799572,
+      "forecast_artifact": "data/forecasts/firms_next_day/big_cougar_2014_learned_forecast.zarr",
+      "forecast_semantics": "next_calendar_day_firms_active_fire_detection_probability",
+      "grid_crs": "EPSG:32611",
+      "grid_shape": {
+        "height": 349,
+        "width": 239
+      },
+      "observed_brier_score": 0.00630650669336319,
+      "preview_png": "reports/figures/big_cougar_2014_explorer_forecast_preview.png",
+      "recommended_f1_score": 0.16903451814369883,
+      "recommended_precision": 0.148973991143267,
+      "recommended_recall": 0.19533837661010017,
+      "recommended_threshold": 0.025,
+      "reference_time": "2014-08-08T00:00:00",
+      "resolution_m": 100.0,
+      "sample_index": 5,
+      "sample_mean_probability": 0.026164235547184944,
+      "sample_peak_probability": 0.7528786659240723,
+      "sample_predicted_positive_fraction": 0.07170517078083226,
+      "sample_target_positive_fraction": 0.03004399899293858,
+      "selection_rule": "peak_forecast_probability_mass",
+      "target_time": "2014-08-09T00:00:00",
+      "target_type": "active_fire_detection_probability"
+    }
+  ],
+  "forecast_semantics": "next_calendar_day_firms_active_fire_detection_probability",
+  "generated_at": "2026-09-15T17:59:12Z",
+  "guardrails": [
+    "Research prototype; not for operational wildfire response, evacuation planning or safety-critical decisions.",
+    "Forecasts estimate satellite-visible FIRMS active-fire evidence, not exact burned perimeter spread.",
+    "Cells without FIRMS detections are no-positive-evidence cells, not confirmed unburned cells.",
+    "Recommended thresholds are display diagnostics, not emergency decision thresholds."
+  ],
+  "not_operational": true,
+  "schema_version": "firetwin.firms_next_day_explorer.v1",
+  "target_type": "active_fire_detection_probability"
+}
