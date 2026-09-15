@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FireTwin Explorer</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="case-rail" aria-label="Forecast cases">
+        <div class="brand-block">
+          <p class="eyebrow">FireTwin</p>
+          <h1>Forecast Explorer</h1>
+          <p class="status-pill">Active-fire evidence</p>
+        </div>
+        <nav id="caseList" class="case-list" aria-label="Available fires"></nav>
+        <section class="guardrail-panel" aria-labelledby="guardrailsTitle">
+          <h2 id="guardrailsTitle">Guardrails</h2>
+          <ul id="guardrailList"></ul>
+        </section>
+      </aside>
+
+      <section class="workspace" aria-live="polite">
+        <header class="workspace-header">
+          <div>
+            <p id="caseId" class="eyebrow">Loading manifest</p>
+            <h2 id="caseName">FireTwin Explorer</h2>
+          </div>
+          <div class="header-actions" aria-label="View controls">
+            <button id="zoomOut" class="icon-button" type="button" title="Zoom out">&minus;</button>
+            <button id="resetZoom" class="icon-button" type="button" title="Reset zoom">&#8634;</button>
+            <button id="zoomIn" class="icon-button" type="button" title="Zoom in">+</button>
+          </div>
+        </header>
+
+        <section class="metric-strip" aria-label="Forecast metrics">
+          <div class="metric">
+            <span>Peak probability</span>
+            <strong id="peakProbability">--</strong>
+          </div>
+          <div class="metric">
+            <span>Display threshold</span>
+            <strong id="threshold">--</strong>
+          </div>
+          <div class="metric">
+            <span>Brier score</span>
+            <strong id="brier">--</strong>
+          </div>
+          <div class="metric">
+            <span>Calibration error</span>
+            <strong id="ece">--</strong>
+          </div>
+        </section>
+
+        <section class="viewer-band" aria-label="Forecast preview">
+          <div id="imageFrame" class="image-frame">
+            <img id="previewImage" alt="" />
+          </div>
+        </section>
+
+        <section class="detail-grid" aria-label="Forecast details">
+          <article class="detail-block">
+            <h3>Forecast Window</h3>
+            <dl>
+              <div>
+                <dt>Reference</dt>
+                <dd id="referenceTime">--</dd>
+              </div>
+              <div>
+                <dt>Target</dt>
+                <dd id="targetTime">--</dd>
+              </div>
+              <div>
+                <dt>Sample</dt>
+                <dd id="sampleIndex">--</dd>
+              </div>
+            </dl>
+          </article>
+          <article class="detail-block">
+            <h3>Observed-Label Diagnostics</h3>
+            <dl>
+              <div>
+                <dt>Precision</dt>
+                <dd id="precision">--</dd>
+              </div>
+              <div>
+                <dt>Recall</dt>
+                <dd id="recall">--</dd>
+              </div>
+              <div>
+                <dt>F1</dt>
+                <dd id="f1">--</dd>
+              </div>
+            </dl>
+          </article>
+          <article class="detail-block">
+            <h3>Grid Provenance</h3>
+            <dl>
+              <div>
+                <dt>Grid</dt>
+                <dd id="gridShape">--</dd>
+              </div>
+              <div>
+                <dt>CRS</dt>
+                <dd id="gridCrs">--</dd>
+              </div>
+              <div>
+                <dt>Resolution</dt>
+                <dd id="resolution">--</dd>
+              </div>
+            </dl>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <div id="loadError" class="load-error" role="alert" hidden>
+      <strong>Explorer manifest unavailable.</strong>
+      <span>Serve the repository root and open <code>/frontend/</code>.</span>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -218,6 +218,16 @@ Export lightweight Explorer-ready preview assets and manifest:
 python3 scripts/export_firms_explorer_assets.py
 ```
 
+Serve the first local FireTwin Explorer UI:
+
+```bash
+python3 scripts/serve_explorer.py --host 127.0.0.1 --port 8000
+```
+
+Then open [`http://127.0.0.1:8000/frontend/`](http://127.0.0.1:8000/frontend/). The preview server
+is allowlisted so it serves the Explorer, manifest and preview figures without exposing `.env` or
+arbitrary repository files.
+
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
 ### Configuration

@@ -60,13 +60,14 @@ This document provides scripts for demonstrating FireTwin to different audiences
 
 ### Current Phase 5A Honest Demo
 
-Until the production web Explorer exists, use the committed FIRMS Explorer assets as the visual
-demo anchor:
+Until the production web Explorer is deployed, use the local FIRMS Explorer as the visual demo
+anchor:
 
-- Show `reports/firms_next_day_explorer_assets.md`.
-- Open the three `*_explorer_forecast_preview.png` figures under `reports/figures/`.
-- Explain that the left panel is learned next-day active-fire probability, the middle panel is the
-  calibrated display threshold and the right panel is next-day FIRMS observation evidence.
+- Run `python3 scripts/serve_explorer.py --host 127.0.0.1 --port 8000`.
+- Open `http://127.0.0.1:8000/frontend/`.
+- Switch between Carlton Complex, King and Big Cougar.
+- Explain that each preview shows learned next-day active-fire probability, the calibrated display
+  threshold and next-day FIRMS observation evidence.
 - Say clearly that this is satellite active-fire evidence forecasting, not operational perimeter
   prediction.
 

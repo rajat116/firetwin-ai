@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-15
-**Current Phase**: Phase 5A ✅ - Next-Day FIRMS Active-Fire Learning + Explorer Assets
+**Current Phase**: Phase 5A ✅ - Next-Day FIRMS Active-Fire Learning + Local Explorer
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -495,6 +495,9 @@ samples for next-calendar-day active-fire probability modeling.
 - [x] Generated preview PNGs under `reports/figures/`.
 - [x] Generated `data/manifests/firms_next_day_explorer_manifest.json`.
 - [x] Generated `reports/firms_next_day_explorer_assets.md`.
+- [x] Added first dependency-free local Explorer UI under `frontend/`.
+- [x] Added allowlisted local preview server at `scripts/serve_explorer.py`.
+- [x] Added static frontend and preview-server tests.
 
 ### Result-Wise Sample Artifacts
 
@@ -591,8 +594,22 @@ understanding Zarr internals.
   probability 0.753, preview `reports/figures/big_cougar_2014_explorer_forecast_preview.png`.
 
 Interpretation: the repository now has a browser-consumable manifest and visual preview assets for
-the learned FIRMS forecasts. The UI still needs to be built; these assets are the bridge from model
-artifact to public-facing Explorer.
+the learned FIRMS forecasts. These assets are the bridge from model artifact to the local Explorer
+and eventual public deployment.
+
+### Local Explorer Preview
+
+The first local Explorer UI now renders the committed FIRMS forecast manifest and preview figures.
+It provides case switching, zoom controls, observed-label diagnostics, grid provenance and the
+non-operational guardrails. Run it with:
+
+```bash
+python3 scripts/serve_explorer.py --host 127.0.0.1 --port 8000
+```
+
+Then open `http://127.0.0.1:8000/frontend/`. The preview server is allowlisted to serve only
+`frontend/`, `data/manifests/firms_next_day_explorer_manifest.json` and the Explorer preview PNGs,
+so local secrets such as `.env` are not exposed.
 
 ### Phase 5A Exit Criteria
 
@@ -603,6 +620,7 @@ artifact to public-facing Explorer.
 - [x] Forecast artifacts are packaged for future UI layers.
 - [x] Calibration and threshold diagnostics exist with reliability figures.
 - [x] Explorer-ready manifest and preview assets exist for the learned forecast layers.
+- [x] A local Explorer UI can render the committed manifest and figures.
 - [x] Guardrails distinguish FIRMS active-fire evidence from exact perimeter spread.
 
 ## Future Phases
@@ -645,9 +663,9 @@ Overall: ██████████████░░░░░░  70%
 
 ## Blockers
 
-No credential blocker remains. Phase 5A plus the Explorer asset bridge are complete. The next
-development decision is whether to start Phase 5B simulation-corpus/surrogate work or build the
-first actual web Explorer around the committed manifest and preview assets.
+No credential blocker remains. Phase 5A plus the first local Explorer are complete. The next
+development decision is whether to deploy/polish the public Explorer or start Phase 5B
+simulation-corpus/surrogate work.
 
 ## Notes
 
