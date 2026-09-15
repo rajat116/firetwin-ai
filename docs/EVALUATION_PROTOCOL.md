@@ -106,9 +106,10 @@ be presented as perimeter accuracy.
 
 Current Phase 5A learned-model status: a calibrated observed-label logistic model now exists for
 next-day FIRMS active-fire probability. In leave-one-fire-out validation it beats persistence on
-Brier score for all three pilot fires, but thresholded recall is conservative. It should be reported
-as active-fire observation forecasting, not as exact burned-area spread or operational perimeter
-prediction.
+Brier score for all three pilot fires. Its current report uses a 0.05 rare-event diagnostic
+threshold; public-demo thresholds should be selected separately from probability calibration. It
+should be reported as active-fire observation forecasting, not as exact burned-area spread or
+operational perimeter prediction.
 
 ## Probabilistic Metrics
 

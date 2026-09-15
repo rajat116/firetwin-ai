@@ -8,9 +8,6 @@ from typing import Any
 
 import numpy as np
 import xarray as xr
-from sklearn.linear_model import SGDClassifier
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
 
 from firetwin.evaluation.firms_next_day import (
     evaluate_firms_next_day_prediction,
@@ -61,6 +58,25 @@ class FIRMSLearnedModelResult:
     def to_dict(self) -> dict[str, Any]:
         """Return a serializable result."""
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class ObservedLabelLogisticModel:
+    """Small NumPy logistic model for CI-stable observed-label probability forecasts."""
+
+    feature_mean: np.ndarray
+    feature_scale: np.ndarray
+    weights: np.ndarray
+    bias: float
+
+    def predict_proba(self, features: np.ndarray) -> np.ndarray:
+        """Return two-column no-evidence/positive-evidence probabilities."""
+        standardized = (features.astype(np.float32) - self.feature_mean) / self.feature_scale
+        logits = np.clip(standardized @ self.weights + self.bias, -50.0, 50.0)
+        positive_probability = 1.0 / (1.0 + np.exp(-logits))
+        return np.column_stack([1.0 - positive_probability, positive_probability]).astype(
+            np.float32
+        )
 
 
 def _flat_sample_yx(
@@ -144,7 +160,7 @@ def train_observed_label_logistic_model(
     random_seed: int = 42,
     max_positive_cells_per_case: int = 20_000,
     negative_ratio: int = 50,
-) -> Pipeline:
+) -> ObservedLabelLogisticModel:
     """Train a simple observed-label logistic model from next-day FIRMS samples."""
     if not training_paths:
         raise ValueError("At least one training path is required")
@@ -167,30 +183,45 @@ def train_observed_label_logistic_model(
             ds.close()
 
     x_train = np.vstack(features)
-    y_train = np.concatenate(targets)
+    y_train = np.concatenate(targets).astype(np.float32)
 
-    model = Pipeline(
-        [
-            ("scaler", StandardScaler()),
-            (
-                "classifier",
-                SGDClassifier(
-                    loss="log_loss",
-                    penalty="l2",
-                    alpha=1e-4,
-                    max_iter=1000,
-                    tol=1e-3,
-                    random_state=random_seed,
-                ),
-            ),
-        ]
+    feature_mean = x_train.mean(axis=0).astype(np.float32)
+    feature_scale = x_train.std(axis=0).astype(np.float32)
+    feature_scale = np.where(feature_scale < 1e-6, 1.0, feature_scale).astype(np.float32)
+    x_train = ((x_train - feature_mean) / feature_scale).astype(np.float32)
+
+    weights = np.zeros(x_train.shape[1], dtype=np.float32)
+    positive_fraction = float(np.clip(y_train.mean(), 1e-6, 1.0 - 1e-6))
+    bias = float(np.log(positive_fraction / (1.0 - positive_fraction)))
+    l2_penalty = 1e-4
+    learning_rate = 0.05
+    batch_size = 65_536
+
+    for epoch in range(8):
+        order = rng.permutation(y_train.size)
+        epoch_rate = learning_rate / np.sqrt(epoch + 1.0)
+        for start in range(0, y_train.size, batch_size):
+            batch_indices = order[start : start + batch_size]
+            batch_x = x_train[batch_indices]
+            batch_y = y_train[batch_indices]
+            logits = np.clip(batch_x @ weights + bias, -50.0, 50.0)
+            probabilities = 1.0 / (1.0 + np.exp(-logits))
+            error = probabilities - batch_y
+            gradient = batch_x.T @ error / batch_y.size + l2_penalty * weights
+            bias_gradient = float(error.mean())
+            weights -= epoch_rate * gradient.astype(np.float32)
+            bias -= epoch_rate * bias_gradient
+
+    return ObservedLabelLogisticModel(
+        feature_mean=feature_mean,
+        feature_scale=feature_scale,
+        weights=weights,
+        bias=bias,
     )
-    model.fit(x_train, y_train)
-    return model
 
 
 def predict_observed_label_probability(
-    model: Pipeline,
+    model: ObservedLabelLogisticModel,
     ds: xr.Dataset,
     batch_size: int = 250_000,
 ) -> np.ndarray:
@@ -208,7 +239,7 @@ def predict_observed_label_probability(
 
 def evaluate_learned_model_leave_one_fire_out(
     sample_paths: list[Path],
-    threshold: float = 0.30,
+    threshold: float = 0.05,
     random_seed: int = 42,
 ) -> list[FIRMSLearnedModelResult]:
     """Evaluate the learned model with leave-one-fire-out validation."""
@@ -283,6 +314,9 @@ def render_learned_model_report(results: list[FIRMSLearnedModelResult]) -> str:
         "",
         "This report evaluates a simple observed-label logistic model with leave-one-fire-out validation.",
         "It predicts next-day FIRMS positive-observation evidence, not perimeter spread.",
+        f"Thresholded metrics use probability threshold {results[0].threshold:.2f}."
+        if results
+        else "Thresholded metrics use the configured model probability threshold.",
         "",
         "| Holdout case | Training cases | Brier | Persistence Brier | Brier improvement | MAE | Precision | Recall | IoU | Predicted + frac | Target + frac |",
         "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",

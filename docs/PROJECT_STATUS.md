@@ -519,16 +519,18 @@ The first learned model is a calibrated observed-label logistic model trained on
 weather, FIRMS initial-state, current-day FIRMS and cumulative-history features. It is evaluated
 with leave-one-fire-out validation and does not use final burned extent as an input.
 
-- Carlton Complex 2014 holdout: learned Brier 0.00279 vs persistence Brier 0.00362, improvement
-  +0.00083; precision 0.277, recall 0.049.
-- King 2014 holdout: learned Brier 0.00345 vs persistence Brier 0.00462, improvement +0.00116;
-  precision 0.551, recall 0.026.
-- Big Cougar 2014 holdout: learned Brier 0.01023 vs persistence Brier 0.01033, improvement
-  +0.00010; precision 0.167, recall 0.075.
+- Carlton Complex 2014 holdout: learned Brier 0.00278 vs persistence Brier 0.00362, improvement
+  +0.00084; precision 0.225, recall 0.202 at threshold 0.05.
+- King 2014 holdout: learned Brier 0.00382 vs persistence Brier 0.00462, improvement +0.00080;
+  precision 0.492, recall 0.307 at threshold 0.05.
+- Big Cougar 2014 holdout: learned Brier 0.00631 vs persistence Brier 0.01033, improvement
+  +0.00402; precision 0.168, recall 0.144 at threshold 0.05.
 
 Interpretation: the calibrated learned model now beats persistence on probabilistic Brier score
-for every held-out pilot fire, but thresholded recall remains conservative. This is a credible first
-forecasting baseline, not yet a public-facing spread visualization product.
+for every held-out pilot fire. The 0.05 diagnostic threshold gives predicted positive fractions in
+the same range as observed FIRMS target fractions, but demo-facing thresholds still need separate
+tuning. This is a credible first forecasting baseline, not yet a public-facing spread visualization
+product.
 
 ### Remaining Phase 5A Work
 
