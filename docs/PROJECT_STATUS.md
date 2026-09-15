@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-14
-**Current Phase**: Phase 5A 🔎 - Next-Day FIRMS Active-Fire Learning
+**Current Phase**: Phase 5A ✅ - Next-Day FIRMS Active-Fire Learning
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -455,9 +455,9 @@ They do not turn FIRMS observations into perimeter truth.
 - [x] Simulator-conditioned arrival-time fields are deferred until after direct FIRMS
   observation-learning baselines exist.
 
-## Phase 5A: Next-Day FIRMS Active-Fire Learning 🔎
+## Phase 5A: Next-Day FIRMS Active-Fire Learning ✅
 
-**Status**: IN PROGRESS (2026-09-14)
+**Status**: COMPLETE (2026-09-15)
 
 **Purpose**: Turn the validated FIRMS companion artifacts into leakage-safe supervised-learning
 samples for next-calendar-day active-fire probability modeling.
@@ -486,6 +486,10 @@ samples for next-calendar-day active-fire probability modeling.
 - [x] Added `scripts/build_firms_next_day_forecasts.py`.
 - [x] Generated local forecast artifacts under ignored `data/forecasts/firms_next_day/`.
 - [x] Generated `reports/firms_next_day_forecasts.md`.
+- [x] Added forecast calibration, reliability-bin and threshold-sweep diagnostics.
+- [x] Added `scripts/evaluate_firms_next_day_forecasts.py`.
+- [x] Generated reliability figures under `reports/figures/`.
+- [x] Generated `reports/firms_next_day_forecast_calibration.md`.
 
 ### Result-Wise Sample Artifacts
 
@@ -553,10 +557,30 @@ future UI layers.
 Interpretation: Phase 5A now has UI-ready probability layers that are still scientifically scoped as
 satellite-visible active-fire evidence, not operational perimeter spread.
 
-### Remaining Phase 5A Work
+### Result-Wise Calibration and Threshold Diagnostics
 
-- [ ] Tune/choose public-demo thresholds separately from probability calibration.
-- [ ] Add calibration and reliability diagnostics for positive-unlabeled observation labels.
+Calibration diagnostics are computed against FIRMS observed-label probability targets. Recommended
+thresholds are diagnostic display thresholds, not operational decision thresholds.
+
+- Carlton Complex 2014: ECE 0.02462, recommended threshold 0.050, F1 0.213, precision 0.225,
+  recall 0.202.
+- King 2014: ECE 0.01871, recommended threshold 0.050, F1 0.378, precision 0.492, recall 0.307.
+- Big Cougar 2014: ECE 0.01018, recommended threshold 0.025, F1 0.169, precision 0.149,
+  recall 0.195.
+
+Interpretation: a public Explorer should expose probability plus a threshold/opacity control rather
+than hard-code one universal threshold. The default diagnostic thresholds are 0.05 for Carlton/King
+and 0.025 for Big Cougar.
+
+### Phase 5A Exit Criteria
+
+- [x] Leakage-safe supervised samples exist.
+- [x] Baselines exist and persistence is explicitly reported.
+- [x] A learned forecast model beats persistence by observed-label Brier score on all held-out pilot
+  fires.
+- [x] Forecast artifacts are packaged for future UI layers.
+- [x] Calibration and threshold diagnostics exist with reliability figures.
+- [x] Guardrails distinguish FIRMS active-fire evidence from exact perimeter spread.
 
 ## Future Phases
 
@@ -580,9 +604,9 @@ Phase 4B: ████████████████████ 100% ✅
 Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
-Phase 5A: █████████████████░░░  85% 🔎
+Phase 5A: ████████████████████ 100% ✅
 ...
-Overall: █████████████░░░░░░░  65%
+Overall: ██████████████░░░░░░  70%
 ```
 
 ## Known Issues
@@ -598,8 +622,9 @@ Overall: █████████████░░░░░░░  65%
 
 ## Blockers
 
-No credential blocker remains. Phase 5A now needs calibration plots and demo-oriented threshold
-selection before simulator/surrogate modeling.
+No credential blocker remains. Phase 5A is complete. The next development decision is whether to
+start Phase 5B simulation-corpus/surrogate work or build an Explorer-facing slice around the
+forecast artifacts first.
 
 ## Notes
 

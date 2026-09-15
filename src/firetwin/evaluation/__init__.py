@@ -11,6 +11,14 @@ from firetwin.evaluation.firms_artifacts import (
     validate_firms_artifacts,
     write_firms_overlay_figure,
 )
+from firetwin.evaluation.firms_forecasts import (
+    ForecastArtifactDiagnostics,
+    ForecastCalibrationDiagnostic,
+    ForecastReliabilityBin,
+    ForecastThresholdDiagnostic,
+    evaluate_forecast_artifact,
+    render_forecast_calibration_report,
+)
 from firetwin.evaluation.firms_next_day import (
     FIRMSNextDayBaselineResult,
     evaluate_firms_next_day_baselines,
@@ -39,6 +47,12 @@ __all__ = [
     "validate_firms_artifacts",
     "write_firms_overlay_figure",
     "render_firms_artifact_validation_markdown",
+    "ForecastArtifactDiagnostics",
+    "ForecastCalibrationDiagnostic",
+    "ForecastReliabilityBin",
+    "ForecastThresholdDiagnostic",
+    "evaluate_forecast_artifact",
+    "render_forecast_calibration_report",
     "FIRMSNextDayBaselineResult",
     "evaluate_firms_next_day_baselines",
     "evaluate_firms_next_day_prediction",

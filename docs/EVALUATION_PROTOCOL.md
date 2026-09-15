@@ -118,6 +118,12 @@ targets for diagnostics. The held-out fire is not used to train its own forecast
 extent is excluded as an input, and the artifacts must be presented as satellite-visible active-fire
 evidence forecasts rather than perimeter spread truth.
 
+Current Phase 5A calibration status: forecast calibration and threshold diagnostics now exist in
+`reports/firms_next_day_forecast_calibration.md`, with reliability figures under
+`reports/figures/`. Expected calibration error is computed against observed FIRMS probability
+labels, not confirmed burned/unburned truth. Recommended thresholds are display diagnostics for
+the Explorer layer and must not be used as operational decision thresholds.
+
 ## Probabilistic Metrics
 
 For probability forecasts:
