@@ -197,6 +197,12 @@ Train and evaluate the first learned next-day FIRMS active-fire model:
 python3 scripts/train_firms_next_day_model.py
 ```
 
+Build leave-one-fire-out learned forecast artifacts for future Explorer layers:
+
+```bash
+python3 scripts/build_firms_next_day_forecasts.py
+```
+
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
 ### Configuration
@@ -318,6 +324,7 @@ FireTwin is designed to answer measurable questions:
 - [FIRMS Next-Day Sample Report](reports/firms_next_day_samples.md)
 - [FIRMS Next-Day Baseline Report](reports/firms_next_day_baselines.md)
 - [FIRMS Next-Day Learned Model Report](reports/firms_next_day_learned_model.md)
+- [FIRMS Next-Day Learned Forecast Artifact Report](reports/firms_next_day_forecasts.md)
 - [Product Specification](docs/PRODUCT_SPEC.md)
 - [UI/UX Specification](docs/UI_UX_SPEC.md)
 - [Demo Script](docs/DEMO_SCRIPT.md)

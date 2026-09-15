@@ -111,6 +111,13 @@ threshold; public-demo thresholds should be selected separately from probability
 should be reported as active-fire observation forecasting, not as exact burned-area spread or
 operational perimeter prediction.
 
+Current Phase 5A forecast-artifact status: leave-one-fire-out learned forecast artifacts now exist
+under `data/forecasts/firms_next_day/`. Each artifact contains learned `forecast_probability`,
+thresholded `forecast_positive_mask`, reference-day FIRMS context and next-day FIRMS observation
+targets for diagnostics. The held-out fire is not used to train its own forecast, final burned
+extent is excluded as an input, and the artifacts must be presented as satellite-visible active-fire
+evidence forecasts rather than perimeter spread truth.
+
 ## Probabilistic Metrics
 
 For probability forecasts:

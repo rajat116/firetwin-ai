@@ -482,6 +482,10 @@ samples for next-calendar-day active-fire probability modeling.
 - [x] Added leave-one-fire-out learned-model evaluation against persistence.
 - [x] Added `scripts/train_firms_next_day_model.py`.
 - [x] Generated `reports/firms_next_day_learned_model.md`.
+- [x] Added leave-one-fire-out learned forecast artifact packaging for future Explorer/demo layers.
+- [x] Added `scripts/build_firms_next_day_forecasts.py`.
+- [x] Generated local forecast artifacts under ignored `data/forecasts/firms_next_day/`.
+- [x] Generated `reports/firms_next_day_forecasts.md`.
 
 ### Result-Wise Sample Artifacts
 
@@ -532,9 +536,25 @@ the same range as observed FIRMS target fractions, but demo-facing thresholds st
 tuning. This is a credible first forecasting baseline, not yet a public-facing spread visualization
 product.
 
+### Result-Wise Forecast Artifacts
+
+Generated artifacts are leave-one-fire-out learned forecasts, so each pilot fire is predicted by a
+model trained on the other two pilot fires. They include `forecast_probability`,
+`forecast_positive_mask`, target FIRMS observation evidence and reference-day FIRMS context for
+future UI layers.
+
+- Carlton Complex 2014: learned forecast Brier 0.00278 vs persistence Brier 0.00362, improvement
+  +0.00084; forecast artifact `data/forecasts/firms_next_day/carlton_complex_2014_learned_forecast.zarr`.
+- King 2014: learned forecast Brier 0.00382 vs persistence Brier 0.00462, improvement +0.00080;
+  forecast artifact `data/forecasts/firms_next_day/king_2014_learned_forecast.zarr`.
+- Big Cougar 2014: learned forecast Brier 0.00631 vs persistence Brier 0.01033, improvement
+  +0.00402; forecast artifact `data/forecasts/firms_next_day/big_cougar_2014_learned_forecast.zarr`.
+
+Interpretation: Phase 5A now has UI-ready probability layers that are still scientifically scoped as
+satellite-visible active-fire evidence, not operational perimeter spread.
+
 ### Remaining Phase 5A Work
 
-- [ ] Generate forecast artifacts suitable for a public FireTwin Explorer demo.
 - [ ] Tune/choose public-demo thresholds separately from probability calibration.
 - [ ] Add calibration and reliability diagnostics for positive-unlabeled observation labels.
 
@@ -560,7 +580,7 @@ Phase 4B: ████████████████████ 100% ✅
 Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
-Phase 5A: ███████████████░░░░░  75% 🔎
+Phase 5A: █████████████████░░░  85% 🔎
 ...
 Overall: █████████████░░░░░░░  65%
 ```
@@ -578,8 +598,8 @@ Overall: █████████████░░░░░░░  65%
 
 ## Blockers
 
-No credential blocker remains. Phase 5A now needs forecast artifact packaging, calibration plots and
-demo-oriented threshold selection before simulator/surrogate modeling.
+No credential blocker remains. Phase 5A now needs calibration plots and demo-oriented threshold
+selection before simulator/surrogate modeling.
 
 ## Notes
 

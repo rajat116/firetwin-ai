@@ -7,8 +7,10 @@ import pandas as pd
 import xarray as xr
 
 from firetwin.models.firms_next_day import (
+    build_leave_one_fire_out_forecast_artifacts,
     evaluate_learned_model_leave_one_fire_out,
     feature_matrix_for_indices,
+    render_forecast_artifact_report,
     render_learned_model_report,
     sample_training_indices,
     train_observed_label_logistic_model,
@@ -62,6 +64,7 @@ def write_model_sample(path: Path, case_id: str, positive_corner: tuple[int, int
             "sample": np.arange(sample_count),
             "reference_time": (["sample"], pd.to_datetime(["2014-01-01", "2014-01-02"])),
             "target_time": (["sample"], pd.to_datetime(["2014-01-02", "2014-01-03"])),
+            "lead_time_hours": (["sample"], np.full(sample_count, 24.0, dtype=np.float32)),
             "y": np.arange(shape[0]),
             "x": np.arange(shape[1]),
         },
@@ -69,6 +72,12 @@ def write_model_sample(path: Path, case_id: str, positive_corner: tuple[int, int
             "case_id": case_id,
             "sample_type": "firms_next_day_active_fire_probability",
             "excludes_final_extent_as_input": "true",
+            "grid_crs": "EPSG:32610",
+            "resolution_m": 100.0,
+            "bbox_min_x": 0.0,
+            "bbox_min_y": 0.0,
+            "bbox_max_x": 300.0,
+            "bbox_max_y": 300.0,
         },
     )
     ds.to_zarr(path, mode="w")
@@ -121,3 +130,43 @@ def test_train_and_evaluate_leave_one_fire_out(tmp_path: Path) -> None:
     assert len(results) == 3
     assert all(result.model_name == "observed_label_logistic_sgd" for result in results)
     assert "leave-one-fire-out" in report
+
+
+def test_build_leave_one_fire_out_forecast_artifacts(tmp_path: Path) -> None:
+    """Forecast artifacts should package learned predictions with no-leakage metadata."""
+    paths = []
+    for case_id, corner in [
+        ("case_a", (0, 0)),
+        ("case_b", (1, 1)),
+        ("case_c", (2, 2)),
+    ]:
+        path = tmp_path / f"{case_id}_samples.zarr"
+        write_model_sample(path, case_id, corner)
+        paths.append(path)
+
+    output_dir = tmp_path / "forecasts"
+    summaries = build_leave_one_fire_out_forecast_artifacts(
+        paths,
+        output_dir,
+        threshold=0.05,
+        random_seed=9,
+    )
+    report = render_forecast_artifact_report(summaries)
+
+    assert len(summaries) == 3
+    assert "leave-one-fire-out" in report
+
+    forecast_path = output_dir / "case_a_learned_forecast.zarr"
+    ds = xr.open_zarr(forecast_path)
+    try:
+        assert (
+            ds.attrs["forecast_type"] == "leave_one_fire_out_next_day_firms_active_fire_probability"
+        )
+        assert ds.attrs["excludes_final_extent_as_input"] == "true"
+        assert ds.attrs["not_hourly_perimeter_truth"] == "true"
+        assert {"forecast_probability", "forecast_positive_mask"}.issubset(ds.data_vars)
+        assert ds["forecast_probability"].shape == (2, 3, 3)
+        assert float(ds["forecast_probability"].min()) >= 0.0
+        assert float(ds["forecast_probability"].max()) <= 1.0
+    finally:
+        ds.close()
