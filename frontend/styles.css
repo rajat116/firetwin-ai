@@ -241,6 +241,48 @@ h3 {
   overflow-wrap: anywhere;
 }
 
+.insight-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.insight-block {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgb(24 29 27 / 82%);
+}
+
+.insight-block p {
+  min-height: 42px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.bar-track {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(244 240 232 / 11%);
+}
+
+.bar-track span {
+  display: block;
+  width: 2%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent), var(--good));
+  transition: width 180ms ease;
+}
+
 .viewer-band {
   min-height: 0;
   border: 1px solid var(--line);
@@ -342,6 +384,7 @@ code {
 
   .case-list,
   .metric-strip,
+  .insight-strip,
   .detail-grid {
     grid-template-columns: 1fr;
   }

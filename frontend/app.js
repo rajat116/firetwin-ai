@@ -16,6 +16,12 @@
     threshold: document.getElementById("threshold"),
     brier: document.getElementById("brier"),
     ece: document.getElementById("ece"),
+    forecastFootprint: document.getElementById("forecastFootprint"),
+    observedEvidence: document.getElementById("observedEvidence"),
+    evidenceBalance: document.getElementById("evidenceBalance"),
+    forecastFootprintBar: document.getElementById("forecastFootprintBar"),
+    observedEvidenceBar: document.getElementById("observedEvidenceBar"),
+    evidenceBalanceBar: document.getElementById("evidenceBalanceBar"),
     previewImage: document.getElementById("previewImage"),
     referenceTime: document.getElementById("referenceTime"),
     targetTime: document.getElementById("targetTime"),
@@ -63,6 +69,27 @@
     els.previewImage.style.transform = `scale(${state.zoom})`;
   }
 
+  function setBar(bar, value, scale = 0.2) {
+    const width = Math.min(100, Math.max(2, (Number(value) / scale) * 100));
+    bar.style.width = `${width.toFixed(1)}%`;
+  }
+
+  function evidenceBalanceLabel(caseData) {
+    const predicted = Number(caseData.sample_predicted_positive_fraction);
+    const observed = Number(caseData.sample_target_positive_fraction);
+    if (observed <= 0) {
+      return "No next-day FIRMS positives in this selected sample.";
+    }
+    const ratio = predicted / observed;
+    if (ratio >= 1.5) {
+      return `${ratio.toFixed(1)}x broader forecast footprint than observed evidence.`;
+    }
+    if (ratio <= 0.67) {
+      return `${ratio.toFixed(1)}x narrower forecast footprint than observed evidence.`;
+    }
+    return `${ratio.toFixed(1)}x forecast-to-observed footprint balance.`;
+  }
+
   function renderCaseButtons() {
     els.caseList.replaceChildren();
     state.manifest.cases.forEach((caseData, index) => {
@@ -107,6 +134,22 @@
     els.threshold.textContent = decimal(caseData.recommended_threshold, 3);
     els.brier.textContent = decimal(caseData.observed_brier_score, 5);
     els.ece.textContent = decimal(caseData.expected_calibration_error, 5);
+    els.forecastFootprint.textContent = `${percent(
+      caseData.sample_predicted_positive_fraction
+    )} of grid cells exceed the display threshold.`;
+    els.observedEvidence.textContent = `${percent(
+      caseData.sample_target_positive_fraction
+    )} of grid cells contain next-day FIRMS evidence.`;
+    els.evidenceBalance.textContent = evidenceBalanceLabel(caseData);
+    setBar(els.forecastFootprintBar, caseData.sample_predicted_positive_fraction);
+    setBar(els.observedEvidenceBar, caseData.sample_target_positive_fraction);
+    setBar(
+      els.evidenceBalanceBar,
+      Math.min(
+        Number(caseData.sample_predicted_positive_fraction),
+        Number(caseData.sample_target_positive_fraction)
+      )
+    );
     els.previewImage.src = assetUrl(caseData.preview_png);
     els.previewImage.alt = `${caseData.case_name} learned forecast preview`;
     els.referenceTime.textContent = dateLabel(caseData.reference_time);
