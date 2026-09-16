@@ -37,15 +37,27 @@ def test_resolve_explorer_request_rejects_secrets_and_unrelated_reports() -> Non
     assert resolve_explorer_request("/reports/firms_next_day_explorer_assets.md") is None
 
 
-def test_resolve_explorer_request_limits_figures_to_explorer_previews() -> None:
-    """Only preview PNGs needed by the Explorer should be served."""
+def test_resolve_explorer_request_limits_figures_to_explorer_assets() -> None:
+    """Only figure PNGs needed by the Explorer should be served."""
     allowed = resolve_explorer_request(
         "/reports/figures/carlton_complex_2014_explorer_forecast_preview.png"
+    )
+    forecast_overlay = resolve_explorer_request(
+        "/reports/figures/carlton_complex_2014_globe_forecast_overlay.png"
+    )
+    observed_overlay = resolve_explorer_request(
+        "/reports/figures/carlton_complex_2014_globe_observed_overlay.png"
     )
     blocked = resolve_explorer_request("/reports/figures/carlton_complex_2014_firms_overlay.png")
 
     assert allowed == Path(
         serve_explorer.REPO_ROOT
         / "reports/figures/carlton_complex_2014_explorer_forecast_preview.png"
+    )
+    assert forecast_overlay == Path(
+        serve_explorer.REPO_ROOT / "reports/figures/carlton_complex_2014_globe_forecast_overlay.png"
+    )
+    assert observed_overlay == Path(
+        serve_explorer.REPO_ROOT / "reports/figures/carlton_complex_2014_globe_observed_overlay.png"
     )
     assert blocked is None

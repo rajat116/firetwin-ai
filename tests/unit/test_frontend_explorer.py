@@ -28,10 +28,15 @@ def test_frontend_references_committed_explorer_assets() -> None:
     assert "persistence_brier_score" in app_js
     assert "Cesium.js" in globe_html
     assert "globeCaseList" in globe_html
+    assert "forecastLayerToggle" in globe_html
+    assert "overlayOpacity" in globe_html
     assert "zoomIn" in globe_html
     assert "zoomOut" in globe_html
     assert "World_Imagery" in globe_js
     assert "UrlTemplateImageryProvider" in globe_js
+    assert "ImageMaterialProperty" in globe_js
+    assert "forecast_overlay_png" in globe_js
+    assert "observed_overlay_png" in globe_js
     assert "wgs84_bbox" in globe_js
     assert "center_lon_lat" in globe_js
     assert manifest["cases"]
@@ -40,6 +45,8 @@ def test_frontend_references_committed_explorer_assets() -> None:
         assert -180 <= case["center_lon_lat"]["lon"] <= 180
         assert -90 <= case["center_lon_lat"]["lat"] <= 90
         assert (REPO_ROOT / case["preview_png"]).exists()
+        assert (REPO_ROOT / case["forecast_overlay_png"]).exists()
+        assert (REPO_ROOT / case["observed_overlay_png"]).exists()
 
 
 def test_frontend_avoids_placeholder_copy() -> None:

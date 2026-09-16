@@ -6,6 +6,9 @@
     viewer: null,
     selectedIndex: 0,
     entities: [],
+    forecastVisible: true,
+    observedVisible: true,
+    overlayOpacity: 0.78,
   };
 
   const els = {
@@ -19,6 +22,9 @@
     zoomOut: document.getElementById("zoomOut"),
     tiltView: document.getElementById("tiltView"),
     northUp: document.getElementById("northUp"),
+    forecastLayerToggle: document.getElementById("forecastLayerToggle"),
+    observedLayerToggle: document.getElementById("observedLayerToggle"),
+    overlayOpacity: document.getElementById("overlayOpacity"),
     flyHome: document.getElementById("flyHome"),
     openExplorer: document.getElementById("openExplorer"),
     error: document.getElementById("globeError"),
@@ -112,7 +118,49 @@
       const bbox = caseData.wgs84_bbox;
       const center = caseData.center_lon_lat;
       const color = colorForCase(index);
-      const entity = state.viewer.entities.add({
+      const rectangle = window.Cesium.Rectangle.fromDegrees(
+        bbox.west,
+        bbox.south,
+        bbox.east,
+        bbox.north
+      );
+      const forecast = state.viewer.entities.add({
+        id: `${caseData.case_id}-forecast-overlay`,
+        name: `${caseData.case_name} forecast footprint`,
+        show: state.forecastVisible,
+        rectangle: {
+          coordinates: rectangle,
+          material: new window.Cesium.ImageMaterialProperty({
+            image: assetUrl(caseData.forecast_overlay_png),
+            transparent: true,
+            color: window.Cesium.Color.WHITE.withAlpha(state.overlayOpacity),
+          }),
+        },
+      });
+      const observed = state.viewer.entities.add({
+        id: `${caseData.case_id}-observed-overlay`,
+        name: `${caseData.case_name} observed FIRMS evidence`,
+        show: state.observedVisible,
+        rectangle: {
+          coordinates: rectangle,
+          material: new window.Cesium.ImageMaterialProperty({
+            image: assetUrl(caseData.observed_overlay_png),
+            transparent: true,
+            color: window.Cesium.Color.WHITE.withAlpha(Math.min(1, state.overlayOpacity + 0.12)),
+          }),
+        },
+      });
+      const extent = state.viewer.entities.add({
+        id: `${caseData.case_id}-analysis-extent`,
+        name: `${caseData.case_name} analysis extent`,
+        rectangle: {
+          coordinates: rectangle,
+          material: colorForCase(index, 0.04),
+          outline: true,
+          outlineColor: colorForCase(index, 0.95),
+        },
+      });
+      const marker = state.viewer.entities.add({
         id: caseData.case_id,
         name: caseData.case_name,
         position: window.Cesium.Cartesian3.fromDegrees(center.lon, center.lat, 2200),
@@ -133,25 +181,15 @@
           verticalOrigin: window.Cesium.VerticalOrigin.BOTTOM,
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
         },
-        rectangle: {
-          coordinates: window.Cesium.Rectangle.fromDegrees(
-            bbox.west,
-            bbox.south,
-            bbox.east,
-            bbox.north
-          ),
-          material: colorForCase(index, 0.24),
-          outline: true,
-          outlineColor: colorForCase(index, 0.95),
-        },
       });
-      entity.description = [
+      marker.description = [
         `<strong>${caseData.case_name}</strong>`,
         `<br>Peak probability: ${percent(caseData.sample_peak_probability)}`,
         `<br>Brier improvement: ${signedDecimal(caseData.brier_improvement_vs_persistence)}`,
       ].join("");
-      return entity;
+      return { forecast, observed, extent, marker };
     });
+    updateOverlayLayers();
   }
 
   function renderCaseButtons() {
@@ -278,11 +316,36 @@
     });
   }
 
+  function updateOverlayLayers() {
+    state.entities.forEach(({ forecast, observed }) => {
+      forecast.show = state.forecastVisible;
+      observed.show = state.observedVisible;
+      forecast.rectangle.material.color = window.Cesium.Color.WHITE.withAlpha(
+        state.overlayOpacity
+      );
+      observed.rectangle.material.color = window.Cesium.Color.WHITE.withAlpha(
+        Math.min(1, state.overlayOpacity + 0.12)
+      );
+    });
+  }
+
   function bindControls() {
     els.zoomIn.addEventListener("click", () => zoomCamera("in"));
     els.zoomOut.addEventListener("click", () => zoomCamera("out"));
     els.tiltView.addEventListener("click", tiltCurrentCase);
     els.northUp.addEventListener("click", resetNorthUp);
+    els.forecastLayerToggle.addEventListener("change", () => {
+      state.forecastVisible = els.forecastLayerToggle.checked;
+      updateOverlayLayers();
+    });
+    els.observedLayerToggle.addEventListener("change", () => {
+      state.observedVisible = els.observedLayerToggle.checked;
+      updateOverlayLayers();
+    });
+    els.overlayOpacity.addEventListener("input", () => {
+      state.overlayOpacity = Number(els.overlayOpacity.value);
+      updateOverlayLayers();
+    });
     els.flyHome.addEventListener("click", flyToAllCases);
     els.openExplorer.addEventListener("click", () => {
       window.location.href = "./index.html";

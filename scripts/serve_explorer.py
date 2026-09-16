@@ -15,7 +15,11 @@ ALLOWED_PREFIXES = {
     "/frontend/": REPO_ROOT / "frontend",
     "/reports/figures/": REPO_ROOT / "reports/figures",
 }
-ALLOWED_FIGURE_SUFFIX = "_explorer_forecast_preview.png"
+ALLOWED_FIGURE_SUFFIXES = (
+    "_explorer_forecast_preview.png",
+    "_globe_forecast_overlay.png",
+    "_globe_observed_overlay.png",
+)
 
 
 def resolve_explorer_request(raw_path: str) -> Path | None:
@@ -35,7 +39,7 @@ def resolve_explorer_request(raw_path: str) -> Path | None:
         relative = Path(parsed_path.removeprefix(prefix))
         if any(part in {"", ".", ".."} for part in relative.parts):
             return None
-        if prefix == "/reports/figures/" and not relative.name.endswith(ALLOWED_FIGURE_SUFFIX):
+        if prefix == "/reports/figures/" and not relative.name.endswith(ALLOWED_FIGURE_SUFFIXES):
             return None
         candidate = (root / relative).resolve()
         try:

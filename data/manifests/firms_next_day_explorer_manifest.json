@@ -16,6 +16,7 @@
       },
       "expected_calibration_error": 0.024617516286837917,
       "forecast_artifact": "data/forecasts/firms_next_day/carlton_complex_2014_learned_forecast.zarr",
+      "forecast_overlay_png": "reports/figures/carlton_complex_2014_globe_forecast_overlay.png",
       "forecast_semantics": "next_calendar_day_firms_active_fire_detection_probability",
       "grid_crs": "EPSG:32610",
       "grid_shape": {
@@ -23,6 +24,7 @@
         "width": 493
       },
       "observed_brier_score": 0.0027800672687590122,
+      "observed_overlay_png": "reports/figures/carlton_complex_2014_globe_observed_overlay.png",
       "persistence_brier_score": 0.003615396097302437,
       "preview_png": "reports/figures/carlton_complex_2014_explorer_forecast_preview.png",
       "recommended_f1_score": 0.21310998080090263,
@@ -62,6 +64,7 @@
       },
       "expected_calibration_error": 0.0187062009570441,
       "forecast_artifact": "data/forecasts/firms_next_day/king_2014_learned_forecast.zarr",
+      "forecast_overlay_png": "reports/figures/king_2014_globe_forecast_overlay.png",
       "forecast_semantics": "next_calendar_day_firms_active_fire_detection_probability",
       "grid_crs": "EPSG:32610",
       "grid_shape": {
@@ -69,6 +72,7 @@
         "width": 312
       },
       "observed_brier_score": 0.003820272861048579,
+      "observed_overlay_png": "reports/figures/king_2014_globe_observed_overlay.png",
       "persistence_brier_score": 0.00461704982444644,
       "preview_png": "reports/figures/king_2014_explorer_forecast_preview.png",
       "recommended_f1_score": 0.37780064549324105,
@@ -108,6 +112,7 @@
       },
       "expected_calibration_error": 0.01018182583799572,
       "forecast_artifact": "data/forecasts/firms_next_day/big_cougar_2014_learned_forecast.zarr",
+      "forecast_overlay_png": "reports/figures/big_cougar_2014_globe_forecast_overlay.png",
       "forecast_semantics": "next_calendar_day_firms_active_fire_detection_probability",
       "grid_crs": "EPSG:32611",
       "grid_shape": {
@@ -115,6 +120,7 @@
         "width": 239
       },
       "observed_brier_score": 0.00630650669336319,
+      "observed_overlay_png": "reports/figures/big_cougar_2014_globe_observed_overlay.png",
       "persistence_brier_score": 0.01032931637018919,
       "preview_png": "reports/figures/big_cougar_2014_explorer_forecast_preview.png",
       "recommended_f1_score": 0.16903451814369883,

@@ -19,6 +19,8 @@ REQUIRED_CASE_FIELDS = (
     "grid_shape",
     "wgs84_bbox",
     "center_lon_lat",
+    "forecast_overlay_png",
+    "observed_overlay_png",
     "observed_brier_score",
     "preview_png",
     "recommended_f1_score",
@@ -179,6 +181,29 @@ def _assert_png(path: Path) -> dict[str, Any]:
     }
 
 
+def _assert_overlay_png(path: Path, *, expected_width: int, expected_height: int) -> dict[str, Any]:
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    width, height, pixels = _decode_png_rgba(path)
+    if (width, height) != (expected_width, expected_height):
+        raise ValueError(
+            f"Overlay PNG shape mismatch for {path}: "
+            f"expected {expected_width}x{expected_height}, got {width}x{height}"
+        )
+    if len(pixels) != width * height * 4:
+        raise ValueError(f"Overlay PNG must be RGBA: {path}")
+    nonzero_alpha = sum(1 for value in pixels[3::4] if value > 0)
+    if nonzero_alpha == 0:
+        raise ValueError(f"Overlay PNG is fully transparent: {path}")
+    return {
+        "path": path.as_posix(),
+        "width": width,
+        "height": height,
+        "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "nonzero_alpha": nonzero_alpha,
+    }
+
+
 def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
     """Validate that a built Explorer bundle is render-ready and self-contained."""
     index_path = bundle_dir / "index.html"
@@ -239,6 +264,7 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
         raise ValueError("Explorer manifest should include the three pilot fire cases")
 
     previews: list[dict[str, Any]] = []
+    overlays: list[dict[str, Any]] = []
     for case in cases:
         missing = [field for field in REQUIRED_CASE_FIELDS if field not in case]
         if missing:
@@ -283,10 +309,24 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
         preview = _assert_png(bundle_dir / preview_path)
         preview["manifest_path"] = case["preview_png"]
         previews.append(preview)
+        for field in ("forecast_overlay_png", "observed_overlay_png"):
+            overlay_path = Path(case[field])
+            if overlay_path.is_absolute() or ".." in overlay_path.parts:
+                raise ValueError(f"Unsafe overlay path in manifest: {overlay_path}")
+            overlay = _assert_overlay_png(
+                bundle_dir / overlay_path,
+                expected_width=int(case["grid_shape"]["width"]),
+                expected_height=int(case["grid_shape"]["height"]),
+            )
+            overlay["manifest_path"] = case[field]
+            overlays.append(overlay)
 
     unique_preview_hashes = {preview["sha256"] for preview in previews}
     if len(unique_preview_hashes) != len(previews):
         raise ValueError("Explorer preview PNGs should be distinct across cases")
+    unique_overlay_hashes = {overlay["sha256"] for overlay in overlays}
+    if len(unique_overlay_hashes) != len(overlays):
+        raise ValueError("Explorer overlay PNGs should be distinct across cases and layers")
 
     for leaked_name in (".env", "pyproject.toml", ".git"):
         if bundle_dir.joinpath(leaked_name).exists():
@@ -296,7 +336,9 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
         "case_count": len(cases),
         "guardrail_count": len(manifest["guardrails"]),
         "preview_count": len(previews),
+        "overlay_count": len(overlays),
         "previews": previews,
+        "overlays": overlays,
     }
 
 
@@ -311,7 +353,8 @@ def main() -> None:
         "Explorer smoke test passed: "
         f"{summary['case_count']} cases, "
         f"{summary['guardrail_count']} guardrails, "
-        f"{summary['preview_count']} preview PNGs"
+        f"{summary['preview_count']} preview PNGs, "
+        f"{summary['overlay_count']} globe overlays"
     )
 
 

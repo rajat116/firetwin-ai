@@ -38,10 +38,12 @@ def test_build_explorer_site_copies_only_deployable_assets(tmp_path: Path) -> No
     assert not output_dir.joinpath("pyproject.toml").exists()
     assert len(copied) == len(build_explorer_site_module.FRONTEND_FILES) + 1 + len(
         manifest["cases"]
-    )
+    ) * len(build_explorer_site_module.CASE_ASSET_FIELDS)
 
     for case in manifest["cases"]:
         assert output_dir.joinpath(case["preview_png"]).exists()
+        assert output_dir.joinpath(case["forecast_overlay_png"]).exists()
+        assert output_dir.joinpath(case["observed_overlay_png"]).exists()
 
 
 def test_frontend_asset_paths_support_repo_and_static_bundle() -> None:
@@ -65,7 +67,10 @@ def test_static_explorer_bundle_smoke_test(tmp_path: Path) -> None:
     assert summary["case_count"] == 3
     assert summary["guardrail_count"] >= 3
     assert summary["preview_count"] == 3
+    assert summary["overlay_count"] == 6
     for preview in summary["previews"]:
         assert preview["width"] >= 1000
         assert preview["height"] >= 400
         assert preview["pixel_range"] >= 24
+    for overlay in summary["overlays"]:
+        assert overlay["nonzero_alpha"] > 0

@@ -18,6 +18,11 @@ FRONTEND_FILES = (
     "globe.css",
     "globe.js",
 )
+CASE_ASSET_FIELDS = (
+    "preview_png",
+    "forecast_overlay_png",
+    "observed_overlay_png",
+)
 
 
 def build_explorer_site(output_dir: Path) -> list[Path]:
@@ -39,16 +44,17 @@ def build_explorer_site(output_dir: Path) -> list[Path]:
     copied.append(manifest_destination)
 
     for case in manifest["cases"]:
-        preview_path = Path(case["preview_png"])
-        if preview_path.is_absolute() or ".." in preview_path.parts:
-            raise ValueError(f"Unsafe preview path in manifest: {preview_path}")
-        source = REPO_ROOT / preview_path
-        if not source.is_file():
-            raise FileNotFoundError(source)
-        destination = output_dir / preview_path
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, destination)
-        copied.append(destination)
+        for field in CASE_ASSET_FIELDS:
+            asset_path = Path(case[field])
+            if asset_path.is_absolute() or ".." in asset_path.parts:
+                raise ValueError(f"Unsafe {field} path in manifest: {asset_path}")
+            source = REPO_ROOT / asset_path
+            if not source.is_file():
+                raise FileNotFoundError(source)
+            destination = output_dir / asset_path
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
+            copied.append(destination)
 
     return copied
 

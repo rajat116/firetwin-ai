@@ -51,6 +51,23 @@
           </dl>
         </article>
 
+        <section class="globe-layers" aria-label="Map layers">
+          <label>
+            <input id="forecastLayerToggle" type="checkbox" checked />
+            <span class="legend-swatch forecast"></span>
+            Forecast
+          </label>
+          <label>
+            <input id="observedLayerToggle" type="checkbox" checked />
+            <span class="legend-swatch observed"></span>
+            Observed
+          </label>
+          <label class="opacity-control">
+            <span>Opacity</span>
+            <input id="overlayOpacity" type="range" min="0.2" max="1" value="0.78" step="0.02" />
+          </label>
+        </section>
+
         <div class="layer-actions" aria-label="Globe actions">
           <button id="flyHome" type="button">All Fires</button>
           <button id="openExplorer" type="button">Open Case</button>
