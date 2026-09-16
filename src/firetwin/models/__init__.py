@@ -13,6 +13,19 @@ from firetwin.models.firms_next_day import (
     render_learned_model_report,
     train_observed_label_logistic_model,
 )
+from firetwin.models.surrogate import (
+    SIMULATION_SURROGATE_MODEL_NAME,
+    SimulationSurrogateEvaluation,
+    SimulationSurrogateModel,
+    SimulationSurrogateTrainingSummary,
+    evaluate_simulation_surrogate_leave_one_out,
+    fit_and_save_simulation_surrogate,
+    load_simulation_surrogate_model,
+    predict_simulation_sample,
+    render_simulation_surrogate_report,
+    save_simulation_surrogate_model,
+    train_simulation_surrogate,
+)
 
 __all__ = [
     "PersistenceBaseline",
@@ -28,4 +41,15 @@ __all__ = [
     "build_firms_next_day_forecast_dataset",
     "build_leave_one_fire_out_forecast_artifacts",
     "render_forecast_artifact_report",
+    "SIMULATION_SURROGATE_MODEL_NAME",
+    "SimulationSurrogateEvaluation",
+    "SimulationSurrogateModel",
+    "SimulationSurrogateTrainingSummary",
+    "train_simulation_surrogate",
+    "predict_simulation_sample",
+    "evaluate_simulation_surrogate_leave_one_out",
+    "fit_and_save_simulation_surrogate",
+    "save_simulation_surrogate_model",
+    "load_simulation_surrogate_model",
+    "render_simulation_surrogate_report",
 ]

@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-16
-**Current Phase**: Phase 5B 🚧 - Simulation Corpus and Surrogate Foundation
+**Current Phase**: Phase 5B 🚧 - Simulation Corpus and First Surrogate Baseline
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -656,6 +656,13 @@ controls can produce real recomputed outputs rather than decorative UI changes.
 - [x] Generated `reports/phase5b_simulation_corpus.md`.
 - [x] Added unit tests for deterministic scenario sampling, NPZ array contract, reproducibility,
   config validation and report rendering.
+- [x] Added `firetwin.models.surrogate` with a NumPy logistic simulation-surrogate baseline.
+- [x] Added `scripts/train_simulation_surrogate.py`.
+- [x] Trained `data/models/phase5b_surrogate_smoke.npz` on the smoke corpus.
+- [x] Generated `reports/phase5b_simulation_surrogate.md` and
+  `reports/phase5b_simulation_surrogate_metrics.json`.
+- [x] Added unit tests for surrogate prediction shape, bounded probabilities, leave-one-out
+  evaluation, save/load round-trip and report guardrails.
 
 ### Result-Wise Simulation Corpus Smoke Artifact
 
@@ -664,15 +671,30 @@ controls can produce real recomputed outputs rather than decorative UI changes.
 - Generator: wind-driven `EllipticalBaseline` over synthetic terrain/fuel/weather scenarios.
 - Total final burned cells across smoke corpus: 3,460.
 - Example sample contract: `initial_burned`, terrain/fuel covariates, scalar weather,
-  `forecast_burned`, `forecast_active_front`, `forecast_hours` and `base_spread_rate_m_h`.
+  `forecast_burned`, `forecast_active_front`, `forecast_hours`, `resolution_m` and
+  `base_spread_rate_m_h`.
 
 Interpretation: Phase 5B now has a reproducible simulator-corpus data contract for surrogate-model
-development. The learned surrogate itself has not been trained yet.
+development.
+
+### Result-Wise Simulation Surrogate Smoke Baseline
+
+- Model: `phase5b_logistic_simulation_surrogate_v1`.
+- Artifact: `data/models/phase5b_surrogate_smoke.npz`.
+- Evaluation: leave-one-simulation-out over the 6-sample smoke corpus.
+- Features: 23 terrain/fuel/weather/geometry features.
+- Mean Brier score: 0.11628 vs 0.20062 initial-state persistence.
+- Mean Brier improvement vs persistence: +0.08434.
+- Mean IoU at threshold 0.40: 0.678.
+
+Interpretation: the first surrogate baseline is real and result-checked against the smoke corpus.
+It is still a simulator-trained baseline, not an observed-wildfire model.
 
 ### Remaining Phase 5B Work
 
-- [ ] Train a first lightweight surrogate on the simulation corpus.
-- [ ] Evaluate surrogate accuracy and latency against the simulator baseline.
+- [x] Train a first lightweight surrogate on the simulation corpus.
+- [x] Evaluate surrogate accuracy against initial-state persistence on held-out simulations.
+- [ ] Benchmark surrogate latency against the simulator baseline.
 - [ ] Add larger configurable corpus generation after the smoke contract is stable.
 - [ ] Connect scenario controls only after backend/surrogate inference is real.
 
@@ -699,9 +721,9 @@ Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
 Phase 5A: ████████████████████ 100% ✅
-Phase 5B: ████░░░░░░░░░░░░░░░░  20% 🚧
+Phase 5B: ███████░░░░░░░░░░░░░  35% 🚧
 ...
-Overall: ██████████████░░░░░░  72%
+Overall: ███████████████░░░░░  74%
 ```
 
 ## Known Issues
@@ -718,8 +740,8 @@ Overall: ██████████████░░░░░░  72%
 ## Blockers
 
 No credential blocker remains. Phase 5A plus the first local Explorer are complete. Phase 5B has
-started with a deterministic synthetic simulation-corpus foundation; the surrogate model is the next
-major unfinished task.
+started with a deterministic synthetic simulation-corpus foundation and a first trained surrogate
+baseline. The next major unfinished task is latency benchmarking plus a larger surrogate corpus.
 
 ## Notes
 

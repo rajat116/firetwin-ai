@@ -57,6 +57,7 @@ def test_build_simulation_corpus_writes_manifest_and_npz_samples(tmp_path: Path)
         assert sample["initial_burned"].shape == (24, 28)
         assert sample["forecast_burned"].shape == (3, 24, 28)
         assert sample["forecast_active_front"].shape == (3, 24, 28)
+        assert sample["resolution_m"].tolist() == [90.0]
         assert sample["weather"].shape == (4,)
         assert sample["forecast_hours"].tolist() == [3.0, 6.0, 12.0]
         burned_cells = sample["forecast_burned"].sum(axis=(1, 2))

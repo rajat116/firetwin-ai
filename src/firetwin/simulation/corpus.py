@@ -150,6 +150,7 @@ def build_simulation_sample(
         "forecast_hours": np.asarray(config.forecast_hours, dtype=np.float32),
         "forecast_burned": burned_stack,
         "forecast_active_front": active_stack,
+        "resolution_m": np.asarray([config.resolution_m], dtype=np.float32),
         "weather": np.asarray(
             [
                 scenario.wind_speed_m_s,

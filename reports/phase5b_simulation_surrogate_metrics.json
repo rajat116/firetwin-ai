@@ -1,0 +1,102 @@
+{
+  "evaluations": [
+    {
+      "brier_improvement_vs_persistence": 0.17784608900547028,
+      "brier_score": 0.14632056653499603,
+      "case_id": "phase5b_sim_0000",
+      "cell_count": 4800,
+      "iou": 0.7468168462291871,
+      "persistence_brier_score": 0.3241666555404663,
+      "precision": 0.7640280561122245,
+      "predicted_positive_fraction": 0.41583333333333333,
+      "recall": 0.9707192870782941,
+      "target_positive_fraction": 0.32729166666666665,
+      "threshold": 0.375,
+      "training_cases": 5
+    },
+    {
+      "brier_improvement_vs_persistence": 0.15054722130298615,
+      "brier_score": 0.15278612077236176,
+      "case_id": "phase5b_sim_0001",
+      "cell_count": 4800,
+      "iou": 0.7701342281879194,
+      "persistence_brier_score": 0.3033333420753479,
+      "precision": 0.8128689492325856,
+      "predicted_positive_fraction": 0.35291666666666666,
+      "recall": 0.9360978925900748,
+      "target_positive_fraction": 0.30645833333333333,
+      "threshold": 0.375,
+      "training_cases": 5
+    },
+    {
+      "brier_improvement_vs_persistence": 0.08017593622207642,
+      "brier_score": 0.11774073541164398,
+      "case_id": "phase5b_sim_0002",
+      "cell_count": 4800,
+      "iou": 0.7508650519031141,
+      "persistence_brier_score": 0.1979166716337204,
+      "precision": 0.8196411709159585,
+      "predicted_positive_fraction": 0.220625,
+      "recall": 0.8994818652849741,
+      "target_positive_fraction": 0.20104166666666667,
+      "threshold": 0.4000000059604645,
+      "training_cases": 5
+    },
+    {
+      "brier_improvement_vs_persistence": 0.04174487292766571,
+      "brier_score": 0.08763012290000916,
+      "case_id": "phase5b_sim_0003",
+      "cell_count": 4800,
+      "iou": 0.7084917617237009,
+      "persistence_brier_score": 0.12937499582767487,
+      "precision": 0.7818181818181819,
+      "predicted_positive_fraction": 0.14895833333333333,
+      "recall": 0.8830963665086888,
+      "target_positive_fraction": 0.131875,
+      "threshold": 0.4000000059604645,
+      "training_cases": 5
+    },
+    {
+      "brier_improvement_vs_persistence": 0.05766819417476654,
+      "brier_score": 0.10316513478755951,
+      "case_id": "phase5b_sim_0004",
+      "cell_count": 4800,
+      "iou": 0.5237515225334958,
+      "persistence_brier_score": 0.16083332896232605,
+      "precision": 0.9267241379310345,
+      "predicted_positive_fraction": 0.09666666666666666,
+      "recall": 0.5463786531130876,
+      "target_positive_fraction": 0.16395833333333334,
+      "threshold": 0.4000000059604645,
+      "training_cases": 5
+    },
+    {
+      "brier_improvement_vs_persistence": -0.0019326135516166687,
+      "brier_score": 0.0900576114654541,
+      "case_id": "phase5b_sim_0005",
+      "cell_count": 4800,
+      "iou": 0.5670995670995671,
+      "persistence_brier_score": 0.08812499791383743,
+      "precision": 0.916083916083916,
+      "predicted_positive_fraction": 0.059583333333333335,
+      "recall": 0.5981735159817352,
+      "target_positive_fraction": 0.09125,
+      "threshold": 0.4000000059604645,
+      "training_cases": 5
+    }
+  ],
+  "summary": {
+    "corpus_dir": "data/simulation/phase5b_synthetic_smoke",
+    "feature_count": 23,
+    "mean_brier_improvement_vs_persistence": 0.08434161668022473,
+    "mean_brier_score": 0.11628338197867076,
+    "mean_iou": 0.6778598296128308,
+    "mean_persistence_brier_score": 0.2006249986588955,
+    "mean_precision": 0.8368607353489835,
+    "mean_recall": 0.8056579300928091,
+    "model_name": "phase5b_logistic_simulation_surrogate_v1",
+    "model_path": "data/models/phase5b_surrogate_smoke.npz",
+    "sample_count": 6,
+    "threshold": 0.4000000059604645
+  }
+}
