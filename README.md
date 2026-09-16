@@ -236,6 +236,12 @@ python3 scripts/build_explorer_site.py --output-dir dist/explorer
 
 The bundle contains only the Explorer, manifest and referenced preview PNGs.
 
+Smoke-test the deployable bundle before sharing it:
+
+```bash
+python3 scripts/smoke_explorer_bundle.py --bundle-dir dist/explorer
+```
+
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
 ### Configuration
@@ -290,7 +296,7 @@ firetwin-ai/
 │   ├── evaluation/        # Metrics and evaluation protocols
 │   ├── tracking/          # Experiment tracking
 │   └── api/               # FastAPI backend
-├── frontend/              # React + MapLibre GL + deck.gl
+├── frontend/              # Dependency-free static Explorer UI
 ├── notebooks/             # Jupyter notebooks for exploration
 ├── tests/                 # Comprehensive test suite
 ├── docs/                  # Detailed documentation

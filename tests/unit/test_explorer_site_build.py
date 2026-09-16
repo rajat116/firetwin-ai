@@ -12,6 +12,13 @@ build_explorer_site_module = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
 SPEC.loader.exec_module(build_explorer_site_module)
 
+SMOKE_SCRIPT_PATH = REPO_ROOT / "scripts/smoke_explorer_bundle.py"
+SMOKE_SPEC = importlib.util.spec_from_file_location("smoke_explorer_bundle", SMOKE_SCRIPT_PATH)
+assert SMOKE_SPEC is not None
+smoke_explorer_bundle = importlib.util.module_from_spec(SMOKE_SPEC)
+assert SMOKE_SPEC.loader is not None
+SMOKE_SPEC.loader.exec_module(smoke_explorer_bundle)
+
 
 def test_build_explorer_site_copies_only_deployable_assets(tmp_path: Path) -> None:
     """Static bundle should contain the Explorer, manifest and referenced preview images."""
@@ -38,3 +45,15 @@ def test_frontend_asset_paths_support_repo_and_static_bundle() -> None:
 
     assert 'includes("/frontend/") ? "../" : "./"' in app_js
     assert 'assetUrl("data/manifests/firms_next_day_explorer_manifest.json")' in app_js
+
+
+def test_static_explorer_bundle_smoke_test(tmp_path: Path) -> None:
+    """Deployable bundle should pass public-demo integrity checks."""
+    output_dir = tmp_path / "explorer"
+    build_explorer_site_module.build_explorer_site(output_dir)
+
+    summary = smoke_explorer_bundle.validate_explorer_bundle(output_dir)
+
+    assert summary["case_count"] == 3
+    assert summary["guardrail_count"] >= 3
+    assert summary["preview_count"] == 3

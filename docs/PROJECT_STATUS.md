@@ -499,6 +499,7 @@ samples for next-calendar-day active-fire probability modeling.
 - [x] Added allowlisted local preview server at `scripts/serve_explorer.py`.
 - [x] Added static frontend and preview-server tests.
 - [x] Added deployable static Explorer bundle builder at `scripts/build_explorer_site.py`.
+- [x] Added deployable Explorer smoke test at `scripts/smoke_explorer_bundle.py`.
 
 ### Result-Wise Sample Artifacts
 
@@ -619,6 +620,12 @@ python3 scripts/build_explorer_site.py --output-dir dist/explorer
 ```
 
 The build copies only the frontend, manifest and referenced preview PNGs into `dist/explorer/`.
+
+Smoke-test the deployable bundle before sharing or deploying it:
+
+```bash
+python3 scripts/smoke_explorer_bundle.py --bundle-dir dist/explorer
+```
 
 ### Phase 5A Exit Criteria
 

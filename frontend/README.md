@@ -25,3 +25,9 @@ python3 scripts/build_explorer_site.py --output-dir dist/explorer
 
 Serve `dist/explorer/` with any static file server. The bundle contains only the Explorer, manifest
 and referenced preview PNGs.
+
+Smoke-test the bundle before sharing or deploying it:
+
+```bash
+python3 scripts/smoke_explorer_bundle.py --bundle-dir dist/explorer
+```
