@@ -11,6 +11,7 @@ from typing import Any
 
 import numpy as np
 import xarray as xr
+from pyproj import Transformer
 
 from firetwin.data.pilot_fires import PILOT_LABEL_SPECS
 from firetwin.evaluation.firms_forecasts import evaluate_forecast_artifact
@@ -44,6 +45,8 @@ class ExplorerCaseExport:
     grid_shape: dict[str, int]
     grid_crs: str
     bbox: dict[str, float]
+    wgs84_bbox: dict[str, float]
+    center_lon_lat: dict[str, float]
     resolution_m: float | None
     recommended_threshold: float
     observed_brier_score: float
@@ -133,6 +136,8 @@ def export_forecast_artifact_for_explorer(
             grid_shape={"height": int(ds.sizes["y"]), "width": int(ds.sizes["x"])},
             grid_crs=str(ds.attrs.get("grid_crs", "unknown")),
             bbox=_bbox_from_attrs(ds),
+            wgs84_bbox=_wgs84_bbox_from_attrs(ds),
+            center_lon_lat=_center_lon_lat_from_attrs(ds),
             resolution_m=_optional_float_attr(ds, "resolution_m"),
             recommended_threshold=threshold,
             observed_brier_score=summary.observed_brier_score,
@@ -295,6 +300,41 @@ def _bbox_from_attrs(ds: xr.Dataset) -> dict[str, float]:
     if not all(key in ds.attrs for key in keys):
         return {}
     return {key: float(ds.attrs[key]) for key in keys}
+
+
+def _wgs84_bbox_from_attrs(ds: xr.Dataset) -> dict[str, float]:
+    bbox = _bbox_from_attrs(ds)
+    if not bbox:
+        return {}
+    grid_crs = str(ds.attrs.get("grid_crs", ""))
+    if not grid_crs or grid_crs == "unknown":
+        return {}
+
+    transformer = Transformer.from_crs(grid_crs, "EPSG:4326", always_xy=True)
+    corners = [
+        transformer.transform(bbox["bbox_min_x"], bbox["bbox_min_y"]),
+        transformer.transform(bbox["bbox_min_x"], bbox["bbox_max_y"]),
+        transformer.transform(bbox["bbox_max_x"], bbox["bbox_min_y"]),
+        transformer.transform(bbox["bbox_max_x"], bbox["bbox_max_y"]),
+    ]
+    longitudes = [lon for lon, _lat in corners]
+    latitudes = [lat for _lon, lat in corners]
+    return {
+        "west": float(min(longitudes)),
+        "south": float(min(latitudes)),
+        "east": float(max(longitudes)),
+        "north": float(max(latitudes)),
+    }
+
+
+def _center_lon_lat_from_attrs(ds: xr.Dataset) -> dict[str, float]:
+    wgs84_bbox = _wgs84_bbox_from_attrs(ds)
+    if not wgs84_bbox:
+        return {}
+    return {
+        "lon": float((wgs84_bbox["west"] + wgs84_bbox["east"]) / 2.0),
+        "lat": float((wgs84_bbox["south"] + wgs84_bbox["north"]) / 2.0),
+    }
 
 
 def _optional_float_attr(ds: xr.Dataset, name: str) -> float | None:

@@ -41,6 +41,7 @@ def test_api_health_and_case_catalog() -> None:
         "king_2014",
         "big_cougar_2014",
     }
+    assert all("center_lon_lat" in case for case in body["cases"])
 
 
 def test_api_forecast_response_is_artifact_backed_and_guarded() -> None:
@@ -55,6 +56,8 @@ def test_api_forecast_response_is_artifact_backed_and_guarded() -> None:
     assert body["not_operational"] is True
     assert body["metrics"]["brier_improvement_vs_persistence"] > 0
     assert body["footprint"]["peak_probability"] > 0
+    assert -180 <= body["provenance"]["center_lon_lat"]["lon"] <= 180
+    assert -90 <= body["provenance"]["center_lon_lat"]["lat"] <= 90
     assert body["provenance"]["forecast_artifact"].endswith("_learned_forecast.zarr")
     assert body["guardrails"]
 

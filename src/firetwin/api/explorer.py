@@ -43,6 +43,8 @@ def list_explorer_cases(manifest: dict[str, Any]) -> list[dict[str, Any]]:
             "observed_brier_score": case["observed_brier_score"],
             "persistence_brier_score": case["persistence_brier_score"],
             "brier_improvement_vs_persistence": case["brier_improvement_vs_persistence"],
+            "center_lon_lat": case["center_lon_lat"],
+            "wgs84_bbox": case["wgs84_bbox"],
             "preview_png": case["preview_png"],
         }
         for case in manifest["cases"]
@@ -102,6 +104,8 @@ def build_forecast_response(
             "selection_rule": case["selection_rule"],
             "grid_shape": case["grid_shape"],
             "grid_crs": case["grid_crs"],
+            "wgs84_bbox": case["wgs84_bbox"],
+            "center_lon_lat": case["center_lon_lat"],
             "resolution_m": case["resolution_m"],
         },
         "guardrails": manifest["guardrails"],

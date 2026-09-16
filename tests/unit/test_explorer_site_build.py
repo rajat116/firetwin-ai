@@ -30,10 +30,15 @@ def test_build_explorer_site_copies_only_deployable_assets(tmp_path: Path) -> No
     assert output_dir.joinpath("index.html").exists()
     assert output_dir.joinpath("styles.css").exists()
     assert output_dir.joinpath("app.js").exists()
+    assert output_dir.joinpath("globe.html").exists()
+    assert output_dir.joinpath("globe.css").exists()
+    assert output_dir.joinpath("globe.js").exists()
     assert manifest_path.exists()
     assert not output_dir.joinpath(".env").exists()
     assert not output_dir.joinpath("pyproject.toml").exists()
-    assert len(copied) == 4 + len(manifest["cases"])
+    assert len(copied) == len(build_explorer_site_module.FRONTEND_FILES) + 1 + len(
+        manifest["cases"]
+    )
 
     for case in manifest["cases"]:
         assert output_dir.joinpath(case["preview_png"]).exists()
@@ -42,9 +47,12 @@ def test_build_explorer_site_copies_only_deployable_assets(tmp_path: Path) -> No
 def test_frontend_asset_paths_support_repo_and_static_bundle() -> None:
     """Frontend path logic should support /frontend/ and root static deployments."""
     app_js = REPO_ROOT.joinpath("frontend/app.js").read_text(encoding="utf-8")
+    globe_js = REPO_ROOT.joinpath("frontend/globe.js").read_text(encoding="utf-8")
 
     assert 'includes("/frontend/") ? "../" : "./"' in app_js
     assert 'assetUrl("data/manifests/firms_next_day_explorer_manifest.json")' in app_js
+    assert 'includes("/frontend/") ? "../" : "./"' in globe_js
+    assert 'assetUrl("data/manifests/firms_next_day_explorer_manifest.json")' in globe_js
 
 
 def test_static_explorer_bundle_smoke_test(tmp_path: Path) -> None:

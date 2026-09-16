@@ -10,7 +10,14 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_DIR = REPO_ROOT / "frontend"
 MANIFEST_PATH = REPO_ROOT / "data/manifests/firms_next_day_explorer_manifest.json"
-FRONTEND_FILES = ("index.html", "styles.css", "app.js")
+FRONTEND_FILES = (
+    "index.html",
+    "styles.css",
+    "app.js",
+    "globe.html",
+    "globe.css",
+    "globe.js",
+)
 
 
 def build_explorer_site(output_dir: Path) -> list[Path]:

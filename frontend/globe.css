@@ -1,0 +1,261 @@
+:root {
+  color-scheme: dark;
+  --bg: #070908;
+  --panel: rgb(18 22 20 / 86%);
+  --panel-strong: rgb(12 15 14 / 94%);
+  --line: rgb(244 240 232 / 18%);
+  --text: #f4f0e8;
+  --muted: #aeb8ad;
+  --accent: #f2c14e;
+  --accent-2: #df6b4f;
+  --good: #74c69d;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button,
+a {
+  font: inherit;
+}
+
+.globe-shell {
+  position: relative;
+  min-height: 100vh;
+}
+
+.globe-canvas {
+  position: fixed;
+  inset: 0;
+  background: #050706;
+}
+
+.mission-panel {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  display: grid;
+  gap: 16px;
+  width: min(390px, calc(100vw - 36px));
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 22px 70px rgb(0 0 0 / 42%);
+  backdrop-filter: blur(16px);
+}
+
+.brand-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  margin-top: 4px;
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  line-height: 0.92;
+}
+
+h2 {
+  margin-top: 4px;
+  font-size: 1.45rem;
+  line-height: 1.05;
+}
+
+.text-link {
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.text-link:hover,
+.text-link:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
+.case-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.case-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  width: 100%;
+  min-height: 70px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  background: rgb(32 39 34 / 72%);
+}
+
+.case-card:hover,
+.case-card:focus-visible,
+.case-card[aria-current="true"] {
+  border-color: var(--accent);
+  outline: none;
+  background: rgb(242 193 78 / 13%);
+}
+
+.case-card strong,
+.case-card span {
+  overflow-wrap: anywhere;
+}
+
+.case-card strong {
+  display: block;
+  font-size: 0.94rem;
+}
+
+.case-card span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.case-card .probability {
+  align-self: center;
+  color: var(--good);
+  font-size: 0.95rem;
+  font-weight: 850;
+}
+
+.case-brief {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-strong);
+}
+
+dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+dl div {
+  display: grid;
+  grid-template-columns: minmax(110px, 40%) minmax(0, 1fr);
+  gap: 10px;
+}
+
+dt {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+dd {
+  min-width: 0;
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.layer-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.layer-actions button {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  background: rgb(24 29 27 / 88%);
+}
+
+.layer-actions button:hover,
+.layer-actions button:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.load-error {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  display: grid;
+  gap: 6px;
+  max-width: 520px;
+  padding: 16px;
+  border: 1px solid var(--accent-2);
+  border-radius: 8px;
+  background: #241311;
+  box-shadow: 0 22px 70px rgb(0 0 0 / 42%);
+}
+
+.load-error[hidden] {
+  display: none;
+}
+
+.cesium-viewer-bottom,
+.cesium-viewer-toolbar {
+  display: none !important;
+}
+
+@media (max-width: 720px) {
+  body {
+    overflow: auto;
+  }
+
+  .mission-panel {
+    position: absolute;
+    top: auto;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    width: auto;
+    max-height: 48vh;
+    padding: 14px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  dl div,
+  .layer-actions {
+    grid-template-columns: 1fr;
+  }
+}

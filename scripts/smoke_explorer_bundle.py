@@ -17,6 +17,8 @@ REQUIRED_CASE_FIELDS = (
     "forecast_semantics",
     "grid_crs",
     "grid_shape",
+    "wgs84_bbox",
+    "center_lon_lat",
     "observed_brier_score",
     "preview_png",
     "recommended_f1_score",
@@ -182,14 +184,27 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
     index_path = bundle_dir / "index.html"
     app_path = bundle_dir / "app.js"
     styles_path = bundle_dir / "styles.css"
+    globe_path = bundle_dir / "globe.html"
+    globe_js_path = bundle_dir / "globe.js"
+    globe_css_path = bundle_dir / "globe.css"
     manifest_path = bundle_dir / "data/manifests/firms_next_day_explorer_manifest.json"
 
-    for path in (index_path, app_path, styles_path, manifest_path):
+    for path in (
+        index_path,
+        app_path,
+        styles_path,
+        globe_path,
+        globe_js_path,
+        globe_css_path,
+        manifest_path,
+    ):
         if not path.is_file():
             raise FileNotFoundError(path)
 
     html = index_path.read_text(encoding="utf-8")
     app_js = app_path.read_text(encoding="utf-8")
+    globe_html = globe_path.read_text(encoding="utf-8")
+    globe_js = globe_js_path.read_text(encoding="utf-8")
     manifest = _load_json(manifest_path)
 
     if "./styles.css" not in html or "./app.js" not in html:
@@ -199,6 +214,12 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
             raise ValueError(f"Explorer bundle is missing UI hook: {element_id}")
     if "data/manifests/firms_next_day_explorer_manifest.json" not in app_js:
         raise ValueError("Explorer app does not load the committed manifest path")
+    if "Cesium.js" not in globe_html or "./globe.js" not in globe_html:
+        raise ValueError("Globe page must load Cesium and local globe JavaScript")
+    if "center_lon_lat" not in globe_js or "wgs84_bbox" not in globe_js:
+        raise ValueError("Globe app must consume committed WGS84 fire locations")
+    if "data/manifests/firms_next_day_explorer_manifest.json" not in globe_js:
+        raise ValueError("Globe app does not load the committed manifest path")
 
     if manifest.get("schema_version") != "firetwin.firms_next_day_explorer.v1":
         raise ValueError("Unexpected Explorer manifest schema version")
@@ -239,6 +260,18 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
             raise ValueError(f"{case['case_id']} has invalid Brier improvement")
         if improvement <= 0:
             raise ValueError(f"{case['case_id']} does not beat persistence by Brier score")
+        wgs84_bbox = case["wgs84_bbox"]
+        center_lon_lat = case["center_lon_lat"]
+        if not (
+            -180 <= wgs84_bbox["west"] < wgs84_bbox["east"] <= 180
+            and -90 <= wgs84_bbox["south"] < wgs84_bbox["north"] <= 90
+        ):
+            raise ValueError(f"{case['case_id']} has invalid WGS84 bounds")
+        if not (
+            wgs84_bbox["west"] <= center_lon_lat["lon"] <= wgs84_bbox["east"]
+            and wgs84_bbox["south"] <= center_lon_lat["lat"] <= wgs84_bbox["north"]
+        ):
+            raise ValueError(f"{case['case_id']} center is outside WGS84 bounds")
 
         preview_path = Path(case["preview_png"])
         if preview_path.is_absolute() or ".." in preview_path.parts:

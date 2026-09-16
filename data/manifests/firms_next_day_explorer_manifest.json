@@ -10,6 +10,10 @@
       "brier_improvement_vs_persistence": 0.0008353288285434246,
       "case_id": "carlton_complex_2014",
       "case_name": "Carlton Complex (2014)",
+      "center_lon_lat": {
+        "lat": 48.22838873650316,
+        "lon": -119.95554900726685
+      },
       "expected_calibration_error": 0.024617516286837917,
       "forecast_artifact": "data/forecasts/firms_next_day/carlton_complex_2014_learned_forecast.zarr",
       "forecast_semantics": "next_calendar_day_firms_active_fire_detection_probability",
@@ -34,7 +38,13 @@
       "sample_target_positive_fraction": 0.03273012507430308,
       "selection_rule": "peak_forecast_probability_mass",
       "target_time": "2014-07-19T00:00:00",
-      "target_type": "active_fire_detection_probability"
+      "target_type": "active_fire_detection_probability",
+      "wgs84_bbox": {
+        "east": -119.60644343542809,
+        "north": 48.53453760697905,
+        "south": 47.922239866027276,
+        "west": -120.3046545791056
+      }
     },
     {
       "bbox": {
@@ -46,6 +56,10 @@
       "brier_improvement_vs_persistence": 0.0007967769633978605,
       "case_id": "king_2014",
       "case_name": "KING (2014)",
+      "center_lon_lat": {
+        "lat": 38.95088169432824,
+        "lon": -120.53963967823438
+      },
       "expected_calibration_error": 0.0187062009570441,
       "forecast_artifact": "data/forecasts/firms_next_day/king_2014_learned_forecast.zarr",
       "forecast_semantics": "next_calendar_day_firms_active_fire_detection_probability",
@@ -70,7 +84,13 @@
       "sample_target_positive_fraction": 0.061500999000999,
       "selection_rule": "peak_forecast_probability_mass",
       "target_time": "2014-09-19T00:00:00",
-      "target_type": "active_fire_detection_probability"
+      "target_type": "active_fire_detection_probability",
+      "wgs84_bbox": {
+        "east": -120.35257935092922,
+        "north": 39.162645511726836,
+        "south": 38.73911787692964,
+        "west": -120.72670000553954
+      }
     },
     {
       "bbox": {
@@ -82,6 +102,10 @@
       "brier_improvement_vs_persistence": 0.004022809676826,
       "case_id": "big_cougar_2014",
       "case_name": "Big Cougar (2014)",
+      "center_lon_lat": {
+        "lat": 45.998394621343394,
+        "lon": -116.84720431871187
+      },
       "expected_calibration_error": 0.01018182583799572,
       "forecast_artifact": "data/forecasts/firms_next_day/big_cougar_2014_learned_forecast.zarr",
       "forecast_semantics": "next_calendar_day_firms_active_fire_detection_probability",
@@ -106,11 +130,17 @@
       "sample_target_positive_fraction": 0.03004399899293858,
       "selection_rule": "peak_forecast_probability_mass",
       "target_time": "2014-08-09T00:00:00",
-      "target_type": "active_fire_detection_probability"
+      "target_type": "active_fire_detection_probability",
+      "wgs84_bbox": {
+        "east": -116.6924425625253,
+        "north": 46.155655288169115,
+        "south": 45.84113395451768,
+        "west": -117.00196607489846
+      }
     }
   ],
   "forecast_semantics": "next_calendar_day_firms_active_fire_detection_probability",
-  "generated_at": "2026-09-16T08:06:21Z",
+  "generated_at": "2026-09-16T08:20:09Z",
   "guardrails": [
     "Research prototype; not for operational wildfire response, evacuation planning or safety-critical decisions.",
     "Forecasts estimate satellite-visible FIRMS active-fire evidence, not exact burned perimeter spread.",

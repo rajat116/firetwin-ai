@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FireTwin Globe</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/cesium@1.123.0/Build/Cesium/Widgets/widgets.css"
+    />
+    <link rel="stylesheet" href="./globe.css" />
+  </head>
+  <body>
+    <main class="globe-shell">
+      <div id="globe" class="globe-canvas" aria-label="FireTwin 3D globe"></div>
+
+      <section class="mission-panel" aria-label="Fire forecast cases">
+        <div class="brand-row">
+          <div>
+            <p class="eyebrow">FireTwin</p>
+            <h1>Wildfire Globe</h1>
+          </div>
+          <a href="./index.html" class="text-link">Explorer</a>
+        </div>
+
+        <nav id="globeCaseList" class="case-stack" aria-label="Available fires"></nav>
+
+        <article class="case-brief" aria-live="polite">
+          <p id="globeCaseId" class="eyebrow">Loading</p>
+          <h2 id="globeCaseName">Forecast case</h2>
+          <dl>
+            <div>
+              <dt>Peak probability</dt>
+              <dd id="globePeakProbability">--</dd>
+            </div>
+            <div>
+              <dt>Vs persistence</dt>
+              <dd id="globeImprovement">--</dd>
+            </div>
+            <div>
+              <dt>Target</dt>
+              <dd id="globeTargetTime">--</dd>
+            </div>
+          </dl>
+        </article>
+
+        <div class="layer-actions" aria-label="Globe actions">
+          <button id="flyHome" type="button">All Fires</button>
+          <button id="openExplorer" type="button">Open Case</button>
+        </div>
+      </section>
+    </main>
+
+    <div id="globeError" class="load-error" role="alert" hidden>
+      <strong>Globe unavailable.</strong>
+      <span>Serve the Explorer through an HTTP server with network access for Cesium.</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/cesium@1.123.0/Build/Cesium/Cesium.js"></script>
+    <script src="./globe.js"></script>
+  </body>
+</html>

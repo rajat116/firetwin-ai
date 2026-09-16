@@ -14,6 +14,12 @@ Then open:
 http://localhost:8000/frontend/
 ```
 
+The first globe-oriented public demo is available at:
+
+```text
+http://localhost:8000/frontend/globe.html
+```
+
 The app loads `data/manifests/firms_next_day_explorer_manifest.json` and the committed preview PNGs
 under `reports/figures/`. It does not require the ignored local Zarr forecast artifacts to render.
 

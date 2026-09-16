@@ -228,6 +228,9 @@ Then open [`http://127.0.0.1:8000/frontend/`](http://127.0.0.1:8000/frontend/). 
 is allowlisted so it serves the Explorer, manifest and preview figures without exposing `.env` or
 arbitrary repository files.
 
+Open the globe-oriented public demo at
+[`http://127.0.0.1:8000/frontend/globe.html`](http://127.0.0.1:8000/frontend/globe.html).
+
 Build a deployable static Explorer bundle:
 
 ```bash

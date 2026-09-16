@@ -109,6 +109,10 @@ def test_export_firms_next_day_explorer_assets(tmp_path: Path) -> None:
     assert exports[0].brier_improvement_vs_persistence == 0.01
     assert exports[0].reference_time == "2014-01-02T00:00:00"
     assert exports[0].grid_shape == {"height": 2, "width": 2}
+    assert exports[0].wgs84_bbox["west"] < exports[0].wgs84_bbox["east"]
+    assert exports[0].wgs84_bbox["south"] < exports[0].wgs84_bbox["north"]
+    assert -180.0 <= exports[0].center_lon_lat["lon"] <= 180.0
+    assert -90.0 <= exports[0].center_lon_lat["lat"] <= 90.0
     assert Path(exports[0].preview_png).exists()
     assert manifest_path.exists()
     assert report_path.exists()
