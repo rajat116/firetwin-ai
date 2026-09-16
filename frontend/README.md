@@ -16,3 +16,12 @@ http://localhost:8000/frontend/
 
 The app loads `data/manifests/firms_next_day_explorer_manifest.json` and the committed preview PNGs
 under `reports/figures/`. It does not require the ignored local Zarr forecast artifacts to render.
+
+Build a deployable static bundle:
+
+```bash
+python3 scripts/build_explorer_site.py --output-dir dist/explorer
+```
+
+Serve `dist/explorer/` with any static file server. The bundle contains only the Explorer, manifest
+and referenced preview PNGs.

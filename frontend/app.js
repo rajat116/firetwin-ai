@@ -1,5 +1,6 @@
 (function () {
-  const manifestUrl = "../data/manifests/firms_next_day_explorer_manifest.json";
+  const assetRoot = window.location.pathname.includes("/frontend/") ? "../" : "./";
+  const manifestUrl = assetUrl("data/manifests/firms_next_day_explorer_manifest.json");
   const state = {
     manifest: null,
     selectedIndex: 0,
@@ -54,7 +55,7 @@
   }
 
   function assetUrl(path) {
-    return `../${path}`;
+    return `${assetRoot}${path}`;
   }
 
   function setZoom(nextZoom) {

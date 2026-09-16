@@ -498,6 +498,7 @@ samples for next-calendar-day active-fire probability modeling.
 - [x] Added first dependency-free local Explorer UI under `frontend/`.
 - [x] Added allowlisted local preview server at `scripts/serve_explorer.py`.
 - [x] Added static frontend and preview-server tests.
+- [x] Added deployable static Explorer bundle builder at `scripts/build_explorer_site.py`.
 
 ### Result-Wise Sample Artifacts
 
@@ -610,6 +611,14 @@ python3 scripts/serve_explorer.py --host 127.0.0.1 --port 8000
 Then open `http://127.0.0.1:8000/frontend/`. The preview server is allowlisted to serve only
 `frontend/`, `data/manifests/firms_next_day_explorer_manifest.json` and the Explorer preview PNGs,
 so local secrets such as `.env` are not exposed.
+
+The Explorer can also be packaged for static hosting with:
+
+```bash
+python3 scripts/build_explorer_site.py --output-dir dist/explorer
+```
+
+The build copies only the frontend, manifest and referenced preview PNGs into `dist/explorer/`.
 
 ### Phase 5A Exit Criteria
 

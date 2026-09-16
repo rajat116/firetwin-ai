@@ -228,6 +228,14 @@ Then open [`http://127.0.0.1:8000/frontend/`](http://127.0.0.1:8000/frontend/). 
 is allowlisted so it serves the Explorer, manifest and preview figures without exposing `.env` or
 arbitrary repository files.
 
+Build a deployable static Explorer bundle:
+
+```bash
+python3 scripts/build_explorer_site.py --output-dir dist/explorer
+```
+
+The bundle contains only the Explorer, manifest and referenced preview PNGs.
+
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
 ### Configuration

@@ -1,4 +1,4 @@
-.PHONY: help install test lint format clean doctor explorer
+.PHONY: help install test lint format clean doctor explorer explorer-build
 
 help:
 	@echo "FireTwin Development Commands"
@@ -10,6 +10,7 @@ help:
 	@echo "make clean      - Remove build artifacts and caches"
 	@echo "make doctor     - Run system diagnostics"
 	@echo "make explorer   - Serve the local FireTwin Explorer preview"
+	@echo "make explorer-build - Build deployable static Explorer bundle"
 	@echo "make pre-commit - Install pre-commit hooks"
 
 install:
@@ -47,6 +48,9 @@ doctor:
 
 explorer:
 	python scripts/serve_explorer.py --host 127.0.0.1 --port 8000
+
+explorer-build:
+	python scripts/build_explorer_site.py --output-dir dist/explorer
 
 pre-commit:
 	pre-commit install
