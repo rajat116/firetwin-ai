@@ -32,7 +32,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 5A Complete - Next-Day FIRMS Active-Fire Learning + Explorer Assets
+**Current Phase**: Phase 5B Started - Simulation Corpus and Surrogate Foundation
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
@@ -44,6 +44,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 - ✅ **Phase 4D**: Final-extent baseline diagnostics and forecast-label guardrails
 - ✅ **Phase 4E**: FIRMS-backed progression labels, initial-state artifacts and validation overlays
 - ✅ **Phase 5A**: Leakage-safe next-day FIRMS active-fire samples, baselines, learned forecasts, calibration and Explorer assets
+- 🚧 **Phase 5B**: Deterministic synthetic simulation-corpus builder started; surrogate training remains next
 
 Current pilot cases contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
 terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes, and real
@@ -64,6 +65,9 @@ exact burned-perimeter spread.
 Leave-one-fire-out forecast artifacts, reliability diagnostics and Explorer-ready preview assets now
 exist for future UI layers under ignored local forecast storage plus committed reports, figures and
 a lightweight manifest.
+Phase 5B has started with a reproducible synthetic simulation-corpus generator that writes
+surrogate-ready NPZ samples and a guarded manifest. This corpus is simulator-derived and is not real
+wildfire truth.
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -356,7 +360,7 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 4D**: Final-extent baseline diagnostics and guardrails
 - [x] **Phase 4E**: FIRMS-backed progression labels and initial-state artifacts
 - [x] **Phase 5A**: Next-day FIRMS active-fire sample artifacts, baselines, learned forecasts, calibration and Explorer assets
-- [ ] **Phase 5B**: Simulation corpus and surrogate
+- [ ] **Phase 5B**: Simulation corpus and surrogate (started)
 - [ ] **Phase 6**: Hybrid model
 - [ ] **Phase 7**: Assimilation and calibrated uncertainty
 - [ ] **Phase 8**: Simulated intervention planner

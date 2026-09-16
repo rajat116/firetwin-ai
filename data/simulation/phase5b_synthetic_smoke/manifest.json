@@ -1,0 +1,160 @@
+{
+  "config": {
+    "base_spread_rate_max_m_h": 145.0,
+    "base_spread_rate_min_m_h": 35.0,
+    "case_count": 6,
+    "forecast_hours": [
+      3.0,
+      6.0,
+      12.0
+    ],
+    "grid_height": 40,
+    "grid_width": 40,
+    "resolution_m": 60.0,
+    "seed": 1729
+  },
+  "generator": "EllipticalBaseline over synthetic terrain/fuel/weather scenarios",
+  "guardrails": [
+    "Synthetic simulator corpus; not observed fire perimeter truth.",
+    "Uses simplified wind-driven elliptical spread for first surrogate scaffolding.",
+    "Designed to test surrogate data contracts before hybrid modeling."
+  ],
+  "not_real_wildfire_truth": true,
+  "sample_count": 6,
+  "samples": [
+    {
+      "artifact": "samples/phase5b_sim_0000.npz",
+      "base_spread_rate_m_h": 142.39919460673366,
+      "case_id": "phase5b_sim_0000",
+      "final_active_cells": 902,
+      "final_burned_cells": 907,
+      "forecast_hours": [
+        3.0,
+        6.0,
+        12.0
+      ],
+      "grid_shape": {
+        "height": 40,
+        "width": 40
+      },
+      "initial_burned_cells": 5,
+      "relative_humidity_percent": 46.9319906871214,
+      "resolution_m": 60.0,
+      "temperature_c": 29.525038197036174,
+      "wind_direction_degrees": 105.8221609362959,
+      "wind_speed_m_s": 2.7741759768267764
+    },
+    {
+      "artifact": "samples/phase5b_sim_0001.npz",
+      "base_spread_rate_m_h": 120.54481050723763,
+      "case_id": "phase5b_sim_0001",
+      "final_active_cells": 901,
+      "final_burned_cells": 906,
+      "forecast_hours": [
+        3.0,
+        6.0,
+        12.0
+      ],
+      "grid_shape": {
+        "height": 40,
+        "width": 40
+      },
+      "initial_burned_cells": 5,
+      "relative_humidity_percent": 38.79483558217716,
+      "resolution_m": 60.0,
+      "temperature_c": 29.83110165367411,
+      "wind_direction_degrees": 314.14435517556643,
+      "wind_speed_m_s": 1.621463623906578
+    },
+    {
+      "artifact": "samples/phase5b_sim_0002.npz",
+      "base_spread_rate_m_h": 102.47276459049937,
+      "case_id": "phase5b_sim_0002",
+      "final_active_cells": 554,
+      "final_burned_cells": 559,
+      "forecast_hours": [
+        3.0,
+        6.0,
+        12.0
+      ],
+      "grid_shape": {
+        "height": 40,
+        "width": 40
+      },
+      "initial_burned_cells": 5,
+      "relative_humidity_percent": 41.52561458185994,
+      "resolution_m": 60.0,
+      "temperature_c": 23.461323870665844,
+      "wind_direction_degrees": 323.07187184942325,
+      "wind_speed_m_s": 4.897965768767362
+    },
+    {
+      "artifact": "samples/phase5b_sim_0003.npz",
+      "base_spread_rate_m_h": 92.55956613889899,
+      "case_id": "phase5b_sim_0003",
+      "final_active_cells": 359,
+      "final_burned_cells": 363,
+      "forecast_hours": [
+        3.0,
+        6.0,
+        12.0
+      ],
+      "grid_shape": {
+        "height": 40,
+        "width": 40
+      },
+      "initial_burned_cells": 4,
+      "relative_humidity_percent": 23.966727566642803,
+      "resolution_m": 60.0,
+      "temperature_c": 20.834670053764736,
+      "wind_direction_degrees": 78.92057000259936,
+      "wind_speed_m_s": 6.635882982831554
+    },
+    {
+      "artifact": "samples/phase5b_sim_0004.npz",
+      "base_spread_rate_m_h": 69.79964891472298,
+      "case_id": "phase5b_sim_0004",
+      "final_active_cells": 439,
+      "final_burned_cells": 444,
+      "forecast_hours": [
+        3.0,
+        6.0,
+        12.0
+      ],
+      "grid_shape": {
+        "height": 40,
+        "width": 40
+      },
+      "initial_burned_cells": 5,
+      "relative_humidity_percent": 26.56596508985821,
+      "resolution_m": 60.0,
+      "temperature_c": 33.32536020728742,
+      "wind_direction_degrees": 357.95792587336524,
+      "wind_speed_m_s": 12.871025490023639
+    },
+    {
+      "artifact": "samples/phase5b_sim_0005.npz",
+      "base_spread_rate_m_h": 42.890449896422844,
+      "case_id": "phase5b_sim_0005",
+      "final_active_cells": 276,
+      "final_burned_cells": 281,
+      "forecast_hours": [
+        3.0,
+        6.0,
+        12.0
+      ],
+      "grid_shape": {
+        "height": 40,
+        "width": 40
+      },
+      "initial_burned_cells": 5,
+      "relative_humidity_percent": 13.585264600875457,
+      "resolution_m": 60.0,
+      "temperature_c": 32.85407026939838,
+      "wind_direction_degrees": 206.71222152895976,
+      "wind_speed_m_s": 5.572659614060691
+    }
+  ],
+  "schema_version": "firetwin.simulation_corpus.v1",
+  "target": "simulated_fire_spread_masks"
+}

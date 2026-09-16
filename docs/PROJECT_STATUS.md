@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
-**Last Updated**: 2026-09-15
-**Current Phase**: Phase 5A ✅ - Next-Day FIRMS Active-Fire Learning + Local Explorer
+**Last Updated**: 2026-09-16
+**Current Phase**: Phase 5B 🚧 - Simulation Corpus and Surrogate Foundation
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -639,6 +639,43 @@ python3 scripts/smoke_explorer_bundle.py --bundle-dir dist/explorer
 - [x] A local Explorer UI can render the committed manifest and figures.
 - [x] Guardrails distinguish FIRMS active-fire evidence from exact perimeter spread.
 
+## Phase 5B: Simulation Corpus and Surrogate 🚧
+
+**Status**: STARTED (2026-09-16)
+
+**Purpose**: Build simulator-derived training data and a learned surrogate so future what-if
+controls can produce real recomputed outputs rather than decorative UI changes.
+
+### Completed Tasks
+
+- [x] Added deterministic Phase 5B simulation-corpus utilities under `firetwin.simulation`.
+- [x] Added `scripts/build_simulation_corpus.py`.
+- [x] Added schema version `firetwin.simulation_corpus.v1`.
+- [x] Added simulator-derived guardrails: synthetic corpus, not observed wildfire truth.
+- [x] Added a small smoke corpus under `data/simulation/phase5b_synthetic_smoke/`.
+- [x] Generated `reports/phase5b_simulation_corpus.md`.
+- [x] Added unit tests for deterministic scenario sampling, NPZ array contract, reproducibility,
+  config validation and report rendering.
+
+### Result-Wise Simulation Corpus Smoke Artifact
+
+- Samples: 6 synthetic scenarios on a 40x40 grid.
+- Forecast horizons: 3h, 6h and 12h.
+- Generator: wind-driven `EllipticalBaseline` over synthetic terrain/fuel/weather scenarios.
+- Total final burned cells across smoke corpus: 3,460.
+- Example sample contract: `initial_burned`, terrain/fuel covariates, scalar weather,
+  `forecast_burned`, `forecast_active_front`, `forecast_hours` and `base_spread_rate_m_h`.
+
+Interpretation: Phase 5B now has a reproducible simulator-corpus data contract for surrogate-model
+development. The learned surrogate itself has not been trained yet.
+
+### Remaining Phase 5B Work
+
+- [ ] Train a first lightweight surrogate on the simulation corpus.
+- [ ] Evaluate surrogate accuracy and latency against the simulator baseline.
+- [ ] Add larger configurable corpus generation after the smoke contract is stable.
+- [ ] Connect scenario controls only after backend/surrogate inference is real.
+
 ## Future Phases
 
 - **Phase 5A**: Next-day FIRMS active-fire samples, baselines, learned model and Explorer assets
@@ -662,8 +699,9 @@ Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
 Phase 5A: ████████████████████ 100% ✅
+Phase 5B: ████░░░░░░░░░░░░░░░░  20% 🚧
 ...
-Overall: ██████████████░░░░░░  70%
+Overall: ██████████████░░░░░░  72%
 ```
 
 ## Known Issues
@@ -679,9 +717,9 @@ Overall: ██████████████░░░░░░  70%
 
 ## Blockers
 
-No credential blocker remains. Phase 5A plus the first local Explorer are complete. The next
-development decision is whether to deploy/polish the public Explorer or start Phase 5B
-simulation-corpus/surrogate work.
+No credential blocker remains. Phase 5A plus the first local Explorer are complete. Phase 5B has
+started with a deterministic synthetic simulation-corpus foundation; the surrogate model is the next
+major unfinished task.
 
 ## Notes
 
