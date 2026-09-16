@@ -1,0 +1,81 @@
+{
+  "rows": [
+    {
+      "case_id": "phase5b_sim_0000",
+      "grid_cells": 1600,
+      "horizon_count": 3,
+      "median_speedup": 27.30948847623354,
+      "repetitions": 9,
+      "simulator_median_ms": 123.45824996009469,
+      "simulator_p95_ms": 138.77246618503705,
+      "surrogate_median_ms": 4.520708986092359,
+      "surrogate_p95_ms": 5.042692215647548
+    },
+    {
+      "case_id": "phase5b_sim_0001",
+      "grid_cells": 1600,
+      "horizon_count": 3,
+      "median_speedup": 16.523096376574852,
+      "repetitions": 9,
+      "simulator_median_ms": 75.78387495595962,
+      "simulator_p95_ms": 81.69580020476133,
+      "surrogate_median_ms": 4.586541967000812,
+      "surrogate_p95_ms": 5.153025221079588
+    },
+    {
+      "case_id": "phase5b_sim_0002",
+      "grid_cells": 1600,
+      "horizon_count": 3,
+      "median_speedup": 18.521364545688506,
+      "repetitions": 9,
+      "simulator_median_ms": 83.21108296513557,
+      "simulator_p95_ms": 89.45459160022438,
+      "surrogate_median_ms": 4.492708016186953,
+      "surrogate_p95_ms": 4.964958212804049
+    },
+    {
+      "case_id": "phase5b_sim_0003",
+      "grid_cells": 1600,
+      "horizon_count": 3,
+      "median_speedup": 18.957340136875207,
+      "repetitions": 9,
+      "simulator_median_ms": 86.37991599971429,
+      "simulator_p95_ms": 91.14765000995249,
+      "surrogate_median_ms": 4.556541971396655,
+      "surrogate_p95_ms": 5.618624994531274
+    },
+    {
+      "case_id": "phase5b_sim_0004",
+      "grid_cells": 1600,
+      "horizon_count": 3,
+      "median_speedup": 12.984422323895526,
+      "repetitions": 9,
+      "simulator_median_ms": 81.34145895019174,
+      "simulator_p95_ms": 86.61120000761002,
+      "surrogate_median_ms": 6.264541996642947,
+      "surrogate_p95_ms": 9.835233411286026
+    },
+    {
+      "case_id": "phase5b_sim_0005",
+      "grid_cells": 1600,
+      "horizon_count": 3,
+      "median_speedup": 3.586075010853742,
+      "repetitions": 9,
+      "simulator_median_ms": 16.736958001274616,
+      "simulator_p95_ms": 18.93697497434914,
+      "surrogate_median_ms": 4.667208006139845,
+      "surrogate_p95_ms": 6.103708175942302
+    }
+  ],
+  "summary": {
+    "corpus_dir": "data/simulation/phase5b_synthetic_smoke",
+    "mean_median_speedup": 16.31363114502023,
+    "mean_simulator_median_ms": 77.81859013872842,
+    "mean_surrogate_median_ms": 4.848041823909928,
+    "median_of_speedups": 17.522230461131677,
+    "model_path": "data/models/phase5b_surrogate_smoke.npz",
+    "repetitions": 9,
+    "sample_count": 6,
+    "warmup": 2
+  }
+}

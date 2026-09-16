@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-16
-**Current Phase**: Phase 5B 🚧 - Simulation Corpus and First Surrogate Baseline
+**Current Phase**: Phase 5B 🚧 - Simulation Corpus, First Surrogate Baseline and Latency Benchmark
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -663,6 +663,10 @@ controls can produce real recomputed outputs rather than decorative UI changes.
   `reports/phase5b_simulation_surrogate_metrics.json`.
 - [x] Added unit tests for surrogate prediction shape, bounded probabilities, leave-one-out
   evaluation, save/load round-trip and report guardrails.
+- [x] Added reusable latency benchmarking under `firetwin.models.surrogate.benchmark`.
+- [x] Added `scripts/benchmark_simulation_surrogate.py`.
+- [x] Generated `reports/phase5b_simulation_surrogate_latency.md` and
+  `reports/phase5b_simulation_surrogate_latency_metrics.json`.
 
 ### Result-Wise Simulation Corpus Smoke Artifact
 
@@ -690,11 +694,25 @@ development.
 Interpretation: the first surrogate baseline is real and result-checked against the smoke corpus.
 It is still a simulator-trained baseline, not an observed-wildfire model.
 
+### Result-Wise Simulation Surrogate Latency Smoke Benchmark
+
+- Benchmark: trained surrogate artifact vs reconstructed `EllipticalBaseline` simulator path.
+- Samples: 6 smoke-corpus scenarios, 1,600 cells each, 3 horizons each.
+- Repetitions: 9 timed runs per sample after 2 warmup runs.
+- Mean simulator median latency: 77.819 ms.
+- Mean surrogate median latency: 4.848 ms.
+- Mean median speedup: 16.31x.
+- Median of sample speedups: 17.52x.
+
+Interpretation: the first surrogate is already fast enough for interactive smoke-scale engineering
+loops. These timings are directional and should be repeated on a larger corpus before claiming a
+production SLA.
+
 ### Remaining Phase 5B Work
 
 - [x] Train a first lightweight surrogate on the simulation corpus.
 - [x] Evaluate surrogate accuracy against initial-state persistence on held-out simulations.
-- [ ] Benchmark surrogate latency against the simulator baseline.
+- [x] Benchmark surrogate latency against the simulator baseline.
 - [ ] Add larger configurable corpus generation after the smoke contract is stable.
 - [ ] Connect scenario controls only after backend/surrogate inference is real.
 
@@ -721,9 +739,9 @@ Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
 Phase 5A: ████████████████████ 100% ✅
-Phase 5B: ███████░░░░░░░░░░░░░  35% 🚧
+Phase 5B: █████████░░░░░░░░░░░  45% 🚧
 ...
-Overall: ███████████████░░░░░  74%
+Overall: ███████████████░░░░░  75%
 ```
 
 ## Known Issues
@@ -740,8 +758,9 @@ Overall: ███████████████░░░░░  74%
 ## Blockers
 
 No credential blocker remains. Phase 5A plus the first local Explorer are complete. Phase 5B has
-started with a deterministic synthetic simulation-corpus foundation and a first trained surrogate
-baseline. The next major unfinished task is latency benchmarking plus a larger surrogate corpus.
+started with a deterministic synthetic simulation-corpus foundation, a first trained surrogate
+baseline and a smoke-corpus latency benchmark. The next major unfinished task is a larger surrogate
+corpus plus the first real backend inference contract for interactive controls.
 
 ## Notes
 
