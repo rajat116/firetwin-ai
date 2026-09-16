@@ -236,7 +236,8 @@ python3 scripts/build_explorer_site.py --output-dir dist/explorer
 
 The bundle contains only the Explorer, manifest and referenced preview PNGs.
 
-Smoke-test the deployable bundle before sharing it:
+Smoke-test the deployable bundle, including manifest integrity and preview-image visual checks,
+before sharing it:
 
 ```bash
 python3 scripts/smoke_explorer_bundle.py --bundle-dir dist/explorer

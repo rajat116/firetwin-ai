@@ -57,3 +57,7 @@ def test_static_explorer_bundle_smoke_test(tmp_path: Path) -> None:
     assert summary["case_count"] == 3
     assert summary["guardrail_count"] >= 3
     assert summary["preview_count"] == 3
+    for preview in summary["previews"]:
+        assert preview["width"] >= 1000
+        assert preview["height"] >= 400
+        assert preview["pixel_range"] >= 24

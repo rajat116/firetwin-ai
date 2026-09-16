@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
+import struct
+import zlib
 from pathlib import Path
 from typing import Any
 
@@ -41,6 +44,18 @@ REQUIRED_FRONTEND_IDS = (
 )
 
 
+def _paeth_predictor(left: int, above: int, upper_left: int) -> int:
+    estimate = left + above - upper_left
+    distance_left = abs(estimate - left)
+    distance_above = abs(estimate - above)
+    distance_upper_left = abs(estimate - upper_left)
+    if distance_left <= distance_above and distance_left <= distance_upper_left:
+        return left
+    if distance_above <= distance_upper_left:
+        return above
+    return upper_left
+
+
 def _load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -51,14 +66,111 @@ def _assert_probability(case: dict[str, Any], field: str) -> None:
         raise ValueError(f"{case.get('case_id', '<unknown>')} has invalid {field}: {value}")
 
 
-def _assert_png(path: Path) -> None:
+def _decode_png_rgba(path: Path) -> tuple[int, int, bytes]:
+    content = path.read_bytes()
+    if content[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError(f"Preview is not a PNG: {path}")
+
+    offset = 8
+    width: int | None = None
+    height: int | None = None
+    bit_depth: int | None = None
+    color_type: int | None = None
+    interlace_method: int | None = None
+    compressed = bytearray()
+
+    while offset < len(content):
+        if offset + 8 > len(content):
+            raise ValueError(f"Malformed PNG chunk header: {path}")
+        chunk_length = struct.unpack(">I", content[offset : offset + 4])[0]
+        chunk_type = content[offset + 4 : offset + 8]
+        chunk_start = offset + 8
+        chunk_end = chunk_start + chunk_length
+        if chunk_end + 4 > len(content):
+            raise ValueError(f"Malformed PNG chunk payload: {path}")
+        chunk_data = content[chunk_start:chunk_end]
+        offset = chunk_end + 4
+
+        if chunk_type == b"IHDR":
+            width, height, bit_depth, color_type, _, _, interlace_method = struct.unpack(
+                ">IIBBBBB", chunk_data
+            )
+        elif chunk_type == b"IDAT":
+            compressed.extend(chunk_data)
+        elif chunk_type == b"IEND":
+            break
+
+    if width is None or height is None or bit_depth is None or color_type is None:
+        raise ValueError(f"PNG is missing IHDR metadata: {path}")
+    if bit_depth != 8 or color_type not in {2, 6} or interlace_method != 0:
+        raise ValueError(
+            f"Unsupported PNG format for visual smoke test: "
+            f"bit_depth={bit_depth}, color_type={color_type}, interlace={interlace_method}"
+        )
+
+    channels = 4 if color_type == 6 else 3
+    bytes_per_pixel = channels
+    row_width = width * channels
+    decompressed = zlib.decompress(bytes(compressed))
+    expected_length = (row_width + 1) * height
+    if len(decompressed) != expected_length:
+        raise ValueError(f"Unexpected PNG pixel buffer length for {path}")
+
+    rows: list[bytes] = []
+    previous = bytes(row_width)
+    read_offset = 0
+    for _ in range(height):
+        filter_type = decompressed[read_offset]
+        read_offset += 1
+        source = decompressed[read_offset : read_offset + row_width]
+        read_offset += row_width
+        current = bytearray(row_width)
+        for index, value in enumerate(source):
+            left = current[index - bytes_per_pixel] if index >= bytes_per_pixel else 0
+            above = previous[index]
+            upper_left = previous[index - bytes_per_pixel] if index >= bytes_per_pixel else 0
+            if filter_type == 0:
+                restored = value
+            elif filter_type == 1:
+                restored = value + left
+            elif filter_type == 2:
+                restored = value + above
+            elif filter_type == 3:
+                restored = value + ((left + above) // 2)
+            elif filter_type == 4:
+                restored = value + _paeth_predictor(left, above, upper_left)
+            else:
+                raise ValueError(f"Unsupported PNG row filter {filter_type} in {path}")
+            current[index] = restored & 0xFF
+        rows.append(bytes(current))
+        previous = bytes(current)
+
+    return width, height, b"".join(rows)
+
+
+def _assert_png(path: Path) -> dict[str, Any]:
     if not path.is_file():
         raise FileNotFoundError(path)
-    header = path.read_bytes()[:8]
-    if header != b"\x89PNG\r\n\x1a\n":
-        raise ValueError(f"Preview is not a PNG: {path}")
     if path.stat().st_size < 10_000:
         raise ValueError(f"Preview PNG is unexpectedly small: {path}")
+    width, height, pixels = _decode_png_rgba(path)
+    if width < 1000 or height < 400:
+        raise ValueError(f"Preview PNG is too small for demo QA: {path} ({width}x{height})")
+
+    sample_step = max(1, len(pixels) // 80_000)
+    sampled = pixels[::sample_step]
+    min_pixel = min(sampled)
+    max_pixel = max(sampled)
+    if max_pixel - min_pixel < 24:
+        raise ValueError(f"Preview PNG appears visually blank or flat: {path}")
+
+    return {
+        "path": path.as_posix(),
+        "width": width,
+        "height": height,
+        "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "pixel_range": max_pixel - min_pixel,
+    }
 
 
 def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
@@ -97,7 +209,7 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
     if not isinstance(cases, list) or len(cases) < 3:
         raise ValueError("Explorer manifest should include the three pilot fire cases")
 
-    preview_paths: list[str] = []
+    previews: list[dict[str, Any]] = []
     for case in cases:
         missing = [field for field in REQUIRED_CASE_FIELDS if field not in case]
         if missing:
@@ -121,8 +233,13 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
         preview_path = Path(case["preview_png"])
         if preview_path.is_absolute() or ".." in preview_path.parts:
             raise ValueError(f"Unsafe preview path in manifest: {preview_path}")
-        _assert_png(bundle_dir / preview_path)
-        preview_paths.append(case["preview_png"])
+        preview = _assert_png(bundle_dir / preview_path)
+        preview["manifest_path"] = case["preview_png"]
+        previews.append(preview)
+
+    unique_preview_hashes = {preview["sha256"] for preview in previews}
+    if len(unique_preview_hashes) != len(previews):
+        raise ValueError("Explorer preview PNGs should be distinct across cases")
 
     for leaked_name in (".env", "pyproject.toml", ".git"):
         if bundle_dir.joinpath(leaked_name).exists():
@@ -131,8 +248,8 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
     return {
         "case_count": len(cases),
         "guardrail_count": len(manifest["guardrails"]),
-        "preview_count": len(preview_paths),
-        "previews": preview_paths,
+        "preview_count": len(previews),
+        "previews": previews,
     }
 
 
