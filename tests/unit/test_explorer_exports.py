@@ -59,6 +59,8 @@ def write_tiny_forecast_artifact(path: Path) -> None:
             "forecast_type": "leave_one_fire_out_next_day_firms_active_fire_probability",
             "excludes_final_extent_as_input": "true",
             "not_hourly_perimeter_truth": "true",
+            "persistence_brier_score": 0.02,
+            "brier_improvement_vs_persistence": 0.01,
             "grid_crs": "EPSG:32610",
             "resolution_m": 100.0,
             "bbox_min_x": 1.0,
@@ -103,6 +105,8 @@ def test_export_firms_next_day_explorer_assets(tmp_path: Path) -> None:
     assert len(exports) == 1
     assert exports[0].case_id == "explorer_test"
     assert exports[0].sample_index == 1
+    assert exports[0].persistence_brier_score == 0.02
+    assert exports[0].brier_improvement_vs_persistence == 0.01
     assert exports[0].reference_time == "2014-01-02T00:00:00"
     assert exports[0].grid_shape == {"height": 2, "width": 2}
     assert Path(exports[0].preview_png).exists()

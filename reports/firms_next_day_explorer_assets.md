@@ -7,11 +7,11 @@ The assets are intended for a future public Explorer UI and preserve the same sc
 - Schema: `firetwin.firms_next_day_explorer.v1`
 - Target: `active_fire_detection_probability`
 
-| Case | Sample | Reference time | Target time | Threshold | Brier | ECE | Peak probability | Predicted + frac | Target + frac | Preview |
-|---|---:|---|---|---:|---:|---:|---:|---:|---:|---|
-| carlton_complex_2014 | 4 | 2014-07-18T00:00:00 | 2014-07-19T00:00:00 | 0.050 | 0.00278 | 0.02462 | 0.470 | 0.15377 | 0.03273 | `reports/figures/carlton_complex_2014_explorer_forecast_preview.png` |
-| king_2014 | 4 | 2014-09-18T00:00:00 | 2014-09-19T00:00:00 | 0.050 | 0.00382 | 0.01871 | 0.216 | 0.08094 | 0.06150 | `reports/figures/king_2014_explorer_forecast_preview.png` |
-| big_cougar_2014 | 5 | 2014-08-08T00:00:00 | 2014-08-09T00:00:00 | 0.025 | 0.00631 | 0.01018 | 0.753 | 0.07171 | 0.03004 | `reports/figures/big_cougar_2014_explorer_forecast_preview.png` |
+| Case | Sample | Reference time | Target time | Threshold | Brier | Persistence Brier | Brier improvement | ECE | Peak probability | Predicted + frac | Target + frac | Preview |
+|---|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| carlton_complex_2014 | 4 | 2014-07-18T00:00:00 | 2014-07-19T00:00:00 | 0.050 | 0.00278 | 0.00362 | +0.00084 | 0.02462 | 0.470 | 0.15377 | 0.03273 | `reports/figures/carlton_complex_2014_explorer_forecast_preview.png` |
+| king_2014 | 4 | 2014-09-18T00:00:00 | 2014-09-19T00:00:00 | 0.050 | 0.00382 | 0.00462 | +0.00080 | 0.01871 | 0.216 | 0.08094 | 0.06150 | `reports/figures/king_2014_explorer_forecast_preview.png` |
+| big_cougar_2014 | 5 | 2014-08-08T00:00:00 | 2014-08-09T00:00:00 | 0.025 | 0.00631 | 0.01033 | +0.00402 | 0.01018 | 0.753 | 0.07171 | 0.03004 | `reports/figures/big_cougar_2014_explorer_forecast_preview.png` |
 
 ## Guardrails
 

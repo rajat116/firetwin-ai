@@ -18,10 +18,15 @@ def test_frontend_references_committed_explorer_assets() -> None:
     assert "./styles.css" in html
     assert "firms_next_day_explorer_manifest.json" in app_js
     assert "forecastFootprint" in html
+    assert "brierImprovement" in html
+    assert "persistenceBrier" in html
     assert "sample_predicted_positive_fraction" in app_js
     assert "sample_target_positive_fraction" in app_js
+    assert "brier_improvement_vs_persistence" in app_js
+    assert "persistence_brier_score" in app_js
     assert manifest["cases"]
     for case in manifest["cases"]:
+        assert case["brier_improvement_vs_persistence"] > 0
         assert (REPO_ROOT / case["preview_png"]).exists()
 
 

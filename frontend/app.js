@@ -15,6 +15,7 @@
     peakProbability: document.getElementById("peakProbability"),
     threshold: document.getElementById("threshold"),
     brier: document.getElementById("brier"),
+    brierImprovement: document.getElementById("brierImprovement"),
     ece: document.getElementById("ece"),
     forecastFootprint: document.getElementById("forecastFootprint"),
     observedEvidence: document.getElementById("observedEvidence"),
@@ -26,6 +27,7 @@
     referenceTime: document.getElementById("referenceTime"),
     targetTime: document.getElementById("targetTime"),
     sampleIndex: document.getElementById("sampleIndex"),
+    persistenceBrier: document.getElementById("persistenceBrier"),
     precision: document.getElementById("precision"),
     recall: document.getElementById("recall"),
     f1: document.getElementById("f1"),
@@ -44,6 +46,12 @@
 
   function decimal(value, digits = 3) {
     return Number(value).toFixed(digits);
+  }
+
+  function signedDecimal(value, digits = 5) {
+    const number = Number(value);
+    const sign = number > 0 ? "+" : "";
+    return `${sign}${number.toFixed(digits)}`;
   }
 
   function dateLabel(value) {
@@ -133,6 +141,10 @@
     els.peakProbability.textContent = percent(caseData.sample_peak_probability);
     els.threshold.textContent = decimal(caseData.recommended_threshold, 3);
     els.brier.textContent = decimal(caseData.observed_brier_score, 5);
+    els.brierImprovement.textContent = signedDecimal(
+      caseData.brier_improvement_vs_persistence,
+      5
+    );
     els.ece.textContent = decimal(caseData.expected_calibration_error, 5);
     els.forecastFootprint.textContent = `${percent(
       caseData.sample_predicted_positive_fraction
@@ -155,6 +167,7 @@
     els.referenceTime.textContent = dateLabel(caseData.reference_time);
     els.targetTime.textContent = dateLabel(caseData.target_time);
     els.sampleIndex.textContent = String(caseData.sample_index);
+    els.persistenceBrier.textContent = decimal(caseData.persistence_brier_score, 5);
     els.precision.textContent = percent(caseData.recommended_precision);
     els.recall.textContent = percent(caseData.recommended_recall);
     els.f1.textContent = decimal(caseData.recommended_f1_score, 3);

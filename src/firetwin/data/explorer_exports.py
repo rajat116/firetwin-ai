@@ -47,6 +47,8 @@ class ExplorerCaseExport:
     resolution_m: float | None
     recommended_threshold: float
     observed_brier_score: float
+    persistence_brier_score: float
+    brier_improvement_vs_persistence: float
     expected_calibration_error: float
     recommended_f1_score: float
     recommended_precision: float
@@ -134,6 +136,8 @@ def export_forecast_artifact_for_explorer(
             resolution_m=_optional_float_attr(ds, "resolution_m"),
             recommended_threshold=threshold,
             observed_brier_score=summary.observed_brier_score,
+            persistence_brier_score=float(ds.attrs["persistence_brier_score"]),
+            brier_improvement_vs_persistence=float(ds.attrs["brier_improvement_vs_persistence"]),
             expected_calibration_error=summary.expected_calibration_error,
             recommended_f1_score=summary.recommended_f1_score,
             recommended_precision=summary.recommended_precision,
@@ -193,14 +197,16 @@ def render_explorer_export_report(
         f"- Schema: `{EXPLORER_SCHEMA_VERSION}`",
         f"- Target: `{TARGET_TYPE}`",
         "",
-        "| Case | Sample | Reference time | Target time | Threshold | Brier | ECE | Peak probability | Predicted + frac | Target + frac | Preview |",
-        "|---|---:|---|---|---:|---:|---:|---:|---:|---:|---|",
+        "| Case | Sample | Reference time | Target time | Threshold | Brier | Persistence Brier | Brier improvement | ECE | Peak probability | Predicted + frac | Target + frac | Preview |",
+        "|---|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for export in exports:
         lines.append(
             f"| {export.case_id} | {export.sample_index} | {export.reference_time} | "
             f"{export.target_time} | {export.recommended_threshold:.3f} | "
-            f"{export.observed_brier_score:.5f} | {export.expected_calibration_error:.5f} | "
+            f"{export.observed_brier_score:.5f} | {export.persistence_brier_score:.5f} | "
+            f"{export.brier_improvement_vs_persistence:+.5f} | "
+            f"{export.expected_calibration_error:.5f} | "
             f"{export.sample_peak_probability:.3f} | "
             f"{export.sample_predicted_positive_fraction:.5f} | "
             f"{export.sample_target_positive_fraction:.5f} | `{export.preview_png}` |"

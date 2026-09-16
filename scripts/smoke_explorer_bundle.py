@@ -26,6 +26,8 @@ REQUIRED_CASE_FIELDS = (
     "reference_time",
     "resolution_m",
     "sample_index",
+    "persistence_brier_score",
+    "brier_improvement_vs_persistence",
     "sample_peak_probability",
     "sample_predicted_positive_fraction",
     "sample_target_positive_fraction",
@@ -38,6 +40,8 @@ REQUIRED_FRONTEND_IDS = (
     "guardrailList",
     "caseName",
     "previewImage",
+    "brierImprovement",
+    "persistenceBrier",
     "forecastFootprint",
     "observedEvidence",
     "evidenceBalance",
@@ -220,6 +224,7 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
             raise ValueError(f"{case['case_id']} forecast semantics disagree with manifest")
         for field in (
             "observed_brier_score",
+            "persistence_brier_score",
             "recommended_f1_score",
             "recommended_precision",
             "recommended_recall",
@@ -229,6 +234,11 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
             "sample_target_positive_fraction",
         ):
             _assert_probability(case, field)
+        improvement = float(case["brier_improvement_vs_persistence"])
+        if not math.isfinite(improvement):
+            raise ValueError(f"{case['case_id']} has invalid Brier improvement")
+        if improvement <= 0:
+            raise ValueError(f"{case['case_id']} does not beat persistence by Brier score")
 
         preview_path = Path(case["preview_png"])
         if preview_path.is_absolute() or ".." in preview_path.parts:
