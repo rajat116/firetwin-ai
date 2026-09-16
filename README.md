@@ -32,7 +32,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 5B In Progress - Simulation Corpus, Surrogate and Latency Benchmark
+**Current Phase**: Phase 5B In Progress - Scaled Simulation Corpus and Surrogate Foundation
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
@@ -44,7 +44,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 - ✅ **Phase 4D**: Final-extent baseline diagnostics and forecast-label guardrails
 - ✅ **Phase 4E**: FIRMS-backed progression labels, initial-state artifacts and validation overlays
 - ✅ **Phase 5A**: Leakage-safe next-day FIRMS active-fire samples, baselines, learned forecasts, calibration and Explorer assets
-- 🚧 **Phase 5B**: Deterministic synthetic simulation corpus, first trained surrogate baseline and latency benchmark
+- 🚧 **Phase 5B**: Deterministic synthetic simulation corpus profiles, first trained surrogate baseline and latency benchmark
 
 Current pilot cases contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
 terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes, and real
@@ -71,7 +71,14 @@ against that corpus and beats initial-state persistence on leave-one-simulation-
 (`0.11628` mean Brier vs `0.20062` persistence, `0.678` mean IoU). Smoke latency benchmarking shows
 the artifact-backed surrogate path is `16.31x` faster on mean median latency than the reconstructed
 `EllipticalBaseline` simulator path (`4.848 ms` vs `77.819 ms`). This corpus is simulator-derived
-and is not real wildfire truth.
+and is not real wildfire truth. Larger local corpus profiles now exist for development and showcase
+experiments without committing bulky generated samples.
+
+Build the larger local development corpus with:
+
+```bash
+python scripts/build_simulation_corpus.py --profile development
+```
 
 See [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) for detailed progress tracking.
 
@@ -364,7 +371,7 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 4D**: Final-extent baseline diagnostics and guardrails
 - [x] **Phase 4E**: FIRMS-backed progression labels and initial-state artifacts
 - [x] **Phase 5A**: Next-day FIRMS active-fire sample artifacts, baselines, learned forecasts, calibration and Explorer assets
-- [ ] **Phase 5B**: Simulation corpus, first surrogate baseline and latency benchmark (in progress)
+- [ ] **Phase 5B**: Simulation corpus profiles, first surrogate baseline and latency benchmark (in progress)
 - [ ] **Phase 6**: Hybrid model
 - [ ] **Phase 7**: Assimilation and calibrated uncertainty
 - [ ] **Phase 8**: Simulated intervention planner

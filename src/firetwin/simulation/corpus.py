@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -90,6 +90,18 @@ class SimulationCorpusSummary:
     sample_count: int
     forecast_hours: list[float]
     total_final_burned_cells: int
+
+
+@dataclass(frozen=True)
+class SimulationCorpusProfile:
+    """Named corpus-generation profile loaded from project configuration."""
+
+    name: str
+    description: str
+    output_dir: Path
+    report_path: Path
+    config: SimulationCorpusConfig
+    commit_outputs: bool
 
 
 def sample_simulation_scenario(index: int, *, seed: int) -> SimulationScenario:
@@ -211,6 +223,68 @@ def build_simulation_corpus(
         sample_count=len(samples),
         forecast_hours=list(config.forecast_hours),
         total_final_burned_cells=int(sum(sample.final_burned_cells for sample in samples)),
+    )
+
+
+def load_simulation_corpus_profiles(path: Path) -> dict[str, SimulationCorpusProfile]:
+    """Load named Phase 5B simulation-corpus profiles from a JSON config file."""
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    raw = cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    raw_profiles = raw.get("profiles")
+    if not isinstance(raw_profiles, dict) or not raw_profiles:
+        raise ValueError("Simulation corpus profiles file must contain a non-empty profiles object")
+
+    profiles: dict[str, SimulationCorpusProfile] = {}
+    for name, raw_profile in raw_profiles.items():
+        if not isinstance(raw_profile, dict):
+            raise ValueError(f"Profile {name!r} must be an object")
+        raw_config = raw_profile.get("config")
+        if not isinstance(raw_config, dict):
+            raise ValueError(f"Profile {name!r} must contain a config object")
+        forecast_hours = tuple(float(hour) for hour in raw_config.get("forecast_hours", ()))
+        config = SimulationCorpusConfig(
+            case_count=int(raw_config["case_count"]),
+            grid_height=int(raw_config["grid_height"]),
+            grid_width=int(raw_config["grid_width"]),
+            resolution_m=float(raw_config.get("resolution_m", 60.0)),
+            forecast_hours=forecast_hours,
+            seed=int(raw_config.get("seed", 1729)),
+            base_spread_rate_min_m_h=float(raw_config.get("base_spread_rate_min_m_h", 35.0)),
+            base_spread_rate_max_m_h=float(raw_config.get("base_spread_rate_max_m_h", 145.0)),
+        )
+        config.validate()
+        profiles[str(name)] = SimulationCorpusProfile(
+            name=str(name),
+            description=str(raw_profile.get("description", "")),
+            output_dir=Path(str(raw_profile["output_dir"])),
+            report_path=Path(str(raw_profile["report_path"])),
+            config=config,
+            commit_outputs=bool(raw_profile.get("commit_outputs", False)),
+        )
+    return profiles
+
+
+def simulation_corpus_profile_report(profile: SimulationCorpusProfile) -> str:
+    """Render a short Markdown description of a configured corpus profile."""
+    sample_cells = profile.config.grid_height * profile.config.grid_width
+    total_masks = profile.config.case_count * len(profile.config.forecast_hours)
+    return "\n".join(
+        [
+            f"## `{profile.name}`",
+            "",
+            profile.description,
+            "",
+            f"- Output directory: `{profile.output_dir.as_posix()}`",
+            f"- Report path: `{profile.report_path.as_posix()}`",
+            f"- Cases: {profile.config.case_count}",
+            f"- Grid: {profile.config.grid_height}x{profile.config.grid_width}",
+            f"- Forecast horizons: {', '.join(f'{hour:g}h' for hour in profile.config.forecast_hours)}",
+            f"- Total forecast masks: {total_masks}",
+            f"- Cells per mask: {sample_cells:,}",
+            f"- Commit generated samples: `{str(profile.commit_outputs).lower()}`",
+            "",
+        ]
     )
 
 

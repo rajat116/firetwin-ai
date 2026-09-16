@@ -10,8 +10,10 @@ from firetwin.simulation import (
     SIMULATION_CORPUS_SCHEMA_VERSION,
     SimulationCorpusConfig,
     build_simulation_corpus,
+    load_simulation_corpus_profiles,
     render_simulation_corpus_report,
     sample_simulation_scenario,
+    simulation_corpus_profile_report,
 )
 
 
@@ -107,3 +109,54 @@ def test_render_simulation_corpus_report(tmp_path: Path) -> None:
     assert "Phase 5B Simulation Corpus" in report
     assert "not as real" in report
     assert str(summary.sample_count) in report
+
+
+def test_load_simulation_corpus_profiles_reads_named_configs(tmp_path: Path) -> None:
+    """Profile config should produce validated named corpus configurations."""
+    profiles_path = tmp_path / "profiles.json"
+    profiles_path.write_text(
+        json.dumps(
+            {
+                "profiles": {
+                    "tiny": {
+                        "description": "Tiny profile",
+                        "output_dir": "data/simulation/tiny",
+                        "report_path": "reports/tiny.md",
+                        "config": {
+                            "case_count": 2,
+                            "grid_height": 18,
+                            "grid_width": 20,
+                            "resolution_m": 75.0,
+                            "forecast_hours": [3.0, 6.0],
+                            "seed": 19,
+                        },
+                        "commit_outputs": False,
+                    }
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    profiles = load_simulation_corpus_profiles(profiles_path)
+    profile = profiles["tiny"]
+    report = simulation_corpus_profile_report(profile)
+
+    assert profile.config.case_count == 2
+    assert profile.config.forecast_hours == (3.0, 6.0)
+    assert profile.output_dir.as_posix() == "data/simulation/tiny"
+    assert profile.commit_outputs is False
+    assert "Total forecast masks: 4" in report
+    assert "Commit generated samples: `false`" in report
+
+
+def test_project_simulation_corpus_profiles_define_safe_larger_corpora() -> None:
+    """Committed profiles should include ignored local development/showcase corpora."""
+    profiles = load_simulation_corpus_profiles(Path("configs/simulation_corpus_profiles.json"))
+
+    assert {"smoke", "development", "showcase"} <= set(profiles)
+    assert profiles["smoke"].commit_outputs is True
+    assert profiles["development"].commit_outputs is False
+    assert profiles["showcase"].commit_outputs is False
+    assert profiles["development"].config.case_count > profiles["smoke"].config.case_count
+    assert profiles["showcase"].config.grid_height > profiles["development"].config.grid_height

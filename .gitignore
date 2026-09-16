@@ -66,6 +66,10 @@ data/processed/*
 data/labels/**
 data/initial_states/**
 data/training/**
+data/simulation/**
+!data/simulation/
+!data/simulation/phase5b_synthetic_smoke/
+!data/simulation/phase5b_synthetic_smoke/**
 !data/raw/.gitkeep
 !data/interim/.gitkeep
 !data/processed/.gitkeep

@@ -1,0 +1,46 @@
+{
+    "profiles": {
+        "smoke": {
+            "description": "Tiny committed corpus for schema, CI and report smoke checks.",
+            "output_dir": "data/simulation/phase5b_synthetic_smoke",
+            "report_path": "reports/phase5b_simulation_corpus.md",
+            "config": {
+                "case_count": 6,
+                "grid_height": 40,
+                "grid_width": 40,
+                "resolution_m": 60.0,
+                "forecast_hours": [3.0, 6.0, 12.0],
+                "seed": 1729
+            },
+            "commit_outputs": true
+        },
+        "development": {
+            "description": "Larger local corpus for Phase 5B surrogate iteration without committing generated samples.",
+            "output_dir": "data/simulation/phase5b_synthetic_development",
+            "report_path": "reports/phase5b_simulation_corpus_development.md",
+            "config": {
+                "case_count": 36,
+                "grid_height": 64,
+                "grid_width": 64,
+                "resolution_m": 60.0,
+                "forecast_hours": [3.0, 6.0, 12.0, 24.0],
+                "seed": 271828
+            },
+            "commit_outputs": false
+        },
+        "showcase": {
+            "description": "Heavier local corpus for interactive what-if experiments and stronger surrogate training.",
+            "output_dir": "data/simulation/phase5b_synthetic_showcase",
+            "report_path": "reports/phase5b_simulation_corpus_showcase.md",
+            "config": {
+                "case_count": 96,
+                "grid_height": 96,
+                "grid_width": 96,
+                "resolution_m": 60.0,
+                "forecast_hours": [1.0, 3.0, 6.0, 12.0, 24.0],
+                "seed": 314159
+            },
+            "commit_outputs": false
+        }
+    }
+}

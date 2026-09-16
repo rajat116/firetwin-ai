@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-16
-**Current Phase**: Phase 5B 🚧 - Simulation Corpus, First Surrogate Baseline and Latency Benchmark
+**Current Phase**: Phase 5B 🚧 - Scaled Simulation Corpus and Surrogate Foundation
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -667,6 +667,12 @@ controls can produce real recomputed outputs rather than decorative UI changes.
 - [x] Added `scripts/benchmark_simulation_surrogate.py`.
 - [x] Generated `reports/phase5b_simulation_surrogate_latency.md` and
   `reports/phase5b_simulation_surrogate_latency_metrics.json`.
+- [x] Added named corpus profiles in `configs/simulation_corpus_profiles.json`.
+- [x] Updated `scripts/build_simulation_corpus.py` with `--profile` and `--list-profiles`.
+- [x] Added ignore guardrails so larger generated corpora under `data/simulation/` are not
+  accidentally committed.
+- [x] Built a larger local development corpus report at
+  `reports/phase5b_simulation_corpus_development.md`.
 
 ### Result-Wise Simulation Corpus Smoke Artifact
 
@@ -708,12 +714,25 @@ Interpretation: the first surrogate is already fast enough for interactive smoke
 loops. These timings are directional and should be repeated on a larger corpus before claiming a
 production SLA.
 
+### Result-Wise Development Corpus Profile
+
+- Profile command: `python scripts/build_simulation_corpus.py --profile development`.
+- Output directory: `data/simulation/phase5b_synthetic_development`.
+- Git policy: generated samples are ignored; the reproducible report is committed.
+- Samples: 36 synthetic scenarios on a 64x64 grid.
+- Forecast horizons: 3h, 6h, 12h and 24h.
+- Total final burned cells: 61,795.
+
+Interpretation: Phase 5B now has a larger local corpus path for stronger surrogate training and
+scenario-control experiments, while keeping repository size controlled.
+
 ### Remaining Phase 5B Work
 
 - [x] Train a first lightweight surrogate on the simulation corpus.
 - [x] Evaluate surrogate accuracy against initial-state persistence on held-out simulations.
 - [x] Benchmark surrogate latency against the simulator baseline.
-- [ ] Add larger configurable corpus generation after the smoke contract is stable.
+- [x] Add larger configurable corpus generation after the smoke contract is stable.
+- [ ] Train and evaluate the surrogate on the larger development corpus.
 - [ ] Connect scenario controls only after backend/surrogate inference is real.
 
 ## Future Phases
@@ -739,9 +758,9 @@ Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
 Phase 5A: ████████████████████ 100% ✅
-Phase 5B: █████████░░░░░░░░░░░  45% 🚧
+Phase 5B: ███████████░░░░░░░░░  55% 🚧
 ...
-Overall: ███████████████░░░░░  75%
+Overall: ████████████████░░░░  76%
 ```
 
 ## Known Issues
@@ -758,9 +777,10 @@ Overall: ███████████████░░░░░  75%
 ## Blockers
 
 No credential blocker remains. Phase 5A plus the first local Explorer are complete. Phase 5B has
-started with a deterministic synthetic simulation-corpus foundation, a first trained surrogate
-baseline and a smoke-corpus latency benchmark. The next major unfinished task is a larger surrogate
-corpus plus the first real backend inference contract for interactive controls.
+started with deterministic simulation-corpus profiles, a first trained surrogate baseline, a
+smoke-corpus latency benchmark and a larger local development corpus. The next major unfinished task
+is training/evaluating the surrogate on that larger corpus plus the first real backend inference
+contract for interactive controls.
 
 ## Notes
 
