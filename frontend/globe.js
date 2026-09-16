@@ -15,6 +15,10 @@
     peakProbability: document.getElementById("globePeakProbability"),
     improvement: document.getElementById("globeImprovement"),
     targetTime: document.getElementById("globeTargetTime"),
+    zoomIn: document.getElementById("zoomIn"),
+    zoomOut: document.getElementById("zoomOut"),
+    tiltView: document.getElementById("tiltView"),
+    northUp: document.getElementById("northUp"),
     flyHome: document.getElementById("flyHome"),
     openExplorer: document.getElementById("openExplorer"),
     error: document.getElementById("globeError"),
@@ -67,11 +71,19 @@
     return manifest;
   }
 
+  function createSatelliteImageryProvider() {
+    return new window.Cesium.UrlTemplateImageryProvider({
+      url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      credit: "Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      maximumLevel: 19,
+    });
+  }
+
   function createViewer() {
     if (!window.Cesium) {
       throw new Error("Cesium is not loaded");
     }
-    return new window.Cesium.Viewer("globe", {
+    const viewer = new window.Cesium.Viewer("globe", {
       animation: false,
       baseLayerPicker: false,
       fullscreenButton: false,
@@ -82,8 +94,17 @@
       sceneModePicker: false,
       selectionIndicator: false,
       timeline: false,
+      baseLayer: new window.Cesium.ImageryLayer(createSatelliteImageryProvider()),
       terrainProvider: new window.Cesium.EllipsoidTerrainProvider(),
     });
+    viewer.scene.globe.enableLighting = true;
+    viewer.scene.globe.showGroundAtmosphere = true;
+    viewer.scene.screenSpaceCameraController.enableRotate = true;
+    viewer.scene.screenSpaceCameraController.enableTranslate = true;
+    viewer.scene.screenSpaceCameraController.enableZoom = true;
+    viewer.scene.screenSpaceCameraController.enableTilt = true;
+    viewer.scene.screenSpaceCameraController.enableLook = true;
+    return viewer;
   }
 
   function addCaseEntities() {
@@ -186,24 +207,82 @@
     });
   }
 
+  function caseCameraHeight(caseData) {
+    const bbox = caseData.wgs84_bbox;
+    const center = caseData.center_lon_lat;
+    const latScale = Math.max(0.35, Math.cos(window.Cesium.Math.toRadians(center.lat)));
+    const widthMeters = Math.abs(bbox.east - bbox.west) * 111320 * latScale;
+    const heightMeters = Math.abs(bbox.north - bbox.south) * 110540;
+    return Math.max(55000, Math.max(widthMeters, heightMeters) * 2.4);
+  }
+
+  function flyToCase(caseData) {
+    const center = caseData.center_lon_lat;
+    state.viewer.camera.flyTo({
+      destination: window.Cesium.Cartesian3.fromDegrees(
+        center.lon,
+        center.lat,
+        caseCameraHeight(caseData)
+      ),
+      orientation: {
+        heading: window.Cesium.Math.toRadians(0),
+        pitch: window.Cesium.Math.toRadians(-58),
+        roll: 0,
+      },
+      duration: 1.1,
+    });
+  }
+
   function selectCase(index, fly) {
     state.selectedIndex = index;
     renderSelectedCase();
     const caseData = state.manifest.cases[index];
     if (fly) {
-      state.viewer.camera.flyTo({
-        destination: window.Cesium.Rectangle.fromDegrees(
-          caseData.wgs84_bbox.west,
-          caseData.wgs84_bbox.south,
-          caseData.wgs84_bbox.east,
-          caseData.wgs84_bbox.north
-        ),
-        duration: 1.1,
-      });
+      flyToCase(caseData);
     }
   }
 
+  function zoomCamera(direction) {
+    if (!state.viewer) {
+      return;
+    }
+    const height = state.viewer.camera.positionCartographic.height;
+    const step = Math.max(1500, height * 0.32);
+    if (direction === "in") {
+      state.viewer.camera.zoomIn(step);
+    } else {
+      state.viewer.camera.zoomOut(step);
+    }
+  }
+
+  function tiltCurrentCase() {
+    if (!state.viewer || !state.manifest) {
+      return;
+    }
+    flyToCase(state.manifest.cases[state.selectedIndex]);
+  }
+
+  function resetNorthUp() {
+    if (!state.viewer) {
+      return;
+    }
+    const camera = state.viewer.camera;
+    camera.flyTo({
+      destination: window.Cesium.Cartesian3.clone(camera.position),
+      orientation: {
+        heading: 0,
+        pitch: camera.pitch,
+        roll: 0,
+      },
+      duration: 0.5,
+    });
+  }
+
   function bindControls() {
+    els.zoomIn.addEventListener("click", () => zoomCamera("in"));
+    els.zoomOut.addEventListener("click", () => zoomCamera("out"));
+    els.tiltView.addEventListener("click", tiltCurrentCase);
+    els.northUp.addEventListener("click", resetNorthUp);
     els.flyHome.addEventListener("click", flyToAllCases);
     els.openExplorer.addEventListener("click", () => {
       window.location.href = "./index.html";

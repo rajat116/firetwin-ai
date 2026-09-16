@@ -216,6 +216,10 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
         raise ValueError("Explorer app does not load the committed manifest path")
     if "Cesium.js" not in globe_html or "./globe.js" not in globe_html:
         raise ValueError("Globe page must load Cesium and local globe JavaScript")
+    if "zoomIn" not in globe_html or "zoomOut" not in globe_html:
+        raise ValueError("Globe page must expose zoom controls")
+    if "World_Imagery" not in globe_js or "UrlTemplateImageryProvider" not in globe_js:
+        raise ValueError("Globe app must configure explicit satellite imagery")
     if "center_lon_lat" not in globe_js or "wgs84_bbox" not in globe_js:
         raise ValueError("Globe app must consume committed WGS84 fire locations")
     if "data/manifests/firms_next_day_explorer_manifest.json" not in globe_js:

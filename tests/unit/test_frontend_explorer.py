@@ -28,6 +28,10 @@ def test_frontend_references_committed_explorer_assets() -> None:
     assert "persistence_brier_score" in app_js
     assert "Cesium.js" in globe_html
     assert "globeCaseList" in globe_html
+    assert "zoomIn" in globe_html
+    assert "zoomOut" in globe_html
+    assert "World_Imagery" in globe_js
+    assert "UrlTemplateImageryProvider" in globe_js
     assert "wgs84_bbox" in globe_js
     assert "center_lon_lat" in globe_js
     assert manifest["cases"]

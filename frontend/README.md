@@ -20,6 +20,10 @@ The first globe-oriented public demo is available at:
 http://localhost:8000/frontend/globe.html
 ```
 
+The globe view loads Cesium plus public satellite imagery tiles, so it needs browser network access.
+When it is healthy, you should see the Earth surface, fire markers, case rectangles, and the `+`, `-`,
+`3D`, and `N` map controls.
+
 The app loads `data/manifests/firms_next_day_explorer_manifest.json` and the committed preview PNGs
 under `reports/figures/`. It does not require the ignored local Zarr forecast artifacts to render.
 

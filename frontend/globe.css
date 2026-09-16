@@ -38,13 +38,47 @@ a {
 .globe-canvas {
   position: fixed;
   inset: 0;
+  cursor: grab;
   background: #050706;
+}
+
+.globe-canvas:active {
+  cursor: grabbing;
+}
+
+.nav-controls {
+  position: fixed;
+  right: 18px;
+  bottom: 26px;
+  z-index: 3;
+  display: grid;
+  gap: 8px;
+}
+
+.nav-controls button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  background: rgb(18 22 20 / 86%);
+  box-shadow: 0 14px 36px rgb(0 0 0 / 34%);
+  backdrop-filter: blur(14px);
+}
+
+.nav-controls button:hover,
+.nav-controls button:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+  background: rgb(242 193 78 / 15%);
 }
 
 .mission-panel {
   position: fixed;
   top: 18px;
   left: 18px;
+  z-index: 2;
   display: grid;
   gap: 16px;
   width: min(390px, calc(100vw - 36px));
@@ -229,9 +263,13 @@ dd {
   display: none;
 }
 
-.cesium-viewer-bottom,
 .cesium-viewer-toolbar {
   display: none !important;
+}
+
+.cesium-viewer-bottom {
+  right: 78px;
+  bottom: 12px;
 }
 
 @media (max-width: 720px) {
@@ -242,7 +280,7 @@ dd {
   .mission-panel {
     position: absolute;
     top: auto;
-    right: 12px;
+    right: 70px;
     bottom: 12px;
     left: 12px;
     width: auto;
@@ -257,5 +295,10 @@ dd {
   dl div,
   .layer-actions {
     grid-template-columns: 1fr;
+  }
+
+  .nav-controls {
+    right: 12px;
+    bottom: 12px;
   }
 }
