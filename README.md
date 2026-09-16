@@ -243,6 +243,17 @@ before sharing it:
 python3 scripts/smoke_explorer_bundle.py --bundle-dir dist/explorer
 ```
 
+Run the FireTwin API backend for the same forecast catalog:
+
+```bash
+uvicorn firetwin.api.main:app --reload
+```
+
+Key endpoints include `/health`, `/api/explorer/cases` and
+`/api/forecast/firms-next-day/{case_id}`. The current forecast endpoint is artifact-backed: it
+serves validated leave-one-fire-out FIRMS forecast products through a live API contract, ready for a
+globe frontend and later on-demand inference.
+
 See [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) for complete API documentation.
 
 ### Configuration
