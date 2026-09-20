@@ -1,0 +1,147 @@
+{
+  "rows": [
+    {
+      "case_id": "phase5b_sim_0000",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 24.45705886105348,
+      "repetitions": 3,
+      "simulator_median_ms": 229.8596669570543,
+      "simulator_p95_ms": 252.3018410662189,
+      "surrogate_median_ms": 9.398499969393015,
+      "surrogate_p95_ms": 10.167325008660555
+    },
+    {
+      "case_id": "phase5b_sim_0001",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 120.02508000581736,
+      "repetitions": 3,
+      "simulator_median_ms": 1117.848540947307,
+      "simulator_p95_ms": 1120.2204162837006,
+      "surrogate_median_ms": 9.31345799472183,
+      "surrogate_p95_ms": 9.374470810871571
+    },
+    {
+      "case_id": "phase5b_sim_0002",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 39.550630375866604,
+      "repetitions": 3,
+      "simulator_median_ms": 365.487375005614,
+      "simulator_p95_ms": 380.79352469649166,
+      "surrogate_median_ms": 9.240999992471188,
+      "surrogate_p95_ms": 10.704174975398928
+    },
+    {
+      "case_id": "phase5b_sim_0003",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 155.35038536347108,
+      "repetitions": 3,
+      "simulator_median_ms": 1453.1732909963466,
+      "simulator_p95_ms": 1496.4504669071175,
+      "surrogate_median_ms": 9.35416598804295,
+      "surrogate_p95_ms": 10.188091592863202
+    },
+    {
+      "case_id": "phase5b_sim_0004",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 296.70008229307865,
+      "repetitions": 3,
+      "simulator_median_ms": 2834.610582969617,
+      "simulator_p95_ms": 2852.306683571078,
+      "surrogate_median_ms": 9.553791023790836,
+      "surrogate_p95_ms": 11.252879386302084
+    },
+    {
+      "case_id": "phase5b_sim_0005",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 24.382031092277124,
+      "repetitions": 3,
+      "simulator_median_ms": 221.9882500357926,
+      "simulator_p95_ms": 229.09776223241352,
+      "surrogate_median_ms": 9.104583994485438,
+      "surrogate_p95_ms": 9.302395913982764
+    },
+    {
+      "case_id": "phase5b_sim_0006",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 18.510467020623143,
+      "repetitions": 3,
+      "simulator_median_ms": 172.76666598627344,
+      "simulator_p95_ms": 182.46949129970744,
+      "surrogate_median_ms": 9.333457972388715,
+      "surrogate_p95_ms": 9.3721957760863
+    },
+    {
+      "case_id": "phase5b_sim_0007",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 62.23421411565193,
+      "repetitions": 3,
+      "simulator_median_ms": 582.037708023563,
+      "simulator_p95_ms": 657.4680210847873,
+      "surrogate_median_ms": 9.352374996524304,
+      "surrogate_p95_ms": 9.590499679325148
+    },
+    {
+      "case_id": "phase5b_sim_0008",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 34.19702060793495,
+      "repetitions": 3,
+      "simulator_median_ms": 493.7365829828195,
+      "simulator_p95_ms": 502.18720859265886,
+      "surrogate_median_ms": 14.437999983783811,
+      "surrogate_p95_ms": 17.551288078539073
+    },
+    {
+      "case_id": "phase5b_sim_0009",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 350.2573589320035,
+      "repetitions": 3,
+      "simulator_median_ms": 3271.7249160050415,
+      "simulator_p95_ms": 3276.235604402609,
+      "surrogate_median_ms": 9.34091699309647,
+      "surrogate_p95_ms": 12.650216993642971
+    },
+    {
+      "case_id": "phase5b_sim_0010",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 211.8048482111288,
+      "repetitions": 3,
+      "simulator_median_ms": 2521.3249159860425,
+      "simulator_p95_ms": 2548.810503812274,
+      "surrogate_median_ms": 11.904000013601035,
+      "surrogate_p95_ms": 11.993700312450528
+    },
+    {
+      "case_id": "phase5b_sim_0011",
+      "grid_cells": 4096,
+      "horizon_count": 4,
+      "median_speedup": 63.84131548731115,
+      "repetitions": 3,
+      "simulator_median_ms": 592.7373750018887,
+      "simulator_p95_ms": 600.6512999651022,
+      "surrogate_median_ms": 9.284542000386864,
+      "surrogate_p95_ms": 10.482966713607311
+    }
+  ],
+  "summary": {
+    "corpus_dir": "data/simulation/phase5b_synthetic_development",
+    "mean_median_speedup": 116.77587436385147,
+    "mean_simulator_median_ms": 1154.7746559081133,
+    "mean_surrogate_median_ms": 9.968232576890538,
+    "median_of_speedups": 63.03776480148154,
+    "model_path": "data/models/phase5b_surrogate_development.npz",
+    "repetitions": 3,
+    "sample_count": 12,
+    "warmup": 1
+  }
+}

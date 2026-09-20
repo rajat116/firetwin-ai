@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
-**Last Updated**: 2026-09-16
-**Current Phase**: Phase 5B 🚧 - Scaled Simulation Corpus and Surrogate Foundation
+**Last Updated**: 2026-09-20
+**Current Phase**: Phase 5B 🚧 - Development-Corpus Surrogate Baseline
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -673,6 +673,12 @@ controls can produce real recomputed outputs rather than decorative UI changes.
   accidentally committed.
 - [x] Built a larger local development corpus report at
   `reports/phase5b_simulation_corpus_development.md`.
+- [x] Trained `data/models/phase5b_surrogate_development.npz` on the larger development corpus.
+- [x] Generated `reports/phase5b_simulation_surrogate_development.md` and
+  `reports/phase5b_simulation_surrogate_development_metrics.json`.
+- [x] Generated a bounded development latency benchmark at
+  `reports/phase5b_simulation_surrogate_development_latency.md` and
+  `reports/phase5b_simulation_surrogate_development_latency_metrics.json`.
 
 ### Result-Wise Simulation Corpus Smoke Artifact
 
@@ -726,13 +732,40 @@ production SLA.
 Interpretation: Phase 5B now has a larger local corpus path for stronger surrogate training and
 scenario-control experiments, while keeping repository size controlled.
 
+### Result-Wise Development Surrogate Baseline
+
+- Model: `phase5b_logistic_simulation_surrogate_v1`.
+- Artifact: `data/models/phase5b_surrogate_development.npz`.
+- Evaluation: leave-one-simulation-out over the 36-sample development corpus.
+- Features: 23 terrain/fuel/weather/geometry features.
+- Mean Brier score: 0.06998 vs 0.18185 initial-state persistence.
+- Mean Brier improvement vs persistence: +0.11187.
+- Mean IoU at threshold 0.52: 0.755.
+- Mean precision / recall: 0.824 / 0.900.
+
+Interpretation: scaling from the 6-case smoke corpus to the 36-case development corpus improved the
+surrogate's aggregate accuracy while preserving the same simulator-derived guardrails.
+
+### Result-Wise Development Surrogate Latency Benchmark
+
+- Benchmark scope: 12 representative development-corpus samples, 4,096 cells each, 4 horizons each.
+- Repetitions: 3 timed runs per sample after 1 warmup run.
+- Mean simulator median latency: 1,154.775 ms.
+- Mean surrogate median latency: 9.968 ms.
+- Mean median speedup: 116.78x.
+- Median of sample speedups: 63.04x.
+
+Interpretation: the surrogate path is comfortably interactive at development-corpus scale. Full
+36-case simulator latency benchmarking was too slow for the normal development loop, because the
+simulator path spends most of its time in binary morphology for larger spread kernels.
+
 ### Remaining Phase 5B Work
 
 - [x] Train a first lightweight surrogate on the simulation corpus.
 - [x] Evaluate surrogate accuracy against initial-state persistence on held-out simulations.
 - [x] Benchmark surrogate latency against the simulator baseline.
 - [x] Add larger configurable corpus generation after the smoke contract is stable.
-- [ ] Train and evaluate the surrogate on the larger development corpus.
+- [x] Train and evaluate the surrogate on the larger development corpus.
 - [ ] Connect scenario controls only after backend/surrogate inference is real.
 
 ## Future Phases
@@ -758,9 +791,9 @@ Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
 Phase 5A: ████████████████████ 100% ✅
-Phase 5B: ███████████░░░░░░░░░  55% 🚧
+Phase 5B: █████████████░░░░░░░  65% 🚧
 ...
-Overall: ████████████████░░░░  76%
+Overall: ████████████████░░░░  78%
 ```
 
 ## Known Issues
@@ -777,10 +810,9 @@ Overall: ████████████████░░░░  76%
 ## Blockers
 
 No credential blocker remains. Phase 5A plus the first local Explorer are complete. Phase 5B has
-started with deterministic simulation-corpus profiles, a first trained surrogate baseline, a
-smoke-corpus latency benchmark and a larger local development corpus. The next major unfinished task
-is training/evaluating the surrogate on that larger corpus plus the first real backend inference
-contract for interactive controls.
+started with deterministic simulation-corpus profiles, smoke and development surrogate baselines,
+and latency benchmarks. The next major unfinished task is the first real backend inference contract
+for interactive scenario controls.
 
 ## Notes
 

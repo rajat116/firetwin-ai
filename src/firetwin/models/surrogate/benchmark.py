@@ -236,7 +236,7 @@ def render_simulation_latency_report(
             "",
             "- Simulator timings measure `EllipticalBaseline.forecast` on reconstructed in-memory cases.",
             "- Surrogate timings measure artifact-backed NPZ loading, feature construction and prediction.",
-            "- These smoke-corpus timings are for engineering direction, not a production SLA.",
+            "- These timings are for engineering direction, not a production SLA.",
             "",
         ]
     )
