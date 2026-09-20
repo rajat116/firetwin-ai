@@ -32,7 +32,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 5B In Progress - Development-Corpus Surrogate Baseline
+**Current Phase**: Phase 5B In Progress - Experimental Scenario Inference API
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
@@ -44,7 +44,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 - ✅ **Phase 4D**: Final-extent baseline diagnostics and forecast-label guardrails
 - ✅ **Phase 4E**: FIRMS-backed progression labels, initial-state artifacts and validation overlays
 - ✅ **Phase 5A**: Leakage-safe next-day FIRMS active-fire samples, baselines, learned forecasts, calibration and Explorer assets
-- 🚧 **Phase 5B**: Deterministic synthetic simulation corpus profiles, trained surrogate baselines and latency benchmarks
+- 🚧 **Phase 5B**: Deterministic synthetic simulation corpus profiles, trained surrogate baselines, latency benchmarks and experimental scenario API
 
 Current pilot cases contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
 terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes, and real
@@ -75,6 +75,8 @@ and is not real wildfire truth. Larger local corpus profiles now exist for devel
 experiments without committing bulky generated samples. The larger development-corpus surrogate now
 beats persistence by Brier score as well (`0.06998` vs `0.18185`, `0.755` mean IoU), with a bounded
 development latency benchmark showing `116.78x` mean median speedup on 12 representative cases.
+An experimental backend scenario endpoint now recomputes surrogate probabilities for wind and spread
+controls, so future UI sliders can call real inference instead of changing decorative values.
 
 Build the larger local development corpus with:
 
@@ -373,7 +375,7 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 4D**: Final-extent baseline diagnostics and guardrails
 - [x] **Phase 4E**: FIRMS-backed progression labels and initial-state artifacts
 - [x] **Phase 5A**: Next-day FIRMS active-fire sample artifacts, baselines, learned forecasts, calibration and Explorer assets
-- [ ] **Phase 5B**: Simulation corpus profiles, surrogate baselines and latency benchmarks (in progress)
+- [ ] **Phase 5B**: Simulation corpus profiles, surrogate baselines, latency benchmarks and scenario API (in progress)
 - [ ] **Phase 6**: Hybrid model
 - [ ] **Phase 7**: Assimilation and calibrated uncertainty
 - [ ] **Phase 8**: Simulated intervention planner

@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
 **Last Updated**: 2026-09-20
-**Current Phase**: Phase 5B 🚧 - Development-Corpus Surrogate Baseline
+**Current Phase**: Phase 5B 🚧 - Experimental Scenario Inference API
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -679,6 +679,12 @@ controls can produce real recomputed outputs rather than decorative UI changes.
 - [x] Generated a bounded development latency benchmark at
   `reports/phase5b_simulation_surrogate_development_latency.md` and
   `reports/phase5b_simulation_surrogate_development_latency_metrics.json`.
+- [x] Added `SimulationScenarioControls` for wind-speed, wind-direction and spread-rate
+  what-if inference.
+- [x] Added `/api/simulation/samples` and `/api/simulation/surrogate/{case_id}` FastAPI
+  endpoints.
+- [x] Added API tests proving scenario controls run real surrogate inference and reject invalid
+  control bounds.
 
 ### Result-Wise Simulation Corpus Smoke Artifact
 
@@ -759,6 +765,20 @@ Interpretation: the surrogate path is comfortably interactive at development-cor
 36-case simulator latency benchmarking was too slow for the normal development loop, because the
 simulator path spends most of its time in binary morphology for larger spread kernels.
 
+### Experimental Scenario Inference Contract
+
+- Sample catalog endpoint: `GET /api/simulation/samples`.
+- Inference endpoint: `POST /api/simulation/surrogate/{case_id}`.
+- Controls: `wind_speed_multiplier`, `wind_direction_delta_degrees`,
+  `base_spread_rate_multiplier`, optional `threshold`, optional downsampled probability grid.
+- Default runtime artifacts: committed smoke corpus samples plus the trained development surrogate
+  model.
+- Response contract: forecast mode, model/corpus provenance, controls, horizon-level probability
+  summaries, optional downsampled probability grids and explicit guardrails.
+
+Interpretation: FireTwin now has a real backend contract for scenario controls. The frontend still
+needs to be wired to these endpoints, but the API is no longer placeholder behavior.
+
 ### Remaining Phase 5B Work
 
 - [x] Train a first lightweight surrogate on the simulation corpus.
@@ -766,7 +786,8 @@ simulator path spends most of its time in binary morphology for larger spread ke
 - [x] Benchmark surrogate latency against the simulator baseline.
 - [x] Add larger configurable corpus generation after the smoke contract is stable.
 - [x] Train and evaluate the surrogate on the larger development corpus.
-- [ ] Connect scenario controls only after backend/surrogate inference is real.
+- [x] Add the first real backend/surrogate inference contract for scenario controls.
+- [ ] Connect frontend scenario controls to the backend inference API.
 
 ## Future Phases
 
@@ -791,9 +812,9 @@ Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
 Phase 5A: ████████████████████ 100% ✅
-Phase 5B: █████████████░░░░░░░  65% 🚧
+Phase 5B: ███████████████░░░░░  75% 🚧
 ...
-Overall: ████████████████░░░░  78%
+Overall: █████████████████░░░  80%
 ```
 
 ## Known Issues
@@ -811,8 +832,8 @@ Overall: ████████████████░░░░  78%
 
 No credential blocker remains. Phase 5A plus the first local Explorer are complete. Phase 5B has
 started with deterministic simulation-corpus profiles, smoke and development surrogate baselines,
-and latency benchmarks. The next major unfinished task is the first real backend inference contract
-for interactive scenario controls.
+latency benchmarks and a real experimental backend inference contract. The next major unfinished
+task is wiring frontend scenario controls to this API.
 
 ## Notes
 

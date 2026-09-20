@@ -5,10 +5,12 @@ from pathlib import Path
 import numpy as np
 
 from firetwin.models.surrogate import (
+    SimulationScenarioControls,
     evaluate_simulation_surrogate_leave_one_out,
     fit_and_save_simulation_surrogate,
     load_simulation_surrogate_model,
     predict_simulation_sample,
+    predict_simulation_sample_with_controls,
     render_simulation_surrogate_report,
     train_simulation_surrogate,
 )
@@ -43,6 +45,28 @@ def test_train_simulation_surrogate_predicts_probability_masks(tmp_path: Path) -
         assert np.all(prediction >= 0.0)
         assert np.all(prediction <= 1.0)
         assert prediction[-1].mean() > prediction[0].mean()
+
+
+def test_predict_simulation_sample_with_controls_changes_probabilities(tmp_path: Path) -> None:
+    """Scenario controls should recompute probabilities from adjusted covariates."""
+    corpus_dir = _build_test_corpus(tmp_path)
+    sample_paths = sorted(corpus_dir.joinpath("samples").glob("*.npz"))
+    model = train_simulation_surrogate(sample_paths[:3], random_seed=3, epochs=30)
+    baseline = predict_simulation_sample(model, sample_paths[3])
+    controlled = predict_simulation_sample_with_controls(
+        model,
+        sample_paths[3],
+        SimulationScenarioControls(
+            wind_speed_multiplier=1.5,
+            wind_direction_delta_degrees=35.0,
+            base_spread_rate_multiplier=1.25,
+        ),
+    )
+
+    assert controlled.shape == baseline.shape
+    assert np.all(controlled >= 0.0)
+    assert np.all(controlled <= 1.0)
+    assert not np.allclose(controlled, baseline)
 
 
 def test_evaluate_simulation_surrogate_leave_one_out_beats_persistence(tmp_path: Path) -> None:

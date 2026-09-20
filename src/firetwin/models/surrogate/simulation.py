@@ -101,6 +101,31 @@ class SimulationSurrogateTrainingSummary:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class SimulationScenarioControls:
+    """Scenario controls applied before surrogate inference."""
+
+    wind_speed_multiplier: float = 1.0
+    wind_direction_delta_degrees: float = 0.0
+    base_spread_rate_multiplier: float = 1.0
+    threshold: float | None = None
+
+    def validate(self) -> None:
+        """Validate scenario-control bounds for experimental inference."""
+        if not 0.2 <= self.wind_speed_multiplier <= 3.0:
+            raise ValueError("wind_speed_multiplier must be between 0.2 and 3.0")
+        if not -180.0 <= self.wind_direction_delta_degrees <= 180.0:
+            raise ValueError("wind_direction_delta_degrees must be between -180 and 180")
+        if not 0.2 <= self.base_spread_rate_multiplier <= 3.0:
+            raise ValueError("base_spread_rate_multiplier must be between 0.2 and 3.0")
+        if self.threshold is not None and not 0.05 <= self.threshold <= 0.95:
+            raise ValueError("threshold must be between 0.05 and 0.95")
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a serializable controls payload."""
+        return asdict(self)
+
+
 def load_simulation_corpus_manifest(corpus_dir: Path) -> dict[str, Any]:
     """Load a Phase 5B simulation-corpus manifest."""
     manifest_path = corpus_dir / "manifest.json"
@@ -195,12 +220,19 @@ def predict_simulation_sample(
 ) -> np.ndarray:
     """Predict burned probability masks for every horizon in one simulation sample."""
     with np.load(sample_path) as sample:
-        horizon_count, height, width = sample["forecast_burned"].shape
-        prediction = np.zeros((horizon_count, height, width), dtype=np.float32)
-        for horizon_index in range(horizon_count):
-            features = _feature_matrix(sample, horizon_index)
-            prediction[horizon_index] = model.predict_probability(features).reshape(height, width)
-    return prediction
+        return _predict_loaded_simulation_sample(model, sample)
+
+
+def predict_simulation_sample_with_controls(
+    model: SimulationSurrogateModel,
+    sample_path: Path,
+    controls: SimulationScenarioControls,
+) -> np.ndarray:
+    """Predict burned probabilities after applying experimental scenario controls."""
+    controls.validate()
+    with np.load(sample_path) as sample:
+        controlled_sample = _controlled_sample_arrays(sample, controls)
+        return _predict_loaded_simulation_sample(model, controlled_sample)
 
 
 def evaluate_simulation_surrogate_leave_one_out(
@@ -436,6 +468,33 @@ def _feature_matrix(
     return np.column_stack(columns).astype(np.float32)
 
 
+def _predict_loaded_simulation_sample(
+    model: SimulationSurrogateModel,
+    sample: Any,
+) -> np.ndarray:
+    horizon_count, height, width = sample["forecast_burned"].shape
+    prediction = np.zeros((horizon_count, height, width), dtype=np.float32)
+    for horizon_index in range(horizon_count):
+        features = _feature_matrix(sample, horizon_index)
+        prediction[horizon_index] = model.predict_probability(features).reshape(height, width)
+    return prediction
+
+
+def _controlled_sample_arrays(
+    sample: Any,
+    controls: SimulationScenarioControls,
+) -> dict[str, np.ndarray]:
+    arrays = {name: sample[name].copy() for name in sample.files}
+    weather = arrays["weather"].astype(np.float32).copy()
+    weather[0] = np.float32(weather[0] * controls.wind_speed_multiplier)
+    weather[1] = np.float32((weather[1] + controls.wind_direction_delta_degrees) % 360.0)
+    arrays["weather"] = weather
+    arrays["base_spread_rate_m_h"] = (
+        arrays["base_spread_rate_m_h"].astype(np.float32) * controls.base_spread_rate_multiplier
+    )
+    return arrays
+
+
 def _initial_centroid(initial_burned: np.ndarray) -> tuple[float, float]:
     positions = np.argwhere(initial_burned > 0)
     if positions.size == 0:
@@ -456,6 +515,8 @@ def _distance_to_initial(
 
 
 def _resolution_from_sample(sample: Any) -> float:
+    if isinstance(sample, dict) and "resolution_m" in sample:
+        return float(sample["resolution_m"][0])
     if "resolution_m" in getattr(sample, "files", []):
         return float(sample["resolution_m"][0])
     return 60.0
