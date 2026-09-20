@@ -377,6 +377,11 @@ dd {
   background: #36daff;
 }
 
+.legend-swatch.scenario {
+  color: #ffcf3a;
+  background: linear-gradient(90deg, rgb(255 210 74 / 25%), #ff8a24, #e82713);
+}
+
 .opacity-control {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr);

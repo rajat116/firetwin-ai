@@ -10,8 +10,11 @@
     viewer: null,
     selectedIndex: 0,
     entities: [],
+    scenarioOverlay: null,
+    scenarioCanvas: null,
     forecastVisible: true,
     observedVisible: true,
+    scenarioVisible: true,
     overlayOpacity: 0.78,
     simulationSamples: [],
     simulationApiAvailable: false,
@@ -37,6 +40,7 @@
     scenarioPeak: document.getElementById("scenarioPeak"),
     scenarioMean: document.getElementById("scenarioMean"),
     scenarioFootprint: document.getElementById("scenarioFootprint"),
+    scenarioUpdated: document.getElementById("scenarioUpdated"),
     windSpeedMultiplier: document.getElementById("windSpeedMultiplier"),
     windSpeedValue: document.getElementById("windSpeedValue"),
     windDirectionDelta: document.getElementById("windDirectionDelta"),
@@ -48,6 +52,7 @@
     flyHome: document.getElementById("flyHome"),
     openExplorer: document.getElementById("openExplorer"),
     error: document.getElementById("globeError"),
+    scenarioLayerToggle: document.getElementById("scenarioLayerToggle"),
   };
 
   function assetUrl(path) {
@@ -269,6 +274,7 @@
     els.scenarioPeak.textContent = "--";
     els.scenarioMean.textContent = "--";
     els.scenarioFootprint.textContent = "--";
+    els.scenarioUpdated.textContent = "--";
   }
 
   function scenarioControls() {
@@ -276,8 +282,8 @@
       wind_speed_multiplier: Number(els.windSpeedMultiplier.value),
       wind_direction_delta_degrees: Number(els.windDirectionDelta.value),
       base_spread_rate_multiplier: Number(els.spreadRateMultiplier.value),
-      include_probability_grid: false,
-      max_grid_size: 32,
+      include_probability_grid: true,
+      max_grid_size: 64,
     };
   }
 
@@ -290,6 +296,74 @@
   function setScenarioStatus(label, stateName) {
     els.scenarioStatus.textContent = label;
     els.scenarioStatus.dataset.state = stateName;
+  }
+
+  function scenarioCanvasFromGrid(grid) {
+    const height = grid.length;
+    const width = height > 0 && Array.isArray(grid[0]) ? grid[0].length : 0;
+    if (height === 0 || width === 0) {
+      throw new Error("Scenario probability grid is empty");
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) {
+      throw new Error("Scenario canvas is unavailable");
+    }
+    const imageData = context.createImageData(width, height);
+    grid.forEach((row, y) => {
+      row.forEach((value, x) => {
+        const probability = Math.max(0, Math.min(1, Number(value)));
+        const offset = (y * width + x) * 4;
+        const warm = Math.min(1, probability * 1.35);
+        imageData.data[offset] = Math.round(255);
+        imageData.data[offset + 1] = Math.round(210 - warm * 150);
+        imageData.data[offset + 2] = Math.round(40 - warm * 30);
+        imageData.data[offset + 3] = probability < 0.08 ? 0 : Math.round(35 + probability * 205);
+      });
+    });
+    context.putImageData(imageData, 0, 0);
+    return canvas;
+  }
+
+  function removeScenarioOverlay() {
+    if (state.viewer && state.scenarioOverlay) {
+      state.viewer.entities.remove(state.scenarioOverlay);
+    }
+    state.scenarioOverlay = null;
+    state.scenarioCanvas = null;
+  }
+
+  function updateScenarioOverlay(payload) {
+    const grid = payload.probability_grid;
+    if (!Array.isArray(grid) || grid.length === 0) {
+      removeScenarioOverlay();
+      return;
+    }
+    const latestHorizon = grid[grid.length - 1];
+    const caseData = state.manifest.cases[state.selectedIndex];
+    const bbox = caseData.wgs84_bbox;
+    removeScenarioOverlay();
+    state.scenarioCanvas = scenarioCanvasFromGrid(latestHorizon);
+    state.scenarioOverlay = state.viewer.entities.add({
+      id: `${caseData.case_id}-scenario-overlay`,
+      name: `${caseData.case_name} scenario probability`,
+      show: state.scenarioVisible,
+      rectangle: {
+        coordinates: window.Cesium.Rectangle.fromDegrees(
+          bbox.west,
+          bbox.south,
+          bbox.east,
+          bbox.north
+        ),
+        material: new window.Cesium.ImageMaterialProperty({
+          image: state.scenarioCanvas,
+          transparent: true,
+          color: window.Cesium.Color.WHITE.withAlpha(Math.min(1, state.overlayOpacity + 0.08)),
+        }),
+      },
+    });
   }
 
   async function runScenarioInference() {
@@ -321,6 +395,12 @@
       els.scenarioPeak.textContent = percent(summary.peak_probability || 0, 1);
       els.scenarioMean.textContent = percent(summary.mean_probability || 0, 1);
       els.scenarioFootprint.textContent = percent(summary.predicted_positive_fraction || 0, 1);
+      els.scenarioUpdated.textContent = new Date().toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+      updateScenarioOverlay(payload);
       setScenarioStatus("Updated", "ready");
     } catch (error) {
       console.error(error);
@@ -445,6 +525,12 @@
         Math.min(1, state.overlayOpacity + 0.12)
       );
     });
+    if (state.scenarioOverlay) {
+      state.scenarioOverlay.show = state.scenarioVisible;
+      state.scenarioOverlay.rectangle.material.color = window.Cesium.Color.WHITE.withAlpha(
+        Math.min(1, state.overlayOpacity + 0.08)
+      );
+    }
   }
 
   function bindControls() {
@@ -458,6 +544,10 @@
     });
     els.observedLayerToggle.addEventListener("change", () => {
       state.observedVisible = els.observedLayerToggle.checked;
+      updateOverlayLayers();
+    });
+    els.scenarioLayerToggle.addEventListener("change", () => {
+      state.scenarioVisible = els.scenarioLayerToggle.checked;
       updateOverlayLayers();
     });
     els.overlayOpacity.addEventListener("input", () => {

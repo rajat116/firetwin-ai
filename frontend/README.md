@@ -37,8 +37,8 @@ Then open:
 http://localhost:8000/frontend/globe.html?api=http://127.0.0.1:8001
 ```
 
-The wind and spread controls call the experimental simulation-surrogate endpoint and update from the
-returned inference summary.
+The wind and spread controls call the experimental simulation-surrogate endpoint, update from the
+returned inference summary, and render the returned probability grid as the Scenario overlay.
 
 The app loads `data/manifests/firms_next_day_explorer_manifest.json` and the committed preview PNGs
 under `reports/figures/`. It does not require the ignored local Zarr forecast artifacts to render.

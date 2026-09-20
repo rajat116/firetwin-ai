@@ -34,6 +34,7 @@ def test_frontend_references_committed_explorer_assets() -> None:
     assert "windDirectionDelta" in globe_html
     assert "spreadRateMultiplier" in globe_html
     assert "runScenario" in globe_html
+    assert "scenarioLayerToggle" in globe_html
     assert "zoomIn" in globe_html
     assert "zoomOut" in globe_html
     assert "World_Imagery" in globe_js
@@ -43,6 +44,8 @@ def test_frontend_references_committed_explorer_assets() -> None:
     assert "/api/simulation/surrogate/" in globe_js
     assert "wind_speed_multiplier" in globe_js
     assert "base_spread_rate_multiplier" in globe_js
+    assert "include_probability_grid: true" in globe_js
+    assert "scenarioCanvasFromGrid" in globe_js
     assert "forecast_overlay_png" in globe_js
     assert "observed_overlay_png" in globe_js
     assert "wgs84_bbox" in globe_js

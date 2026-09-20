@@ -248,6 +248,7 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
         "windDirectionDelta",
         "spreadRateMultiplier",
         "runScenario",
+        "scenarioLayerToggle",
     ):
         if element_id not in globe_html:
             raise ValueError(f"Globe page is missing scenario UI hook: {element_id}")
@@ -255,6 +256,8 @@ def validate_explorer_bundle(bundle_dir: Path) -> dict[str, Any]:
         raise ValueError("Globe app must configure explicit satellite imagery")
     if "/api/simulation/surrogate/" not in globe_js or "/api/simulation/samples" not in globe_js:
         raise ValueError("Globe scenario controls must call the simulation API")
+    if "include_probability_grid: true" not in globe_js or "scenarioCanvasFromGrid" not in globe_js:
+        raise ValueError("Globe scenario controls must render returned probability grids")
     if "center_lon_lat" not in globe_js or "wgs84_bbox" not in globe_js:
         raise ValueError("Globe app must consume committed WGS84 fire locations")
     if "data/manifests/firms_next_day_explorer_manifest.json" not in globe_js:
