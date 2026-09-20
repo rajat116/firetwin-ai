@@ -1,6 +1,10 @@
 (function () {
   const assetRoot = window.location.pathname.includes("/frontend/") ? "../" : "./";
   const manifestUrl = assetUrl("data/manifests/firms_next_day_explorer_manifest.json");
+  const apiBase = (new URLSearchParams(window.location.search).get("api") || "").replace(
+    /\/$/,
+    ""
+  );
   const state = {
     manifest: null,
     viewer: null,
@@ -9,6 +13,9 @@
     forecastVisible: true,
     observedVisible: true,
     overlayOpacity: 0.78,
+    simulationSamples: [],
+    simulationApiAvailable: false,
+    scenarioRequestId: 0,
   };
 
   const els = {
@@ -25,6 +32,19 @@
     forecastLayerToggle: document.getElementById("forecastLayerToggle"),
     observedLayerToggle: document.getElementById("observedLayerToggle"),
     overlayOpacity: document.getElementById("overlayOpacity"),
+    scenarioStatus: document.getElementById("scenarioStatus"),
+    scenarioSample: document.getElementById("scenarioSample"),
+    scenarioPeak: document.getElementById("scenarioPeak"),
+    scenarioMean: document.getElementById("scenarioMean"),
+    scenarioFootprint: document.getElementById("scenarioFootprint"),
+    windSpeedMultiplier: document.getElementById("windSpeedMultiplier"),
+    windSpeedValue: document.getElementById("windSpeedValue"),
+    windDirectionDelta: document.getElementById("windDirectionDelta"),
+    windDirectionValue: document.getElementById("windDirectionValue"),
+    spreadRateMultiplier: document.getElementById("spreadRateMultiplier"),
+    spreadRateValue: document.getElementById("spreadRateValue"),
+    runScenario: document.getElementById("runScenario"),
+    resetScenario: document.getElementById("resetScenario"),
     flyHome: document.getElementById("flyHome"),
     openExplorer: document.getElementById("openExplorer"),
     error: document.getElementById("globeError"),
@@ -75,6 +95,18 @@
       throw new Error("Manifest has no cases");
     }
     return manifest;
+  }
+
+  async function loadSimulationSamples() {
+    const response = await fetch(`${apiBase}/api/simulation/samples`, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Simulation sample request failed: ${response.status}`);
+    }
+    const payload = await response.json();
+    if (!Array.isArray(payload.samples) || payload.samples.length === 0) {
+      throw new Error("Simulation API returned no samples");
+    }
+    return payload.samples;
   }
 
   function createSatelliteImageryProvider() {
@@ -221,7 +253,92 @@
     els.peakProbability.textContent = percent(caseData.sample_peak_probability, 1);
     els.improvement.textContent = signedDecimal(caseData.brier_improvement_vs_persistence);
     els.targetTime.textContent = dateLabel(caseData.target_time);
+    renderScenarioSample();
     renderCaseButtons();
+  }
+
+  function selectedSimulationSampleId() {
+    if (state.simulationSamples.length > 0) {
+      return state.simulationSamples[state.selectedIndex % state.simulationSamples.length].case_id;
+    }
+    return `phase5b_sim_${String(state.selectedIndex).padStart(4, "0")}`;
+  }
+
+  function renderScenarioSample() {
+    els.scenarioSample.textContent = selectedSimulationSampleId();
+    els.scenarioPeak.textContent = "--";
+    els.scenarioMean.textContent = "--";
+    els.scenarioFootprint.textContent = "--";
+  }
+
+  function scenarioControls() {
+    return {
+      wind_speed_multiplier: Number(els.windSpeedMultiplier.value),
+      wind_direction_delta_degrees: Number(els.windDirectionDelta.value),
+      base_spread_rate_multiplier: Number(els.spreadRateMultiplier.value),
+      include_probability_grid: false,
+      max_grid_size: 32,
+    };
+  }
+
+  function renderScenarioControlValues() {
+    els.windSpeedValue.textContent = `${Number(els.windSpeedMultiplier.value).toFixed(2)}x`;
+    els.windDirectionValue.textContent = `${Number(els.windDirectionDelta.value).toFixed(0)} deg`;
+    els.spreadRateValue.textContent = `${Number(els.spreadRateMultiplier.value).toFixed(2)}x`;
+  }
+
+  function setScenarioStatus(label, stateName) {
+    els.scenarioStatus.textContent = label;
+    els.scenarioStatus.dataset.state = stateName;
+  }
+
+  async function runScenarioInference() {
+    if (!state.simulationApiAvailable) {
+      setScenarioStatus("API offline", "offline");
+      return;
+    }
+    const requestId = (state.scenarioRequestId += 1);
+    const sampleId = selectedSimulationSampleId();
+    setScenarioStatus("Running", "running");
+    els.runScenario.disabled = true;
+    try {
+      const response = await fetch(
+        `${apiBase}/api/simulation/surrogate/${encodeURIComponent(sampleId)}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(scenarioControls()),
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`Simulation inference failed: ${response.status}`);
+      }
+      const payload = await response.json();
+      if (requestId !== state.scenarioRequestId) {
+        return;
+      }
+      const summary = payload.summary || {};
+      els.scenarioPeak.textContent = percent(summary.peak_probability || 0, 1);
+      els.scenarioMean.textContent = percent(summary.mean_probability || 0, 1);
+      els.scenarioFootprint.textContent = percent(summary.predicted_positive_fraction || 0, 1);
+      setScenarioStatus("Updated", "ready");
+    } catch (error) {
+      console.error(error);
+      setScenarioStatus("API error", "offline");
+    } finally {
+      if (requestId === state.scenarioRequestId) {
+        els.runScenario.disabled = false;
+      }
+    }
+  }
+
+  function resetScenarioControls() {
+    els.windSpeedMultiplier.value = "1";
+    els.windDirectionDelta.value = "0";
+    els.spreadRateMultiplier.value = "1";
+    renderScenarioControlValues();
+    renderScenarioSample();
+    void runScenarioInference();
   }
 
   function flyToAllCases() {
@@ -278,6 +395,7 @@
     if (fly) {
       flyToCase(caseData);
     }
+    void runScenarioInference();
   }
 
   function zoomCamera(direction) {
@@ -346,6 +464,16 @@
       state.overlayOpacity = Number(els.overlayOpacity.value);
       updateOverlayLayers();
     });
+    [
+      els.windSpeedMultiplier,
+      els.windDirectionDelta,
+      els.spreadRateMultiplier,
+    ].forEach((input) => {
+      input.addEventListener("input", renderScenarioControlValues);
+      input.addEventListener("change", () => void runScenarioInference());
+    });
+    els.runScenario.addEventListener("click", () => void runScenarioInference());
+    els.resetScenario.addEventListener("click", resetScenarioControls);
     els.flyHome.addEventListener("click", flyToAllCases);
     els.openExplorer.addEventListener("click", () => {
       window.location.href = "./index.html";
@@ -354,12 +482,24 @@
 
   async function init() {
     bindControls();
+    renderScenarioControlValues();
     try {
       state.manifest = await loadManifest();
       state.viewer = createViewer();
       addCaseEntities();
       renderSelectedCase();
       flyToAllCases();
+      try {
+        state.simulationSamples = await loadSimulationSamples();
+        state.simulationApiAvailable = true;
+        setScenarioStatus("API ready", "ready");
+        renderScenarioSample();
+        void runScenarioInference();
+      } catch (error) {
+        console.info(error);
+        state.simulationApiAvailable = false;
+        setScenarioStatus("API offline", "offline");
+      }
     } catch (error) {
       console.error(error);
       els.error.hidden = false;

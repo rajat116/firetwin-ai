@@ -25,6 +25,21 @@ When it is healthy, you should see the Earth surface, fire markers, subtle analy
 forecast/evidence overlays, layer toggles, opacity control, and the `+`, `-`, `3D`, and `N` map
 controls.
 
+For live scenario controls, run the API in a second terminal:
+
+```bash
+uvicorn firetwin.api.main:app --host 127.0.0.1 --port 8001
+```
+
+Then open:
+
+```text
+http://localhost:8000/frontend/globe.html?api=http://127.0.0.1:8001
+```
+
+The wind and spread controls call the experimental simulation-surrogate endpoint and update from the
+returned inference summary.
+
 The app loads `data/manifests/firms_next_day_explorer_manifest.json` and the committed preview PNGs
 under `reports/figures/`. It does not require the ignored local Zarr forecast artifacts to render.
 

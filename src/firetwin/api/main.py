@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from firetwin import __version__
 from firetwin.api.explorer import (
@@ -30,6 +31,7 @@ def create_app(
     manifest_path: Path = DEFAULT_MANIFEST_PATH,
     simulation_corpus_dir: Path = DEFAULT_SIMULATION_CORPUS_DIR,
     simulation_model_path: Path = DEFAULT_SIMULATION_MODEL_PATH,
+    cors_origins: list[str] | None = None,
 ) -> FastAPI:
     """Create the FireTwin API app."""
     app = FastAPI(
@@ -39,6 +41,17 @@ def create_app(
             "Research API for FireTwin forecast exploration. Current forecast responses are "
             "validated artifact-backed outputs for satellite-visible FIRMS active-fire evidence."
         ),
+    )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=cors_origins
+        or [
+            "http://127.0.0.1:8000",
+            "http://localhost:8000",
+        ],
+        allow_credentials=False,
+        allow_methods=["GET", "POST"],
+        allow_headers=["*"],
     )
 
     def manifest() -> dict[str, Any]:

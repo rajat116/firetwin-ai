@@ -46,6 +46,22 @@ def test_api_health_and_case_catalog() -> None:
     assert all("center_lon_lat" in case for case in body["cases"])
 
 
+def test_api_allows_local_explorer_cors() -> None:
+    """Local static Explorer should be able to call the development API."""
+    client = TestClient(create_app(MANIFEST_PATH))
+
+    response = client.options(
+        "/api/simulation/samples",
+        headers={
+            "Origin": "http://127.0.0.1:8000",
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://127.0.0.1:8000"
+
+
 def test_api_forecast_response_is_artifact_backed_and_guarded() -> None:
     """Forecast endpoint should return the validated artifact-backed forecast contract."""
     client = TestClient(create_app(MANIFEST_PATH))

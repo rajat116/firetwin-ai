@@ -51,6 +51,74 @@
           </dl>
         </article>
 
+        <section class="scenario-panel" aria-label="Simulation scenario controls">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Scenario</p>
+              <h2>Wind & Spread</h2>
+            </div>
+            <output id="scenarioStatus" class="status-pill">API pending</output>
+          </div>
+
+          <dl class="scenario-readout">
+            <div>
+              <dt>Sample</dt>
+              <dd id="scenarioSample">--</dd>
+            </div>
+            <div>
+              <dt>Peak</dt>
+              <dd id="scenarioPeak">--</dd>
+            </div>
+            <div>
+              <dt>Mean</dt>
+              <dd id="scenarioMean">--</dd>
+            </div>
+            <div>
+              <dt>Footprint</dt>
+              <dd id="scenarioFootprint">--</dd>
+            </div>
+          </dl>
+
+          <label class="scenario-control">
+            <span>Wind speed <output id="windSpeedValue">1.00x</output></span>
+            <input
+              id="windSpeedMultiplier"
+              type="range"
+              min="0.2"
+              max="3"
+              value="1"
+              step="0.05"
+            />
+          </label>
+          <label class="scenario-control">
+            <span>Wind turn <output id="windDirectionValue">0 deg</output></span>
+            <input
+              id="windDirectionDelta"
+              type="range"
+              min="-180"
+              max="180"
+              value="0"
+              step="5"
+            />
+          </label>
+          <label class="scenario-control">
+            <span>Spread rate <output id="spreadRateValue">1.00x</output></span>
+            <input
+              id="spreadRateMultiplier"
+              type="range"
+              min="0.2"
+              max="3"
+              value="1"
+              step="0.05"
+            />
+          </label>
+
+          <div class="scenario-actions">
+            <button id="runScenario" type="button">Run Scenario</button>
+            <button id="resetScenario" type="button">Reset</button>
+          </div>
+        </section>
+
         <section class="globe-layers" aria-label="Map layers">
           <label>
             <input id="forecastLayerToggle" type="checkbox" checked />

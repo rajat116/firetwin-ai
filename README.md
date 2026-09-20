@@ -75,8 +75,8 @@ and is not real wildfire truth. Larger local corpus profiles now exist for devel
 experiments without committing bulky generated samples. The larger development-corpus surrogate now
 beats persistence by Brier score as well (`0.06998` vs `0.18185`, `0.755` mean IoU), with a bounded
 development latency benchmark showing `116.78x` mean median speedup on 12 representative cases.
-An experimental backend scenario endpoint now recomputes surrogate probabilities for wind and spread
-controls, so future UI sliders can call real inference instead of changing decorative values.
+The globe Explorer can now call that endpoint from wind and spread controls when a local API base is
+provided, so scenario readouts come from real surrogate inference rather than decorative UI state.
 
 Build the larger local development corpus with:
 
@@ -249,6 +249,15 @@ arbitrary repository files.
 
 Open the globe-oriented public demo at
 [`http://127.0.0.1:8000/frontend/globe.html`](http://127.0.0.1:8000/frontend/globe.html).
+
+Run the live scenario API in another terminal:
+
+```bash
+uvicorn firetwin.api.main:app --host 127.0.0.1 --port 8001
+```
+
+Then open the globe with the API base parameter:
+[`http://127.0.0.1:8000/frontend/globe.html?api=http://127.0.0.1:8001`](http://127.0.0.1:8000/frontend/globe.html?api=http://127.0.0.1:8001).
 
 Build a deployable static Explorer bundle:
 

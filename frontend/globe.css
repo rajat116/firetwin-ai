@@ -224,6 +224,117 @@ dd {
   overflow-wrap: anywhere;
 }
 
+.scenario-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgb(12 15 14 / 82%);
+}
+
+.panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel-heading h2 {
+  font-size: 1rem;
+  line-height: 1.1;
+}
+
+.status-pill {
+  flex: 0 0 auto;
+  min-width: 82px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-align: center;
+  background: rgb(244 240 232 / 8%);
+}
+
+.status-pill[data-state="ready"] {
+  border-color: rgb(116 198 157 / 48%);
+  color: var(--good);
+}
+
+.status-pill[data-state="running"] {
+  border-color: rgb(242 193 78 / 58%);
+  color: var(--accent);
+}
+
+.status-pill[data-state="offline"] {
+  border-color: rgb(223 107 79 / 58%);
+  color: #f2a18e;
+}
+
+.scenario-readout {
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+}
+
+.scenario-readout div {
+  grid-template-columns: 1fr;
+  gap: 2px;
+  min-width: 0;
+}
+
+.scenario-control {
+  display: grid;
+  gap: 7px;
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 760;
+}
+
+.scenario-control span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.scenario-control output {
+  color: var(--accent);
+  font-size: 0.75rem;
+}
+
+.scenario-control input {
+  width: 100%;
+  accent-color: var(--accent-2);
+}
+
+.scenario-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.scenario-actions button {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  background: rgb(24 29 27 / 88%);
+}
+
+.scenario-actions button:hover,
+.scenario-actions button:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.scenario-actions button:disabled {
+  cursor: progress;
+  opacity: 0.68;
+}
+
 .globe-layers {
   display: grid;
   gap: 12px;
@@ -345,6 +456,8 @@ dd {
   }
 
   dl div,
+  .scenario-readout,
+  .scenario-actions,
   .layer-actions {
     grid-template-columns: 1fr;
   }

@@ -30,11 +30,19 @@ def test_frontend_references_committed_explorer_assets() -> None:
     assert "globeCaseList" in globe_html
     assert "forecastLayerToggle" in globe_html
     assert "overlayOpacity" in globe_html
+    assert "windSpeedMultiplier" in globe_html
+    assert "windDirectionDelta" in globe_html
+    assert "spreadRateMultiplier" in globe_html
+    assert "runScenario" in globe_html
     assert "zoomIn" in globe_html
     assert "zoomOut" in globe_html
     assert "World_Imagery" in globe_js
     assert "UrlTemplateImageryProvider" in globe_js
     assert "ImageMaterialProperty" in globe_js
+    assert "/api/simulation/samples" in globe_js
+    assert "/api/simulation/surrogate/" in globe_js
+    assert "wind_speed_multiplier" in globe_js
+    assert "base_spread_rate_multiplier" in globe_js
     assert "forecast_overlay_png" in globe_js
     assert "observed_overlay_png" in globe_js
     assert "wgs84_bbox" in globe_js
