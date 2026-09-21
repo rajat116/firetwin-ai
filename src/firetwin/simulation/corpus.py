@@ -189,7 +189,7 @@ def build_simulation_sample(
         relative_humidity_percent=scenario.relative_humidity_percent,
         base_spread_rate_m_h=scenario.base_spread_rate_m_h,
     )
-    return cast(dict[str, np.ndarray], artifact), summary
+    return artifact, summary
 
 
 def build_simulation_corpus(
