@@ -3,8 +3,8 @@
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import xarray as xr
-from tests.unit.test_firms_next_day_baselines import write_sample_artifact
 
 from firetwin.models.physics_prior import (
     PHYSICS_PRIOR_NAME,
@@ -13,6 +13,59 @@ from firetwin.models.physics_prior import (
     render_physics_prior_report,
     wind_aware_fuel_spread_prior,
 )
+
+
+def write_sample_artifact(path: Path) -> None:
+    """Write a tiny next-day FIRMS sample artifact for physics-prior tests."""
+    input_detection = np.zeros((2, 2, 2), dtype=np.float32)
+    input_detection[0, 0, 0] = 0.8
+    input_detection[1, 0, 1] = 0.6
+    cumulative = np.maximum.accumulate(input_detection, axis=0)
+
+    target_probability = np.zeros((2, 2, 2), dtype=np.float32)
+    target_probability[0, 0, 0] = 0.7
+    target_probability[1, 1, 1] = 0.9
+    target_mask = (target_probability > 0).astype(np.uint8)
+
+    ds = xr.Dataset(
+        data_vars={
+            "fuel_model": (["y", "x"], np.array([[101, 101], [0, 102]], dtype=np.int16)),
+            "fuel_load_kg_m2": (
+                ["y", "x"],
+                np.array([[0.3, 0.8], [0.0, 1.2]], dtype=np.float32),
+            ),
+            "fuel_moisture_percent": (
+                ["y", "x"],
+                np.array([[8.0, 6.0], [0.0, 5.0]], dtype=np.float32),
+            ),
+            "slope_degrees": (
+                ["y", "x"],
+                np.array([[5.0, 10.0], [0.0, 20.0]], dtype=np.float32),
+            ),
+            "weather_wind_speed_m_s": (["sample"], np.array([4.0, 8.0], dtype=np.float32)),
+            "weather_wind_direction_degrees": (
+                ["sample"],
+                np.array([270.0, 180.0], dtype=np.float32),
+            ),
+            "input_detection_probability": (["sample", "y", "x"], input_detection),
+            "input_cumulative_detection_probability": (["sample", "y", "x"], cumulative),
+            "target_detection_probability": (["sample", "y", "x"], target_probability),
+            "target_positive_observation_mask": (["sample", "y", "x"], target_mask),
+        },
+        coords={
+            "sample": [0, 1],
+            "reference_time": (["sample"], pd.to_datetime(["2014-01-01", "2014-01-02"])),
+            "target_time": (["sample"], pd.to_datetime(["2014-01-02", "2014-01-03"])),
+            "y": [0, 1],
+            "x": [0, 1],
+        },
+        attrs={
+            "case_id": "baseline_test",
+            "sample_type": "firms_next_day_active_fire_probability",
+            "excludes_final_extent_as_input": "true",
+        },
+    )
+    ds.to_zarr(path, mode="w")
 
 
 def test_wind_aware_fuel_spread_prior_is_aligned_and_bounded(tmp_path: Path) -> None:
