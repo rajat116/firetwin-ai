@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import xarray as xr
@@ -152,7 +152,7 @@ def feature_matrix_for_indices(ds: xr.Dataset, flat_indices: np.ndarray) -> np.n
 def target_for_indices(ds: xr.Dataset, flat_indices: np.ndarray) -> np.ndarray:
     """Return binary observed-label targets for flattened sample/y/x indices."""
     target = ds["target_positive_observation_mask"].values.astype(bool).ravel()
-    return target[flat_indices].astype(np.uint8)
+    return cast(np.ndarray, target[flat_indices].astype(np.uint8))
 
 
 def sample_training_indices(

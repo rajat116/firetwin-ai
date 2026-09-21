@@ -17,11 +17,14 @@ Update frequency: Fires added after containment and final perimeter mapping
 
 from datetime import datetime
 from pathlib import Path
+from typing import TypeAlias
 
 import geopandas as gpd
 import requests
 from pydantic import BaseModel, Field
 from shapely.geometry import shape
+
+RequestParams: TypeAlias = dict[str, str | int | float]
 
 
 class NIFCHistoricalPerimeter(BaseModel):
@@ -125,7 +128,7 @@ class NIFCHistoricalClient:
         if min_acres is not None:
             where_clauses.append(f"GIS_ACRES>={min_acres}")
 
-        params = {
+        params: RequestParams = {
             "where": " AND ".join(where_clauses),
             "outFields": (
                 "INCIDENT,GIS_ACRES,FIRE_YEAR_INT,DATE_CUR,UNQE_FIRE_ID,"
@@ -175,7 +178,7 @@ class NIFCHistoricalClient:
         if year:
             where_parts.append(f"FIRE_YEAR_INT={year}")
 
-        params = {
+        params: RequestParams = {
             "where": " AND ".join(where_parts),
             "outFields": (
                 "INCIDENT,GIS_ACRES,FIRE_YEAR_INT,DATE_CUR,UNQE_FIRE_ID,"

@@ -19,9 +19,15 @@ def test_frontend_references_committed_explorer_assets() -> None:
     assert "./app.js" in html
     assert "./styles.css" in html
     assert "firms_next_day_explorer_manifest.json" in app_js
+    assert "Run guided demo" in html
+    assert "Open 3D globe" in html
+    assert "Product Path" in html
+    assert "AI Wildfire Twin" in html
     assert "forecastFootprint" in html
     assert "brierImprovement" in html
     assert "persistenceBrier" in html
+    assert "guidedDemo" in app_js
+    assert "caseBrief" in app_js
     assert "sample_predicted_positive_fraction" in app_js
     assert "sample_target_positive_fraction" in app_js
     assert "brier_improvement_vs_persistence" in app_js
@@ -38,6 +44,7 @@ def test_frontend_references_committed_explorer_assets() -> None:
     assert "zoomIn" in globe_html
     assert "zoomOut" in globe_html
     assert "World_Imagery" in globe_js
+    assert "initialCaseId" in globe_js
     assert "UrlTemplateImageryProvider" in globe_js
     assert "ImageMaterialProperty" in globe_js
     assert "/api/simulation/samples" in globe_js

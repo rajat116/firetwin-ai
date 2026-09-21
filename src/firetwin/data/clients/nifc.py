@@ -16,11 +16,14 @@ Data is updated approximately every 5 minutes during active fire seasons.
 
 from datetime import datetime
 from pathlib import Path
+from typing import TypeAlias
 
 import geopandas as gpd
 import requests
 from pydantic import BaseModel, Field
 from shapely.geometry import shape
+
+RequestParams: TypeAlias = dict[str, str | int | float]
 
 
 class NIFCPerimeter(BaseModel):
@@ -110,7 +113,7 @@ class NIFCClient:
         where_clause = " AND ".join(where_conditions) if where_conditions else "1=1"
 
         # Build query parameters
-        params = {
+        params: RequestParams = {
             "where": where_clause,
             "outFields": (
                 "poly_IncidentName,attr_IncidentTypeCategory,poly_GISAcres,"
@@ -154,7 +157,7 @@ class NIFCClient:
         Returns:
             List of NIFCPerimeter objects matching the fire name
         """
-        params = {
+        params: RequestParams = {
             "where": f"poly_IncidentName LIKE '%{fire_name}%'",
             "outFields": (
                 "poly_IncidentName,attr_IncidentTypeCategory,poly_GISAcres,"

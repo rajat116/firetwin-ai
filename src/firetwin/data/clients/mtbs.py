@@ -17,11 +17,14 @@ Partnership between USGS EROS and USDA Forest Service GTAC.
 
 from datetime import datetime
 from pathlib import Path
+from typing import TypeAlias
 
 import geopandas as gpd
 import requests
 from pydantic import BaseModel, Field
 from shapely.geometry import shape
+
+RequestParams: TypeAlias = dict[str, str | int | float]
 
 
 class MTBSFire(BaseModel):
@@ -118,7 +121,7 @@ class MTBSClient:
         where_clause = " AND ".join(where_conditions)
 
         # Build query parameters (use lowercase field names)
-        params = {
+        params: RequestParams = {
             "where": where_clause,
             "outFields": "fire_id,fire_name,acres,ig_date,fire_type",
             "f": "geojson",
@@ -168,7 +171,7 @@ class MTBSClient:
         search_name = fire_name.upper().replace("'", "''")  # SQL escape
         where_clause = f"UPPER(fire_name) LIKE '%{search_name}%'"
 
-        params = {
+        params: RequestParams = {
             "where": where_clause,
             "outFields": "fire_id,fire_name,acres,ig_date,fire_type",
             "f": "geojson",

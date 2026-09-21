@@ -54,7 +54,7 @@ class SimulationSurrogateModel:
         """Predict burned probability for feature rows."""
         standardized = (features.astype(np.float32) - self.feature_mean) / self.feature_scale
         logits = np.clip(standardized @ self.weights + self.bias, -50.0, 50.0)
-        return (1.0 / (1.0 + np.exp(-logits))).astype(np.float32)
+        return cast(np.ndarray, (1.0 / (1.0 + np.exp(-logits))).astype(np.float32))
 
 
 @dataclass(frozen=True)
@@ -496,7 +496,7 @@ def _controlled_sample_arrays(
 
 
 def _initial_centroid(initial_burned: np.ndarray) -> tuple[float, float]:
-    positions = np.argwhere(initial_burned > 0)
+    positions = np.argwhere(initial_burned > 0).astype(np.float32)
     if positions.size == 0:
         return ((initial_burned.shape[0] - 1) / 2.0, (initial_burned.shape[1] - 1) / 2.0)
     return (float(np.mean(positions[:, 0])), float(np.mean(positions[:, 1])))
@@ -505,13 +505,14 @@ def _initial_centroid(initial_burned: np.ndarray) -> tuple[float, float]:
 def _distance_to_initial(
     initial_burned: np.ndarray, rows: np.ndarray, cols: np.ndarray
 ) -> np.ndarray:
-    positions = np.argwhere(initial_burned > 0)
-    if positions.size == 0:
-        centroid = np.asarray([_initial_centroid(initial_burned)], dtype=np.float32)
-        positions = centroid
+    burned_positions = np.argwhere(initial_burned > 0)
+    if burned_positions.size == 0:
+        positions = np.asarray([_initial_centroid(initial_burned)], dtype=np.float32)
+    else:
+        positions = burned_positions.astype(np.float32)
     row_delta = rows[:, None].astype(np.float32) - positions[None, :, 0].astype(np.float32)
     col_delta = cols[:, None].astype(np.float32) - positions[None, :, 1].astype(np.float32)
-    return np.sqrt(np.min(row_delta**2 + col_delta**2, axis=1)).astype(np.float32)
+    return cast(np.ndarray, np.sqrt(np.min(row_delta**2 + col_delta**2, axis=1)).astype(np.float32))
 
 
 def _resolution_from_sample(sample: Any) -> float:

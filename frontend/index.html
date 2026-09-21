@@ -11,10 +11,33 @@
       <aside class="case-rail" aria-label="Forecast cases">
         <div class="brand-block">
           <p class="eyebrow">FireTwin</p>
-          <h1>Forecast Explorer</h1>
-          <p class="status-pill">Active-fire evidence</p>
+          <h1>AI Wildfire Twin</h1>
+          <p class="brand-copy">
+            Explore real historical fires, see next-day active-fire predictions, and try
+            scenario controls in the 3D globe.
+          </p>
+          <div class="rail-actions">
+            <button id="guidedDemo" class="primary-action" type="button">Run guided demo</button>
+            <a
+              id="openGlobe"
+              class="secondary-action"
+              href="./globe.html"
+              aria-label="Open 3D what-if globe"
+            >
+              Open 3D globe
+            </a>
+          </div>
+          <p class="status-pill">Research prototype</p>
         </div>
         <nav id="caseList" class="case-list" aria-label="Available fires"></nav>
+        <section class="product-panel" aria-labelledby="productPathTitle">
+          <h2 id="productPathTitle">Product Path</h2>
+          <ol>
+            <li><strong>Forecast</strong><span>Next-day active-fire probability</span></li>
+            <li><strong>Experiment</strong><span>Wind and spread what-if controls</span></li>
+            <li><strong>Plan</strong><span>Assimilation, uncertainty and interventions next</span></li>
+          </ol>
+        </section>
         <section class="guardrail-panel" aria-labelledby="guardrailsTitle">
           <h2 id="guardrailsTitle">Guardrails</h2>
           <ul id="guardrailList"></ul>
@@ -24,8 +47,11 @@
       <section class="workspace" aria-live="polite">
         <header class="workspace-header">
           <div>
-            <p id="caseId" class="eyebrow">Loading manifest</p>
+            <p id="caseId" class="eyebrow">Loading demo</p>
             <h2 id="caseName">FireTwin Explorer</h2>
+            <p id="caseBrief" class="case-brief-copy">
+              Pick a fire to compare the AI forecast with later satellite evidence.
+            </p>
           </div>
           <div class="header-actions" aria-label="View controls">
             <button id="zoomOut" class="icon-button" type="button" title="Zoom out">&minus;</button>
@@ -40,7 +66,7 @@
             <strong id="peakProbability">--</strong>
           </div>
           <div class="metric">
-            <span>Display threshold</span>
+            <span>AI display threshold</span>
             <strong id="threshold">--</strong>
           </div>
           <div class="metric">
@@ -59,21 +85,21 @@
 
         <section class="insight-strip" aria-label="Forecast interpretation">
           <article class="insight-block">
-            <h3>Forecast Footprint</h3>
+            <h3>Prediction Area</h3>
             <p id="forecastFootprint">--</p>
             <div class="bar-track" aria-hidden="true">
               <span id="forecastFootprintBar"></span>
             </div>
           </article>
           <article class="insight-block">
-            <h3>Observed Evidence</h3>
+            <h3>Satellite Evidence</h3>
             <p id="observedEvidence">--</p>
             <div class="bar-track" aria-hidden="true">
               <span id="observedEvidenceBar"></span>
             </div>
           </article>
           <article class="insight-block">
-            <h3>Evidence Balance</h3>
+            <h3>What It Means</h3>
             <p id="evidenceBalance">--</p>
             <div class="bar-track" aria-hidden="true">
               <span id="evidenceBalanceBar"></span>
@@ -106,7 +132,7 @@
             </dl>
           </article>
           <article class="detail-block">
-            <h3>Observed-Label Diagnostics</h3>
+            <h3>How The AI Did</h3>
             <dl>
               <div>
                 <dt>Persistence Brier</dt>
@@ -127,7 +153,7 @@
             </dl>
           </article>
           <article class="detail-block">
-            <h3>Grid Provenance</h3>
+            <h3>Map Provenance</h3>
             <dl>
               <div>
                 <dt>Grid</dt>

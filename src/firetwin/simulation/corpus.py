@@ -189,7 +189,7 @@ def build_simulation_sample(
         relative_humidity_percent=scenario.relative_humidity_percent,
         base_spread_rate_m_h=scenario.base_spread_rate_m_h,
     )
-    return artifact, summary
+    return cast(dict[str, np.ndarray], artifact), summary
 
 
 def build_simulation_corpus(
@@ -208,7 +208,7 @@ def build_simulation_corpus(
     for index in range(config.case_count):
         scenario = sample_simulation_scenario(index, seed=config.seed)
         artifact, summary = build_simulation_sample(scenario, config=config)
-        np.savez_compressed(output_dir / summary.artifact, **artifact)
+        np.savez_compressed(output_dir / summary.artifact, **cast(Any, artifact))
         samples.append(summary)
 
     manifest = _manifest(config=config, samples=samples)

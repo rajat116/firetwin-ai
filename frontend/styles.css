@@ -52,6 +52,25 @@ button {
   gap: 8px;
 }
 
+.brand-copy,
+.case-brief-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.brand-copy {
+  max-width: 34ch;
+  font-size: 0.95rem;
+}
+
+.case-brief-copy {
+  max-width: 72ch;
+  padding-top: 8px;
+  font-size: 0.92rem;
+}
+
 .eyebrow {
   margin: 0;
   color: var(--accent);
@@ -93,6 +112,47 @@ h3 {
   font-size: 0.8rem;
   font-weight: 750;
   background: rgb(242 193 78 / 9%);
+}
+
+.rail-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  padding-top: 8px;
+}
+
+.primary-action,
+.secondary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.primary-action {
+  border: 1px solid rgb(242 193 78 / 70%);
+  color: #171410;
+  cursor: pointer;
+  background: var(--accent);
+}
+
+.secondary-action {
+  border: 1px solid var(--line);
+  color: var(--text);
+  background: rgb(32 39 34 / 78%);
+}
+
+.primary-action:hover,
+.primary-action:focus-visible,
+.secondary-action:hover,
+.secondary-action:focus-visible {
+  outline: 2px solid rgb(242 193 78 / 50%);
+  outline-offset: 2px;
 }
 
 .case-list {
@@ -156,8 +216,45 @@ h3 {
   border-top: 1px solid var(--line);
 }
 
+.product-panel,
+.guardrail-panel {
+  min-width: 0;
+}
+
+.product-panel {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgb(32 39 34 / 70%);
+}
+
+.product-panel h2,
 .guardrail-panel h2 {
   font-size: 0.95rem;
+}
+
+.product-panel ol {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-panel li {
+  display: grid;
+  gap: 3px;
+}
+
+.product-panel strong {
+  color: var(--accent);
+  font-size: 0.84rem;
+}
+
+.product-panel span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
 }
 
 .guardrail-panel ul {

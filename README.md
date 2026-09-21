@@ -410,9 +410,11 @@ FireTwin is designed to answer measurable questions:
 - [FIRMS Next-Day Forecast Calibration Report](reports/firms_next_day_forecast_calibration.md)
 - [FIRMS Next-Day Explorer Asset Report](reports/firms_next_day_explorer_assets.md)
 - [FIRMS Next-Day Explorer Manifest](data/manifests/firms_next_day_explorer_manifest.json)
+- [Phase 5B Exit Report](reports/phase5b_exit_report.md)
 - [Product Specification](docs/PRODUCT_SPEC.md)
 - [UI/UX Specification](docs/UI_UX_SPEC.md)
 - [Demo Script](docs/DEMO_SCRIPT.md)
+- [Local Demo Runbook](docs/LOCAL_DEMO_RUNBOOK.md)
 
 ## Contributing
 

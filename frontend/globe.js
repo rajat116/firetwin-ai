@@ -5,6 +5,7 @@
     /\/$/,
     ""
   );
+  const initialCaseId = new URLSearchParams(window.location.search).get("case") || "";
   const state = {
     manifest: null,
     viewer: null,
@@ -575,6 +576,12 @@
     renderScenarioControlValues();
     try {
       state.manifest = await loadManifest();
+      const initialIndex = state.manifest.cases.findIndex((caseData) => {
+        return caseData.case_id === initialCaseId;
+      });
+      if (initialIndex >= 0) {
+        state.selectedIndex = initialIndex;
+      }
       state.viewer = createViewer();
       addCaseEntities();
       renderSelectedCase();

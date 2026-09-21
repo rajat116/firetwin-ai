@@ -16,6 +16,7 @@ Data available as GeoTIFF files via The National Map API.
 import re
 from datetime import date
 from pathlib import Path
+from typing import TypeAlias
 
 import numpy as np
 import requests
@@ -24,6 +25,8 @@ from rasterio.transform import from_bounds
 from rasterio.vrt import WarpedVRT
 
 from firetwin.schemas.core import TerrainData
+
+RequestParams: TypeAlias = dict[str, str | int | float]
 
 
 class USGS3DEPClient:
@@ -64,7 +67,7 @@ class USGS3DEPClient:
         """
         min_lon, min_lat, max_lon, max_lat = bbox
 
-        params = {
+        params: RequestParams = {
             "bbox": f"{min_lon},{min_lat},{max_lon},{max_lat}",
             "datasets": dataset,
             "prodFormats": product_format,

@@ -685,6 +685,9 @@ controls can produce real recomputed outputs rather than decorative UI changes.
   endpoints.
 - [x] Added API tests proving scenario controls run real surrogate inference and reject invalid
   control bounds.
+- [x] Wired globe Explorer wind-speed, wind-direction and spread-rate controls to the simulation
+  surrogate API when a local API base is provided.
+- [x] Rendered returned scenario probability grids as an experimental globe overlay.
 
 ### Result-Wise Simulation Corpus Smoke Artifact
 
@@ -776,8 +779,9 @@ simulator path spends most of its time in binary morphology for larger spread ke
 - Response contract: forecast mode, model/corpus provenance, controls, horizon-level probability
   summaries, optional downsampled probability grids and explicit guardrails.
 
-Interpretation: FireTwin now has a real backend contract for scenario controls. The frontend still
-needs to be wired to these endpoints, but the API is no longer placeholder behavior.
+Interpretation: FireTwin now has a real backend contract for scenario controls, and the globe
+Explorer can call it to render recomputed surrogate probability overlays. This remains
+simulator-trained experimental inference, not observed wildfire truth.
 
 ### Remaining Phase 5B Work
 
@@ -787,7 +791,10 @@ needs to be wired to these endpoints, but the API is no longer placeholder behav
 - [x] Add larger configurable corpus generation after the smoke contract is stable.
 - [x] Train and evaluate the surrogate on the larger development corpus.
 - [x] Add the first real backend/surrogate inference contract for scenario controls.
-- [ ] Connect frontend scenario controls to the backend inference API.
+- [x] Connect frontend scenario controls to the backend inference API.
+- [x] Add a short runbook for starting the static Explorer and FastAPI service together.
+- [x] Write Phase 5B exit report with results, guardrails and Phase 6 handoff.
+- [ ] Optionally build/train/report the heavier showcase corpus before a polished public demo.
 
 ## Future Phases
 
@@ -812,7 +819,7 @@ Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
 Phase 5A: ████████████████████ 100% ✅
-Phase 5B: ███████████████░░░░░  75% 🚧
+Phase 5B: █████████████████░░░  85% 🚧
 ...
 Overall: █████████████████░░░  80%
 ```
@@ -831,9 +838,10 @@ Overall: █████████████████░░░  80%
 ## Blockers
 
 No credential blocker remains. Phase 5A plus the first local Explorer are complete. Phase 5B has
-started with deterministic simulation-corpus profiles, smoke and development surrogate baselines,
-latency benchmarks and a real experimental backend inference contract. The next major unfinished
-task is wiring frontend scenario controls to this API.
+deterministic simulation-corpus profiles, smoke and development surrogate baselines, latency
+benchmarks, a real experimental backend inference contract and globe scenario-control wiring. The
+next unfinished tasks are packaging a concise local-demo runbook, keeping docs synchronized and
+optionally building the heavier showcase corpus for a more polished public demo.
 
 ## Notes
 

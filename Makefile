@@ -1,4 +1,4 @@
-.PHONY: help install test lint format clean doctor explorer explorer-build
+.PHONY: help install test lint format clean doctor api explorer explorer-build
 
 help:
 	@echo "FireTwin Development Commands"
@@ -9,6 +9,7 @@ help:
 	@echo "make format     - Format code with ruff"
 	@echo "make clean      - Remove build artifacts and caches"
 	@echo "make doctor     - Run system diagnostics"
+	@echo "make api        - Serve the local FireTwin API"
 	@echo "make explorer   - Serve the local FireTwin Explorer preview"
 	@echo "make explorer-build - Build deployable static Explorer bundle"
 	@echo "make pre-commit - Install pre-commit hooks"
@@ -45,6 +46,9 @@ clean:
 
 doctor:
 	firetwin doctor
+
+api:
+	python -m uvicorn firetwin.api.main:app --host 127.0.0.1 --port 8001
 
 explorer:
 	python scripts/serve_explorer.py --host 127.0.0.1 --port 8000

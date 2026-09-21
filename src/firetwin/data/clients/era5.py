@@ -18,6 +18,7 @@ Requires:
 
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
+from typing import Any, cast
 
 import numpy as np
 import xarray as xr
@@ -260,10 +261,10 @@ class ERA5LandClient:
         weather_timestamp = timestamp
         if timestamp is not None and "time" in ds.coords:
             selected = ds.sel(time=np.datetime64(timestamp), method="nearest")
-            time_value = selected.coords["time"].values
+            time_value = cast(Any, selected.coords["time"].values)
             weather_timestamp = np.datetime64(time_value).astype("datetime64[s]").astype(datetime)
         elif "time" in ds.coords:
-            time_value = ds.coords["time"].values[0]
+            time_value = cast(Any, ds.coords["time"].values[0])
             weather_timestamp = np.datetime64(time_value).astype("datetime64[s]").astype(datetime)
 
         if weather_timestamp is None:

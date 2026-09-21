@@ -293,7 +293,10 @@ def generate_synthetic_fire_case(
     if ignition_center:
         ig_point = (h // 2, w // 2)
     else:
-        ig_point = (rng.integers(h // 4, 3 * h // 4), rng.integers(w // 4, 3 * w // 4))
+        ig_point = (
+            int(rng.integers(h // 4, 3 * h // 4)),
+            int(rng.integers(w // 4, 3 * w // 4)),
+        )
 
     # Generate evolution
     states = generate_fire_evolution(

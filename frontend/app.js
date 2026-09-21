@@ -5,13 +5,17 @@
     manifest: null,
     selectedIndex: 0,
     zoom: 1,
+    guidedTimer: null,
   };
 
   const els = {
     caseList: document.getElementById("caseList"),
     guardrailList: document.getElementById("guardrailList"),
+    guidedDemo: document.getElementById("guidedDemo"),
+    openGlobe: document.getElementById("openGlobe"),
     caseId: document.getElementById("caseId"),
     caseName: document.getElementById("caseName"),
+    caseBrief: document.getElementById("caseBrief"),
     peakProbability: document.getElementById("peakProbability"),
     threshold: document.getElementById("threshold"),
     brier: document.getElementById("brier"),
@@ -98,6 +102,12 @@
     return `${ratio.toFixed(1)}x forecast-to-observed footprint balance.`;
   }
 
+  function caseBrief(caseData) {
+    const peak = percent(caseData.sample_peak_probability, 0);
+    const improvement = signedDecimal(caseData.brier_improvement_vs_persistence, 5);
+    return `${caseData.case_name} is a prepared public demo case. The model highlights where next-day satellite active-fire evidence was most likely, with ${peak} peak probability and ${improvement} Brier improvement over persistence.`;
+  }
+
   function renderCaseButtons() {
     els.caseList.replaceChildren();
     state.manifest.cases.forEach((caseData, index) => {
@@ -138,6 +148,7 @@
     document.title = `FireTwin Explorer - ${caseData.case_name}`;
     els.caseId.textContent = caseData.case_id;
     els.caseName.textContent = caseData.case_name;
+    els.caseBrief.textContent = caseBrief(caseData);
     els.peakProbability.textContent = percent(caseData.sample_peak_probability);
     els.threshold.textContent = decimal(caseData.recommended_threshold, 3);
     els.brier.textContent = decimal(caseData.observed_brier_score, 5);
@@ -176,6 +187,7 @@
     els.resolution.textContent = caseData.resolution_m
       ? `${caseData.resolution_m.toFixed(0)} m`
       : "unknown";
+    els.openGlobe.href = `./globe.html?case=${encodeURIComponent(caseData.case_id)}`;
   }
 
   function render() {
@@ -196,6 +208,26 @@
   }
 
   function bindControls() {
+    els.guidedDemo.addEventListener("click", () => {
+      if (!state.manifest) {
+        return;
+      }
+      if (state.guidedTimer) {
+        clearInterval(state.guidedTimer);
+        state.guidedTimer = null;
+        els.guidedDemo.textContent = "Run guided demo";
+        return;
+      }
+      state.selectedIndex = 0;
+      setZoom(1);
+      render();
+      els.guidedDemo.textContent = "Stop guided demo";
+      state.guidedTimer = setInterval(() => {
+        state.selectedIndex = (state.selectedIndex + 1) % state.manifest.cases.length;
+        setZoom(1);
+        render();
+      }, 3600);
+    });
     els.zoomOut.addEventListener("click", () => setZoom(state.zoom - 0.15));
     els.zoomIn.addEventListener("click", () => setZoom(state.zoom + 0.15));
     els.resetZoom.addEventListener("click", () => setZoom(1));
