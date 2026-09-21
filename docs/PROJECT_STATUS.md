@@ -810,10 +810,12 @@ target semantics and no-leakage guardrails.
 - [x] Added first hybrid blend contract under `firetwin.models.hybrid`.
 - [x] Added tests for bounded hybrid probabilities, validation-weight selection and report
   guardrails.
+- [x] Added `phase6_wind_aware_fuel_spread_prior_v1` physics-prior contract aligned to FIRMS
+  next-day `sample/y/x` artifacts.
+- [x] Added `scripts/build_phase6_physics_priors.py` for local prior artifact/report generation.
 
 ### Remaining Phase 6 Work
 
-- [ ] Generate physics-prior fields aligned to FIRMS next-day sample artifacts.
 - [ ] Evaluate leave-one-fire-out hybrid blending on the three pilot fires.
 - [ ] Package hybrid forecast artifacts alongside Phase 5A learned forecasts.
 - [ ] Export hybrid Explorer preview and globe overlays.

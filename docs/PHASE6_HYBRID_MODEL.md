@@ -47,11 +47,38 @@ architecture.
 
 ## Next Implementation Tasks
 
-1. Generate physics-prior fields aligned to FIRMS next-day sample artifacts.
+1. Generate physics-prior fields aligned to FIRMS next-day sample artifacts. ✅
 2. Evaluate leave-one-fire-out hybrid blending on the three pilot fires.
 3. Package hybrid forecast artifacts alongside Phase 5A learned forecasts.
 4. Export hybrid Explorer preview and globe overlays.
 5. Add API/frontend model selection between observed-label ML and hybrid forecasts.
+
+## Physics-Prior Contract
+
+The first Phase 6 physics prior is `phase6_wind_aware_fuel_spread_prior_v1`. It generates a
+`sample/y/x` probability tensor aligned to each Phase 5A FIRMS next-day sample artifact.
+
+Inputs:
+
+- Same-day FIRMS detection probability.
+- Cumulative FIRMS detection history.
+- Static fuel/terrain susceptibility.
+- Reference-time wind speed and wind direction when available.
+
+Outputs:
+
+- `physics_prior_probability`
+- `physics_prior_positive_mask`
+- copied target arrays for diagnostics only
+
+The builder script is:
+
+```bash
+python3 scripts/build_phase6_physics_priors.py
+```
+
+It writes ignored local artifacts under `data/forecasts/phase6_physics_priors/` and a report at
+`reports/phase6_physics_priors.md`.
 
 ## Guardrails
 

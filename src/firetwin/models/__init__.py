@@ -22,6 +22,14 @@ from firetwin.models.hybrid import (
     hybrid_blend_probability,
     render_hybrid_blend_report,
 )
+from firetwin.models.physics_prior import (
+    PHYSICS_PRIOR_NAME,
+    PhysicsPriorArtifactSummary,
+    build_physics_prior_artifacts,
+    build_physics_prior_dataset,
+    render_physics_prior_report,
+    wind_aware_fuel_spread_prior,
+)
 from firetwin.models.surrogate import (
     SIMULATION_SURROGATE_MODEL_NAME,
     SimulationLatencyBenchmarkRow,
@@ -65,6 +73,12 @@ __all__ = [
     "fit_hybrid_blend_model",
     "evaluate_hybrid_blend",
     "render_hybrid_blend_report",
+    "PHYSICS_PRIOR_NAME",
+    "PhysicsPriorArtifactSummary",
+    "wind_aware_fuel_spread_prior",
+    "build_physics_prior_dataset",
+    "build_physics_prior_artifacts",
+    "render_physics_prior_report",
     "SIMULATION_SURROGATE_MODEL_NAME",
     "SimulationLatencyBenchmarkRow",
     "SimulationLatencyBenchmarkSummary",

@@ -412,6 +412,7 @@ FireTwin is designed to answer measurable questions:
 - [FIRMS Next-Day Explorer Manifest](data/manifests/firms_next_day_explorer_manifest.json)
 - [Phase 5B Exit Report](reports/phase5b_exit_report.md)
 - [Phase 6 Hybrid Model Plan](docs/PHASE6_HYBRID_MODEL.md)
+- Phase 6 physics priors: `python3 scripts/build_phase6_physics_priors.py`
 - [Product Specification](docs/PRODUCT_SPEC.md)
 - [UI/UX Specification](docs/UI_UX_SPEC.md)
 - [Demo Script](docs/DEMO_SCRIPT.md)
