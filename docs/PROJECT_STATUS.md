@@ -1,7 +1,7 @@
 # FireTwin Project Status
 
-**Last Updated**: 2026-09-20
-**Current Phase**: Phase 5B 🚧 - Experimental Scenario Inference API
+**Last Updated**: 2026-09-21
+**Current Phase**: Phase 6 🚧 - Hybrid Model
 
 ## Phase 0: Repository and Engineering Foundation ✅
 
@@ -639,9 +639,9 @@ python3 scripts/smoke_explorer_bundle.py --bundle-dir dist/explorer
 - [x] A local Explorer UI can render the committed manifest and figures.
 - [x] Guardrails distinguish FIRMS active-fire evidence from exact perimeter spread.
 
-## Phase 5B: Simulation Corpus and Surrogate 🚧
+## Phase 5B: Simulation Corpus and Surrogate ✅
 
-**Status**: STARTED (2026-09-16)
+**Status**: COMPLETED (2026-09-21)
 
 **Purpose**: Build simulator-derived training data and a learned surrogate so future what-if
 controls can produce real recomputed outputs rather than decorative UI changes.
@@ -783,7 +783,7 @@ Interpretation: FireTwin now has a real backend contract for scenario controls, 
 Explorer can call it to render recomputed surrogate probability overlays. This remains
 simulator-trained experimental inference, not observed wildfire truth.
 
-### Remaining Phase 5B Work
+### Completed Phase 5B Work
 
 - [x] Train a first lightweight surrogate on the simulation corpus.
 - [x] Evaluate surrogate accuracy against initial-state persistence on held-out simulations.
@@ -794,6 +794,9 @@ simulator-trained experimental inference, not observed wildfire truth.
 - [x] Connect frontend scenario controls to the backend inference API.
 - [x] Add a short runbook for starting the static Explorer and FastAPI service together.
 - [x] Write Phase 5B exit report with results, guardrails and Phase 6 handoff.
+
+### Optional Showcase Work
+
 - [ ] Optionally build/train/report the heavier showcase corpus before a polished public demo.
 
 ## Phase 6: Hybrid Model 🚧
@@ -844,10 +847,10 @@ Phase 4C: ████████████████████ 100% ✅
 Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
 Phase 5A: ████████████████████ 100% ✅
-Phase 5B: █████████████████░░░  85% 🚧
-Phase 6: ██░░░░░░░░░░░░░░░░░░  10% 🚧
+Phase 5B: ████████████████████ 100% ✅
+Phase 6: ████░░░░░░░░░░░░░░░░  20% 🚧
 ...
-Overall: █████████████████░░░  80%
+Overall: ██████████████████░░  82%
 ```
 
 ## Known Issues
@@ -863,11 +866,12 @@ Overall: █████████████████░░░  80%
 
 ## Blockers
 
-No credential blocker remains. Phase 5A plus the first local Explorer are complete. Phase 5B has
+No credential blocker remains. Phase 5A plus the first local Explorer are complete. Phase 5B is
+complete with
 deterministic simulation-corpus profiles, smoke and development surrogate baselines, latency
 benchmarks, a real experimental backend inference contract and globe scenario-control wiring. The
-next unfinished tasks are packaging a concise local-demo runbook, keeping docs synchronized and
-optionally building the heavier showcase corpus for a more polished public demo.
+next unfinished tasks are Phase 6 leave-one-fire-out hybrid evaluation, hybrid forecast artifacts,
+Explorer overlays and model selection for the public-facing product path.
 
 ## Notes
 

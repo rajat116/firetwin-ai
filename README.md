@@ -32,7 +32,7 @@ This project answers **measurable research questions** about hybrid physics-ML f
 
 ## Project Status
 
-**Current Phase**: Phase 5B In Progress - Experimental Scenario Inference API
+**Current Phase**: Phase 6 In Progress - Hybrid Model
 
 - ✅ **Phase 0**: Repository and engineering foundation
 - ✅ **Phase 1**: Synthetic data pipeline, baseline models, evaluation metrics
@@ -44,7 +44,8 @@ This project answers **measurable research questions** about hybrid physics-ML f
 - ✅ **Phase 4D**: Final-extent baseline diagnostics and forecast-label guardrails
 - ✅ **Phase 4E**: FIRMS-backed progression labels, initial-state artifacts and validation overlays
 - ✅ **Phase 5A**: Leakage-safe next-day FIRMS active-fire samples, baselines, learned forecasts, calibration and Explorer assets
-- 🚧 **Phase 5B**: Deterministic synthetic simulation corpus profiles, trained surrogate baselines, latency benchmarks and experimental scenario API
+- ✅ **Phase 5B**: Deterministic synthetic simulation corpus profiles, trained surrogate baselines, latency benchmarks and experimental scenario API
+- 🚧 **Phase 6**: Hybrid blend contract and aligned physics-prior artifacts for next-day FIRMS forecasts
 
 Current pilot cases contain real NIFC/MTBS-derived final perimeter masks, real USGS 3DEP
 terrain-derived elevation/slope/aspect, real LANDFIRE LF2022 FBFM40 fuel-model classes, and real
@@ -65,7 +66,7 @@ exact burned-perimeter spread.
 Leave-one-fire-out forecast artifacts, reliability diagnostics and Explorer-ready preview assets now
 exist for future UI layers under ignored local forecast storage plus committed reports, figures and
 a lightweight manifest.
-Phase 5B has started with a reproducible synthetic simulation-corpus generator that writes
+Phase 5B completed a reproducible synthetic simulation-corpus generator that writes
 surrogate-ready NPZ samples and a guarded manifest. A first lightweight logistic surrogate now trains
 against that corpus and beats initial-state persistence on leave-one-simulation-out smoke evaluation
 (`0.11628` mean Brier vs `0.20062` persistence, `0.678` mean IoU). Smoke latency benchmarking shows
@@ -77,6 +78,8 @@ beats persistence by Brier score as well (`0.06998` vs `0.18185`, `0.755` mean I
 development latency benchmark showing `116.78x` mean median speedup on 12 representative cases.
 The globe Explorer can now call that endpoint from wind and spread controls when a local API base is
 provided, so scenario readouts come from real surrogate inference rather than decorative UI state.
+Phase 6 has started with a tested hybrid blend contract and wind-aware physics-prior artifacts aligned
+to the existing next-day FIRMS sample tensors.
 
 Build the larger local development corpus with:
 
@@ -384,8 +387,8 @@ FireTwin is designed to answer measurable questions:
 - [x] **Phase 4D**: Final-extent baseline diagnostics and guardrails
 - [x] **Phase 4E**: FIRMS-backed progression labels and initial-state artifacts
 - [x] **Phase 5A**: Next-day FIRMS active-fire sample artifacts, baselines, learned forecasts, calibration and Explorer assets
-- [ ] **Phase 5B**: Simulation corpus profiles, surrogate baselines, latency benchmarks and scenario API (in progress)
-- [ ] **Phase 6**: Hybrid model
+- [x] **Phase 5B**: Simulation corpus profiles, surrogate baselines, latency benchmarks and scenario API
+- [ ] **Phase 6**: Hybrid model (in progress)
 - [ ] **Phase 7**: Assimilation and calibrated uncertainty
 - [ ] **Phase 8**: Simulated intervention planner
 - [ ] **Phase 9**: Production application
