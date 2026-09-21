@@ -13,6 +13,15 @@ from firetwin.models.firms_next_day import (
     render_learned_model_report,
     train_observed_label_logistic_model,
 )
+from firetwin.models.hybrid import (
+    HYBRID_MODEL_NAME,
+    HybridBlendEvaluation,
+    HybridBlendModel,
+    evaluate_hybrid_blend,
+    fit_hybrid_blend_model,
+    hybrid_blend_probability,
+    render_hybrid_blend_report,
+)
 from firetwin.models.surrogate import (
     SIMULATION_SURROGATE_MODEL_NAME,
     SimulationLatencyBenchmarkRow,
@@ -49,6 +58,13 @@ __all__ = [
     "build_firms_next_day_forecast_dataset",
     "build_leave_one_fire_out_forecast_artifacts",
     "render_forecast_artifact_report",
+    "HYBRID_MODEL_NAME",
+    "HybridBlendModel",
+    "HybridBlendEvaluation",
+    "hybrid_blend_probability",
+    "fit_hybrid_blend_model",
+    "evaluate_hybrid_blend",
+    "render_hybrid_blend_report",
     "SIMULATION_SURROGATE_MODEL_NAME",
     "SimulationLatencyBenchmarkRow",
     "SimulationLatencyBenchmarkSummary",

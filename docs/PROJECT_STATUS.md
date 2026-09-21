@@ -796,6 +796,29 @@ simulator-trained experimental inference, not observed wildfire truth.
 - [x] Write Phase 5B exit report with results, guardrails and Phase 6 handoff.
 - [ ] Optionally build/train/report the heavier showcase corpus before a polished public demo.
 
+## Phase 6: Hybrid Model 🚧
+
+**Status**: STARTED (2026-09-21)
+
+**Purpose**: Combine observed-label FIRMS learning with physics/simulator priors while preserving
+target semantics and no-leakage guardrails.
+
+### Completed Tasks
+
+- [x] Added `docs/PHASE6_HYBRID_MODEL.md` with Phase 6 definition, entry contract and acceptance
+  criteria.
+- [x] Added first hybrid blend contract under `firetwin.models.hybrid`.
+- [x] Added tests for bounded hybrid probabilities, validation-weight selection and report
+  guardrails.
+
+### Remaining Phase 6 Work
+
+- [ ] Generate physics-prior fields aligned to FIRMS next-day sample artifacts.
+- [ ] Evaluate leave-one-fire-out hybrid blending on the three pilot fires.
+- [ ] Package hybrid forecast artifacts alongside Phase 5A learned forecasts.
+- [ ] Export hybrid Explorer preview and globe overlays.
+- [ ] Add API/frontend model selection between observed-label ML and hybrid forecasts.
+
 ## Future Phases
 
 - **Phase 5A**: Next-day FIRMS active-fire samples, baselines, learned model and Explorer assets
@@ -820,6 +843,7 @@ Phase 4D: ████████████████████ 100% ✅
 Phase 4E: ████████████████████ 100% ✅
 Phase 5A: ████████████████████ 100% ✅
 Phase 5B: █████████████████░░░  85% 🚧
+Phase 6: ██░░░░░░░░░░░░░░░░░░  10% 🚧
 ...
 Overall: █████████████████░░░  80%
 ```
